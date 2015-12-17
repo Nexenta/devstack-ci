@@ -1,1 +1,1 @@
-# cinder-plugin-qa
+# cinder-plugin
