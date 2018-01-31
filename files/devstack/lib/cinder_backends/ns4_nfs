@@ -11,12 +11,12 @@ function configure_cinder_backend_ns4_nfs {
 	declare prefix=volumes
 	declare item
 	declare -A opt
-	
+
 	opt[volume_backend_name]=backend
 	opt[volume_driver]=NEXENTA_DRIVER
 	opt[nas_mount_options]=NEXENTA_OPTIONS
 	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
-	
+
 	for item in "${!opt[@]}"; do
 		declare -n var="${opt[$item]}"
 
