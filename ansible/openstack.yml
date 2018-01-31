@@ -1,0 +1,234 @@
+---
+- name: OpenStack Continuous Integration
+  hosts: local
+  vars_files:
+    - global.yml
+  tasks:
+    - name: Set required parameters
+      set_fact: {"{{ item }}":"{{ lookup('env', item) }}"}
+      when: hostvars['localhost'][item] is undefined
+      with_items: "{{ required }}"
+
+    - name: Check required parameters
+      fail: msg="Required parameter {{ item }} is not defined"
+      when: hostvars['localhost'][item] == ""
+      with_items: "{{ required }}"
+
+    - name: Set current workspace via Jenkins environment
+      set_fact:
+        workspace: "{{ lookup('env', 'WORKSPACE') }}"
+      when: workspace is undefined
+
+    - name: Set current workspace via shell environment
+      set_fact:
+        workspace: "{{ lookup('env', 'PWD') }}"
+      when: workspace == ""
+
+    - name: Validate backend parameter
+      fail: msg="Invalid backend parameter value - {{ backend }}"
+      when: backend not in backends
+
+    - name: Validate branch parameter
+      fail: msg="Invalid branch parameter value - {{ branch }}"
+      when: (branch not in branches14) and (branch not in branches16)
+
+    - name: Set OS version to Ubuntu Trusty Tahr 14.04
+      set_fact:
+        osversion: "ubuntu14"
+      when: branch in branches14
+
+    - name: Set OS version to Ubuntu Xenial Xerus 16.04
+      set_fact:
+        osversion: "ubuntu16"
+      when: branch in branches16
+
+    - name: Create unique pseudo-random BIOS UUID
+      bios_uuid:
+        project: "{{ config.ci.project }}"
+        branch: "{{ branch }}"
+        backend: "{{ backend }}"
+        ostype: "{{ config.ci.ostype }}"
+        osversion: "{{ osversion }}"
+      register: bios
+
+    - name: Set global parameters
+      set_fact:
+        matrix:
+          ci:
+            branch: "{{ branch }}"
+            backend: "{{ backend }}"
+            osversion: "{{ osversion }}"
+          vm:
+            uuid: "{{ bios.uuid }}"
+            hostname: "{{ config.ci.project }}-{{ branch }}-{{ backend }}"
+            name: "{{ config.ci.project }}-{{ branch }}-{{ backend }}-{{ bios.uuid }}"
+
+    - name: Combine global parameters
+      set_fact:
+        config: "{{ config | combine(matrix, recursive=True) }}"
+
+    - name: Set backend parameters
+      set_fact:
+        matrix:
+          backend: "{{ item.value }}"
+      when: item.key == config.ci.backend
+      with_dict: "{{ config }}"
+
+    - name: Combine backend parameters
+      set_fact:
+        config: "{{ config | combine(matrix, recursive=True) }}"
+
+    - name: Print CI configuration
+      debug:
+        msg: "{{ config }}"
+
+    - name: Random delay
+      pause:
+        seconds: "{{ config.ci.delay | random }}"
+
+    - name: Destroy VM
+      vmware_guest:
+        validate_certs: False
+        hostname: "{{ config.vsphere.host }}"
+        username: "{{ config.vsphere.user }}"
+        password: "{{ config.vsphere.password }}"
+        datacenter: "{{ config.vsphere.datacenter }}"
+        cluster: "{{ config.vsphere.cluster }}"
+        folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+        name: "{{ config.vm.name }}"
+        state: absent
+        force: yes
+
+    - name: Create new VM
+      vmware_guest:
+        validate_certs: False
+        hostname: "{{ config.vsphere.host }}"
+        username: "{{ config.vsphere.user }}"
+        password: "{{ config.vsphere.password }}"
+        datacenter: "{{ config.vsphere.datacenter }}"
+        cluster: "{{ config.vsphere.cluster }}"
+        resource_pool: "{{ config.vsphere.pool }}"
+        folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+        uuid: "{{ config.vm.uuid }}"
+        name: "{{ config.vm.name }}"
+        guest_id: "{{ config.vm.guest }}"
+        disk:
+        - size_gb: "{{ config.vm.disk }}"
+          type: "thin"
+          datastore: "{{ config.vm.datastore }}"
+          autoselect_datastore: True
+        networks:
+        - name: "{{ config.vm.network }}"
+        hardware:
+          memory_mb: "{{ config.vm.ram }}"
+          num_cpus: "{{ config.vm.cpu }}"
+          scsi: "paravirtual"
+        wait_for_ip_address: True
+        state: "poweredon"
+      register: vm
+
+    - name: Print VM parameters
+      debug:
+        var: vm
+
+    - name: Check VM IP address
+      fail: msg="VM IP address is not defined"
+      when: (vm.instance.ipv4 is not defined) or (vm.instance.ipv4 == "")
+
+    - name: Create inventory for VM IP address
+      add_host:
+        name: "{{ config.vm.name }}"
+        groups: "{{ config.ci.project }}"
+        ansible_host: "{{ vm.instance.ipv4 }}"
+        ansible_user: "{{ config.devstack.user }}"
+        ansible_connection: "ssh"
+        ansible_ssh_private_key_file: "/usr/local/jenkins/.ssh/id_rsa"
+        ansible_ssh_common_args: "{{ ssh_args }}"
+
+    - name: Compound OpenStack task
+      block:
+        - name: Create directory for CI scripts
+          file:
+            path: "{{ config.devstack.destinaton }}/bin"
+            state: directory
+            mode: 0755
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Copy CI scripts
+          template:
+            src: "{{ workspace }}/scripts/{{ item }}"
+            dest: "{{ config.devstack.destinaton }}/bin/{{ item }}"
+            mode: 0755
+          with_items: "{{ scripts }}"
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Install devstack environment
+          shell: "{{ config.devstack.destinaton }}/bin/stack.sh"
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Acquire backend lock
+          flock:
+            name: "{{ config.ci.project }}-{{ config.ci.backend }}"
+            action: "acquire"
+
+        - name: Run test suite - first pass
+          shell: "{{ config.devstack.destinaton }}/bin/test.sh"
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Run test suite - second pass
+          shell: "{{ config.devstack.destinaton }}/bin/test.sh"
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Clean environment
+          shell: "{{ config.devstack.destinaton }}/bin/clean.sh"
+          delegate_to: "{{ config.vm.name }}"
+
+      rescue:
+        - name: Set error flag
+          set_fact:
+            error: True
+
+      always:
+        - name: Release backend lock
+          flock:
+            name: "{{ config.ci.project }}-{{ config.ci.backend }}"
+            action: "release"
+
+        - name: Fetch log files tarball
+          fetch:
+            src: "{{ config.devstack.destinaton }}/logs.tgz"
+            dest: "{{ workspace }}/logs.tgz"
+            flat: yes
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Extract log files tarball
+          unarchive:
+            src: "{{ workspace }}/logs.tgz"
+            dest: "{{ workspace }}"
+
+        - name: Tail log files
+          shell: "tail -50 {{ workspace }}/log/devstack/{{ item }}"
+          with_first_found:
+            - files: "{{ logs }}"
+              skip: true
+          register: tail
+
+        - name: Display log file
+          debug:
+            msg: "{{ tail.results | map(attribute='stdout_lines') | list }}"
+          when: tail.results
+
+        - name: Destroy VM
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            datacenter: "{{ config.vsphere.datacenter }}"
+            cluster: "{{ config.vsphere.cluster }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+            name: "{{ config.vm.name }}"
+            state: absent
+            force: yes
+          when: (config.vm.policy == "no") or (config.vm.policy == "onerror" and not error)
+...
