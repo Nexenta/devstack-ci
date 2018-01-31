@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#
+# Configure the NexentaStor5 NFS backend
+#
+
+NEXENTA_XTRACE=$(set +o | grep xtrace)
+set +o xtrace
+
+function configure_cinder_backend_ns5_nfs {
+	declare backend=$1
+	declare item share
+	declare -A opt
+
+	if [[ -n "$NEXENTA_POOL" ]]; then
+		share=$NEXENTA_POOL/$backend
+	fi
+
+	opt[volume_backend_name]=backend
+	opt[volume_driver]=NEXENTA_DRIVER
+	opt[nas_host]=NEXENTA_HOST
+	opt[nas_share_path]=share
+	opt[nas_mount_options]=NEXENTA_OPTIONS
+	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
+	opt[nexenta_user]=NEXENTA_REST_USER
+	opt[nexenta_password]=NEXENTA_REST_PASSWORD
+	opt[nexenta_rest_address]=NEXENTA_REST_HOST
+	opt[nexenta_rest_port]=NEXENTA_REST_PORT
+	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
+
+	for item in "${!opt[@]}"; do
+		declare -n var="${opt[$item]}"
+		if [[ -n "${var:-}" ]]; then
+			iniset $CINDER_CONF $backend "${opt[$item]}" $var
+		fi
+	done
+}
+
+function cleanup_cinder_backend_ns5_nfs {
+	local mount_point
+
+	for mount_point in $CINDER_STATE_PATH/mnt/*; do
+		sudo "umount -f $mount_point && rmdir $mount_point"
+	done
+}
+
+$NEXENTA_XTRACE
