@@ -5,12 +5,14 @@
     - global.yml
   tasks:
     - name: Set required parameters
-      set_fact: {"{{ item }}":"{{ lookup('env', item) }}"}
+      set_fact:
+        {"{{ item }}":"{{ lookup('env', item) }}"}
       when: hostvars['localhost'][item] is undefined
       with_items: "{{ required }}"
 
     - name: Check required parameters
-      fail: msg="Required parameter {{ item }} is not defined"
+      fail:
+        msg: "Required parameter {{ item }} is not defined"
       when: hostvars['localhost'][item] == ""
       with_items: "{{ required }}"
 
@@ -23,24 +25,6 @@
       set_fact:
         workspace: "{{ lookup('env', 'PWD') }}"
       when: workspace == ""
-
-    - name: Validate backend parameter
-      fail: msg="Invalid backend parameter value - {{ backend }}"
-      when: backend not in backends
-
-    - name: Validate branch parameter
-      fail: msg="Invalid branch parameter value - {{ branch }}"
-      when: (branch not in branches14) and (branch not in branches16)
-
-    - name: Set OS version to Ubuntu Trusty Tahr 14.04
-      set_fact:
-        osversion: "ubuntu14"
-      when: branch in branches14
-
-    - name: Set OS version to Ubuntu Xenial Xerus 16.04
-      set_fact:
-        osversion: "ubuntu16"
-      when: branch in branches16
 
     - name: Create unique pseudo-random BIOS UUID
       bios_uuid:
@@ -132,7 +116,8 @@
         var: vm
 
     - name: Check VM IP address
-      fail: msg="VM IP address is not defined"
+      fail:
+        msg: "VM IP address is not defined"
       when: (vm.instance.ipv4 is not defined) or (vm.instance.ipv4 == "")
 
     - name: Create inventory for VM IP address
@@ -147,23 +132,21 @@
 
     - name: Compound OpenStack task
       block:
-        - name: Create directory for CI scripts
-          file:
-            path: "{{ config.devstack.destinaton }}/bin"
-            state: directory
-            mode: 0755
+        - name: Checkout CI repository
+          git:
+            repo: "{{ config.ci.repository }}"
+            dest: "{{ config.ci.destination }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Copy CI scripts
+        - name: Copy CI profile
           template:
-            src: "{{ workspace }}/scripts/{{ item }}"
-            dest: "{{ config.devstack.destinaton }}/bin/{{ item }}"
-            mode: 0755
-          with_items: "{{ scripts }}"
+            src: "{{ workspace }}/scripts/env.in"
+            dest: "{{ config.ci.destination }}/scripts/env.sh"
+            mode: 0644
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Install devstack environment
-          shell: "{{ config.devstack.destinaton }}/bin/stack.sh"
+        - name: Install DevStack environment
+          shell: "{{ config.ci.destination }}/scripts/stack.sh"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Acquire backend lock
@@ -172,15 +155,15 @@
             action: "acquire"
 
         - name: Run test suite - first pass
-          shell: "{{ config.devstack.destinaton }}/bin/test.sh"
+          shell: "{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Run test suite - second pass
-          shell: "{{ config.devstack.destinaton }}/bin/test.sh"
+          shell: "{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Clean environment
-          shell: "{{ config.devstack.destinaton }}/bin/clean.sh"
+          shell: "{{ config.ci.destination }}/scripts/clean.sh"
           delegate_to: "{{ config.vm.name }}"
 
       rescue:
@@ -194,22 +177,43 @@
             name: "{{ config.ci.project }}-{{ config.ci.backend }}"
             action: "release"
 
-        - name: Fetch log files tarball
-          fetch:
-            src: "{{ config.devstack.destinaton }}/logs.tgz"
-            dest: "{{ workspace }}/logs.tgz"
-            flat: yes
+        - name: Find results files
+          find:
+            paths: "{{ item.source }}"
+            patterns: "{{ item.pattern }}"
+          register: find
+          with_items: "{{ config.ci.tree }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Extract log files tarball
-          unarchive:
-            src: "{{ workspace }}/logs.tgz"
-            dest: "{{ workspace }}"
+        - name: Create results directories
+          file:
+            path: "{{ workspace }}/{{ item.item.destination }}"
+            state: "directory"
+            recurse: "yes"
+            mode: 0755
+          with_items: "{{ find.results }}"
 
-        - name: Tail log files
-          shell: "tail -50 {{ workspace }}/log/devstack/{{ item }}"
+        - name: Fetch results files
+          fetch:
+            src: "{{ item.1.path }}"
+            dest: "{{ workspace }}/{{ config.ci.results }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
+          with_subelements:
+            - "{{ find.results }}"
+            - files
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Find log files
+          find:
+            paths: "{{ workspace }}/{{ config.ci.results }}"
+            patterns: "{{ config.ci.logs | join(',') }}"
+            size: 1
+            recurse: "yes"
+          register: find
+
+        - name: Tail log file
+          shell: "tail -50 {{ workspace }}/{{ config.ci.results }}/{{ item }}"
           with_first_found:
-            - files: "{{ logs }}"
+            - files: "{{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list }}"
               skip: true
           register: tail
 
