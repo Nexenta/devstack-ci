@@ -26,6 +26,10 @@
         workspace: "{{ lookup('env', 'PWD') }}"
       when: workspace == ""
 
+    - name: Debug
+      debug:
+        msg: "{{ config }}"
+
     - name: Create unique pseudo-random BIOS UUID
       bios_uuid:
         project: "{{ config.ci.project }}"
