@@ -50,6 +50,9 @@
     - name: Set dependent parameters
       set_fact:
         matrix:
+          os:
+            type: "{{ os.type }}"
+            version: "{{ os.version }}"
           ci:
             branch: "{{ branch }}"
             backend: "{{ backend }}"
