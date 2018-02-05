@@ -26,53 +26,63 @@
         workspace: "{{ lookup('env', 'PWD') }}"
       when: workspace == ""
 
-    - name: Set OS type and version
+    - name: Set common SSH options
       set_fact:
-        os:
-          type: "{{ item.type }}"
-          version: "{{ item.version }}"
-      when: item.branch == branch
-      with_items: "{{ config.match }}"
-
-    - name: Debug
-      debug:
-        msg: "{{ config }}"
-
-    - name: Create unique pseudo-random BIOS UUID
-      bios_uuid:
-        project: "{{ config.ci.project }}"
-        branch: "{{ branch }}"
-        backend: "{{ backend }}"
-        ostype: "{{ os.type }}"
-        osversion: "{{ os.version }}"
-      register: bios
+        ansible_ssh_common_args: "{{ ansible_ssh_common_args | default('-q') }} -o {{ item.option }}={{ item.value }}"
+      with_items: "{{ config.ssh }}"
 
     - name: Set dependent parameters
       set_fact:
         matrix:
-          os:
-            type: "{{ os.type }}"
-            version: "{{ os.version }}"
           ci:
             branch: "{{ branch }}"
             backend: "{{ backend }}"
-          vm:
-            uuid: "{{ bios.uuid }}"
-            hostname: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}"
-            name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
 
-    - name: Combine global parameters
+    - name: Combine dependent parameters
       set_fact:
         config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Set backend parameters
+    - name: Set dependent parameters
+      set_fact:
+        matrix:
+          ci:
+            ostype: "{{ item.type }}"
+            osversion: "{{ item.version }}"
+      when: item.branch == config.ci.branch
+      with_items: "{{ config.match }}"
+
+    - name: Combine dependent parameters
+      set_fact:
+        config: "{{ config | combine(matrix, recursive=True) }}"
+
+    - name: Set current backend parameters
       set_fact:
         matrix:
           backend: "{{ item.value }}"
       when: item.key == config.ci.backend
       with_dict: "{{ config }}"
 
-    - name: Combine backend parameters
+    - name: Combine surrent backend parameters
+      set_fact:
+        config: "{{ config | combine(matrix, recursive=True) }}"
+
+    - name: Create unique pseudo-random BIOS UUID
+      bios_uuid:
+        project: "{{ config.ci.project }}"
+        branch: "{{ config.ci.branch }}"
+        backend: "{{ config.ci.backend }}"
+        ostype: "{{ config.ci.ostype }}"
+        osversion: "{{ config.ci.osversion }}"
+      register: bios
+
+    - name: Set dependent parameters
+      set_fact:
+        matrix:
+          vm:
+            uuid: "{{ bios.uuid }}"
+            name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
+
+    - name: Combine dependent parameters
       set_fact:
         config: "{{ config | combine(matrix, recursive=True) }}"
 
