@@ -58,8 +58,8 @@
             backend: "{{ backend }}"
           vm:
             uuid: "{{ bios.uuid }}"
-            hostname: "{{ config.ci.project }}-{{ branch }}-{{ backend }}"
-            name: "{{ config.ci.project }}-{{ branch }}-{{ backend }}-{{ bios.uuid }}"
+            hostname: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}"
+            name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
 
     - name: Combine global parameters
       set_fact:
