@@ -65,22 +65,22 @@ def main():
     lock_name = module.params.get('name')
     lock_action = module.params.get('action')
 
-    result = {
-        'changed': True,
-        'message': 'Lock name: %s, action: %s, result: success' % (
-            lock_name, lock_action)
-    }
-
     rc = actions[lock_action](lock_name)
 
-    if not rc == 0:
+    if rc == 0:
+        result = {
+            'changed': True,
+            'msg': 'Lock name: %s, action: %s, result: success' % (
+                lock_name, lock_action)
+        }
+        module.exit_json(**result)
+    else:
         result = {
             'changed': False,
-            'message': 'Lock name: %s, action: %s, result: %s' % (
+            'msg': 'Lock name: %s, action: %s, result: %s' % (
                 lock_name, lock_action, os.strerror(rc))
         }
-
-    module.exit_json(**result)
+        module.fail_json(**result)
  
 if __name__ == "__main__":
     main()
