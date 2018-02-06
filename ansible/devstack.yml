@@ -28,15 +28,17 @@
 
     - name: Set common SSH options
       set_fact:
-        ansible_ssh_common_args: "{{ ansible_ssh_common_args | default('-q') }} -o {{ item.option }}={{ item.value }}"
-      with_items: "{{ config.ssh }}"
+        ssh_opts: "{{ ssh_opts | default('-q') }} -o {{ item.option }}={{ item.value }}"
+      with_items: "{{ config.ssh_opts }}"
 
     - name: Set dependent parameters
       set_fact:
         matrix:
           ci:
+            source: "{{ workspace }}"
             branch: "{{ branch }}"
             backend: "{{ backend }}"
+            ssh_opts: "{{ ssh_opts }}"
 
     - name: Combine dependent parameters
       set_fact:
@@ -144,6 +146,12 @@
         msg: "VM IP address is not defined"
       when: (vm.instance.ipv4 is not defined) or (vm.instance.ipv4 == "")
 
+    - name: Wait for SSH port to become open and contain "OpenSSH"
+      wait_for:
+        port: 22
+        host: "{{ vm.instance.ipv4 }}"
+        search_regex: "OpenSSH"
+
     - name: Create inventory for VM IP address
       add_host:
         name: "{{ config.vm.name }}"
@@ -151,8 +159,8 @@
         ansible_host: "{{ vm.instance.ipv4 }}"
         ansible_user: "{{ config.devstack.user }}"
         ansible_connection: "ssh"
-        ansible_ssh_private_key_file: "/usr/local/jenkins/.ssh/id_rsa"
-        ansible_ssh_common_args: "{{ ssh_args }}"
+        ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
+        ansible_ssh_common_args: "{{ config.ci.ssh_opts }}"
 
     - name: Compound OpenStack task
       block:
@@ -164,7 +172,7 @@
 
         - name: Copy CI profile
           template:
-            src: "{{ workspace }}/scripts/env.in"
+            src: "{{ config.ci.source }}/scripts/env.in"
             dest: "{{ config.ci.destination }}/scripts/env.sh"
             mode: 0644
           delegate_to: "{{ config.vm.name }}"
@@ -211,7 +219,7 @@
 
         - name: Create results directories
           file:
-            path: "{{ workspace }}/{{ item.item.destination }}"
+            path: "{{ config.ci.source }}/{{ item.item.destination }}"
             state: "directory"
             recurse: "yes"
             mode: 0755
@@ -220,7 +228,7 @@
         - name: Fetch results files
           fetch:
             src: "{{ item.1.path }}"
-            dest: "{{ workspace }}/{{ config.ci.results }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
+            dest: "{{ config.ci.source }}/{{ config.ci.results }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
           with_subelements:
             - "{{ find.results }}"
             - files
@@ -228,17 +236,17 @@
 
         - name: Find log files
           find:
-            paths: "{{ workspace }}/{{ config.ci.results }}"
+            paths: "{{ config.ci.source }}/{{ config.ci.results }}"
             patterns: "{{ config.ci.logs | join(',') }}"
             size: 1
             recurse: "yes"
           register: find
 
         - name: Tail log file
-          shell: "tail -50 {{ workspace }}/{{ config.ci.results }}/{{ item }}"
+          shell: "tail -50 {{ config.ci.source }}/{{ config.ci.results }}/{{ item }}"
           with_first_found:
             - files: "{{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list }}"
-              skip: true
+              skip: True
           register: tail
 
         - name: Display log file
