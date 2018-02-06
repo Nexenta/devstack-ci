@@ -11,6 +11,8 @@ def lock_cleanup(lock_name):
     lock_file = lock_path(lock_name)
     if os.path.isfile(lock_file):
         os.unlink(lock_file)
+        return 0
+    return errno.ENOENT
 
 def lock_acquire(lock_name):
     lock_file = lock_path(lock_name)
@@ -25,10 +27,11 @@ def lock_acquire(lock_name):
         else:
             os.close(lock_fd)
             time.sleep(random.uniform(1, lock_wait))
+    return 0
 
 def lock_release(lock_name):
     lock_file = lock_path(lock_name)
-    if os.path.isfile(lock_file):
+    if not os.path.isfile(lock_file):
         return errno.ENOENT
     lock_fd = os.open(lock_file, os.O_RDWR)
     fcntl.flock(lock_fd, fcntl.LOCK_EX)
@@ -36,6 +39,7 @@ def lock_release(lock_name):
     if lock_text == lock_name:
         os.ftruncate(lock_fd, 0)
     os.close(lock_fd)
+    return 0
 
 def main():
     spec = {
@@ -50,12 +54,6 @@ def main():
         }
     }
 
-    messages = {
-        'acquire': 'Lock %s has been acquired: %s',
-        'release': 'Lock %s has been released: %s',
-        'cleanup': 'Lock %s has been cleaned: %s'
-    }
-
     actions = {
         'acquire': lock_acquire,
         'release': lock_release,
@@ -67,9 +65,22 @@ def main():
     lock_name = module.params.get('name')
     lock_action = module.params.get('action')
 
-    result = actions[lock_action](lock_name)
+    result = {
+        'changed': True,
+        'message': 'Lock name: %s, action: %s, result: success' % (
+            lock_name, lock_action)
+    }
 
-    module.exit_json(msg=messages[lock_action] % (lock_name, result), changed=True, lock=result)
+    rc = actions[lock_action](lock_name)
+
+    if not rc == 0:
+        result = {
+            'changed': False,
+            'message': 'Lock name: %s, action: %s, result: %s' % (
+                lock_name, lock_action, os.strerror(rc))
+        }
+
+    module.exit_json(**result)
  
 if __name__ == "__main__":
     main()
