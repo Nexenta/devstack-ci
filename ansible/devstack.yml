@@ -127,8 +127,7 @@
           type: "thin"
           datastore: "{{ config.vm.datastore }}"
           autoselect_datastore: True
-        networks:
-        - name: "{{ config.vm.network }}"
+        networks: "{{ config.vm.networks }}"
         hardware:
           memory_mb: "{{ config.vm.ram }}"
           num_cpus: "{{ config.vm.cpu }}"
