@@ -122,11 +122,7 @@
         uuid: "{{ config.vm.uuid }}"
         name: "{{ config.vm.name }}"
         guest_id: "{{ config.vm.guest }}"
-        disk:
-        - size_gb: "{{ config.vm.disk }}"
-          type: "thin"
-          datastore: "{{ config.vm.datastore }}"
-          autoselect_datastore: True
+        disk: "{{ config.vm.disks }}"
         networks: "{{ config.vm.networks }}"
         hardware:
           memory_mb: "{{ config.vm.ram }}"
