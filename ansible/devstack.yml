@@ -28,8 +28,8 @@
 
     - name: Set common SSH options
       set_fact:
-        ssh_opts: "{{ ssh_opts | default('-q') }} -o {{ item.option }}={{ item.value }}"
-      with_items: "{{ config.ssh_opts }}"
+        ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
+      with_items: "{{ config.ssh }}"
 
     - name: Set dependent parameters
       set_fact:
@@ -38,7 +38,7 @@
             source: "{{ workspace }}"
             branch: "{{ branch }}"
             backend: "{{ backend }}"
-            ssh_opts: "{{ ssh_opts }}"
+            ssh: "{{ ssh }}"
 
     - name: Combine dependent parameters
       set_fact:
@@ -51,7 +51,7 @@
             ostype: "{{ item.type }}"
             osversion: "{{ item.version }}"
       when: item.branch == config.ci.branch
-      with_items: "{{ config.match }}"
+      with_items: "{{ config.matrix.os }}"
 
     - name: Combine dependent parameters
       set_fact:
@@ -160,7 +160,7 @@
         ansible_user: "{{ config.devstack.user }}"
         ansible_connection: "ssh"
         ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
-        ansible_ssh_common_args: "{{ config.ci.ssh_opts }}"
+        ansible_ssh_common_args: "{{ config.ci.ssh }}"
 
     - name: Compound OpenStack task
       block:
