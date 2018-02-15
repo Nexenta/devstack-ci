@@ -192,7 +192,7 @@
           git:
             repo: "{{ config.devstack.repository }}"
             dest: "{{ config.devstack.destination }}"
-            version: "config.devstack.branch }}"
+            version: "{{ config.devstack.branch }}"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Patch DevStack source code
