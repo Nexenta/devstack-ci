@@ -31,7 +31,7 @@
         ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
       with_items: "{{ config.ssh }}"
 
-    - name: Set dependent parameters
+    - name: Set global parameters
       set_fact:
         matrix:
           ci:
@@ -40,11 +40,11 @@
             backend: "{{ backend }}"
             ssh: "{{ ssh }}"
 
-    - name: Combine dependent parameters
+    - name: Combine global parameters
       set_fact:
         config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Set dependent parameters
+    - name: Set OS type and version
       set_fact:
         matrix:
           ci:
@@ -53,7 +53,29 @@
       when: item.branch == config.ci.branch
       with_items: "{{ config.matrix.os }}"
 
-    - name: Combine dependent parameters
+    - name: Combine OS type and version
+      set_fact:
+        config: "{{ config | combine(matrix, recursive=True) }}"
+
+    - name: Set DevStack branch
+      set_fact:
+        matrix:
+          devstack:
+            branch: "{{ item.name }}"
+      when: item.ci == config.ci.branch and item.project == "devstack"
+      with_items: "{{ config.matrix.branch }}"
+
+    - name: Set default DevStack branch
+      set_fact:
+        matrix:
+          devstack:
+            branch: "{{ item.name }}"
+      when: matrix.devstack.branch is not defined
+            and item.ci == config.ci.branch
+            and item.project == "default"
+      with_items: "{{ config.matrix.branch }}"
+
+    - name: Combine active DevStack branch
       set_fact:
         config: "{{ config | combine(matrix, recursive=True) }}"
 
@@ -64,7 +86,7 @@
       when: item.key == config.ci.backend
       with_dict: "{{ config }}"
 
-    - name: Combine surrent backend parameters
+    - name: Combine active backend parameters
       set_fact:
         config: "{{ config | combine(matrix, recursive=True) }}"
 
@@ -164,6 +186,20 @@
             repo: "{{ config.ci.repository }}"
             dest: "{{ config.ci.destination }}"
           delegate_to: "{{ config.vm.name }}"
+
+        - name: Checkout DevStack repository
+          git:
+            repo: "{{ config.devstack.repository }}"
+            dest: "{{ config.devstack.destination }}"
+            version: "config.devstack.branch }}"
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Patch DevStack source code
+          patch:
+            src: "{{ config.ci.destination }}/patches/{{ config.ci.branch }}/devstack.diff"
+            basedir: "{{ config.devstack.destination }}"
+            remote_src: yes
+            strip: 1
 
         - name: Copy CI profile
           template:
