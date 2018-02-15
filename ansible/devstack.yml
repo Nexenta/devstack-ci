@@ -185,32 +185,40 @@
         - name: Checkout CI repository
           git:
             repo: "{{ config.ci.repository }}"
-            dest: "{{ config.ci.destination }}"
+            dest: "{{ config.ci.base }}/{{ config.ci.destination }}"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Checkout DevStack repository
           git:
             repo: "{{ config.devstack.repository }}"
-            dest: "{{ config.devstack.destination }}"
+            dest: "{{ config.ci.base }}/{{ config.devstack.destination }}"
             version: "{{ config.devstack.branch }}"
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Stat DevStack patch
+          stat:
+            path: "{{ config.ci.base }}/patches/{{ config.ci.branch }}/devstack.diff"
+          register: devstack_patch
           delegate_to: "{{ config.vm.name }}"
 
         - name: Patch DevStack source code
           patch:
-            src: "{{ config.ci.destination }}/patches/{{ config.ci.branch }}/devstack.diff"
-            basedir: "{{ config.devstack.destination }}"
+            src: "{{ config.ci.base }}/patches/{{ config.ci.branch }}/devstack.diff"
+            basedir: "{{ config.ci.base }}/{{ config.devstack.destination }}"
             remote_src: yes
             strip: 1
+          when: devstack_patch.stat.exists == True
+          delegate_to: "{{ config.vm.name }}"
 
         - name: Copy CI profile
           template:
-            src: "{{ config.ci.source }}/scripts/env.in"
-            dest: "{{ config.ci.destination }}/scripts/env.sh"
+            src: "{{ config.ci.source }}/templates/env.in"
+            dest: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/env.sh"
             mode: 0644
           delegate_to: "{{ config.vm.name }}"
 
         - name: Install DevStack environment
-          shell: "{{ config.ci.destination }}/scripts/stack.sh"
+          shell: "{{ config.ci.base }}/{{ config.devstack.destination }}/stack.sh"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Acquire backend lock
@@ -219,15 +227,11 @@
             action: "acquire"
 
         - name: Run test suite - first pass
-          shell: "{{ config.ci.destination }}/scripts/test.sh"
+          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Run test suite - second pass
-          shell: "{{ config.ci.destination }}/scripts/test.sh"
-          delegate_to: "{{ config.vm.name }}"
-
-        - name: Clean environment
-          shell: "{{ config.ci.destination }}/scripts/clean.sh"
+          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
       rescue:
@@ -243,7 +247,7 @@
 
         - name: Find results files
           find:
-            paths: "{{ item.source }}"
+            paths: "{{ config.ci.base }}/{{ item.source }}"
             patterns: "{{ item.pattern }}"
           register: find
           with_items: "{{ config.ci.tree }}"
@@ -298,5 +302,6 @@
             name: "{{ config.vm.name }}"
             state: absent
             force: yes
-          when: (config.vm.policy == "no") or (config.vm.policy == "onerror" and not error)
+          when: (config.vm.policy == "no") or
+                (config.vm.policy == "onerror" and not error)
 ...
