@@ -127,7 +127,7 @@
         hardware:
           memory_mb: "{{ config.vm.ram }}"
           num_cpus: "{{ config.vm.cpu }}"
-          scsi: "paravirtual"
+          scsi: "{{ config.vm.scsi }}"
         wait_for_ip_address: True
         state: "poweredon"
       register: vm
