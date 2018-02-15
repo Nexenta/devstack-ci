@@ -197,23 +197,23 @@
 
         - name: Stat DevStack patch
           stat:
-            path: "{{ config.ci.base }}/patches/{{ config.ci.branch }}/devstack.diff"
+            path: "{{ config.ci.base }}/{{ config.devstack.destination }}/patches/{{ config.ci.branch }}/devstack.diff"
           register: devstack_patch
           delegate_to: "{{ config.vm.name }}"
 
         - name: Patch DevStack source code
           patch:
-            src: "{{ config.ci.base }}/patches/{{ config.ci.branch }}/devstack.diff"
+            src: "{{ config.ci.base }}/{{ config.devstack.destination }}/patches/{{ config.ci.branch }}/devstack.diff"
             basedir: "{{ config.ci.base }}/{{ config.devstack.destination }}"
             remote_src: yes
             strip: 1
           when: devstack_patch.stat.exists == True
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Copy CI profile
+        - name: Copy DevStack profile
           template:
-            src: "{{ config.ci.source }}/templates/env.in"
-            dest: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/env.sh"
+            src: "{{ config.ci.source }}/templates/local.conf.j2"
+            dest: "{{ config.ci.base }}/{{ config.devstack.destination }}/local.conf"
             mode: 0644
           delegate_to: "{{ config.vm.name }}"
 

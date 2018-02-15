@@ -1,0 +1,54 @@
+[[local|localrc]]
+enable_service tempest c-bak
+
+ADMIN_PASSWORD="{{ config.devstack.password }}"
+DATABASE_PASSWORD="{{ config.devstack.password }}"
+RABBIT_PASSWORD="{{ config.devstack.password }}"
+SERVICE_PASSWORD="{{ config.devstack.password }}"
+SERVICE_TOKEN="{{ config.devstack.password }}"
+DEST="{{ config.ci.base }}"
+CIDIR="{{ config.ci.base }}/{{ config.ci.destination }}"
+LOGDIR="{{ config.ci.base }}/logs"
+SCREEN_LOGDIR="{{ config.ci.base }}/logs"
+LOGFILE="{{ config.ci.base }}/logs//stack.log"
+VIRT_DRIVER=libvirt
+IP_VERSION=4
+USE_SCREEN=True
+API_RATE_LIMIT=False
+INSTALL_TEMPEST=True
+LOG_COLOR=False
+SYSLOG=True
+USE_SYSTEMD=False
+USE_JOURNAL=False
+
+{% for project in config.matrix.project %}
+{% for branch in config.matrix.branch %}
+{% if branch.ci == config.ci.branch %}
+{% if branch.project == project.name %}
+{% set value = branch.name %}
+{% elif branch.project == "default" and value is not defined %}
+{% set value = branch.name %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{{ p.option }}={{ value }}
+{% endfor %}
+
+declare -A NEXENTA_DRIVER
+declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
+declare -A NEXENTA_REST_HOST NEXENTA_REST_PORT NEXENTA_REST_PROTO
+declare -A NEXENTA_HOST NEXENTA_POOL NEXENTA_DATASET NEXENTA_SPARSED
+
+{% for instance in config.backend.instances %}
+{% set backend = {{ config.ci.backend }}{{ loop.index }} %}
+NEXENTA_DRIVER[{{ backend }}]={{ config.backend.driver }}
+NEXENTA_REST_HOST[{{ backend }}]={{ config.backend.rest.hosts|join(', ') }}
+NEXENTA_REST_PORT[{{ backend }}]={{ config.backend.rest.port }}
+NEXENTA_REST_PROTO[{{ backend }}]={{ config.backend.rest.proto }}
+NEXENTA_REST_USER[{{ backend }}]={{ config.backend.rest.user }}
+NEXENTA_REST_PASSWORD[{{ backend }}]={{ config.backend.rest.password }}
+NEXENTA_HOST[{{ backend }}]={{ instance.host }}
+NEXENTA_POOL[{{ backend }}]={{ instance.pool }}
+NEXENTA_DATASET[{{ backend }}]={{ instance.dataset }}
+NEXENTA_SPARSED[{{ backend }}]={{ instance.sparsed }}
+{% endfor %}
