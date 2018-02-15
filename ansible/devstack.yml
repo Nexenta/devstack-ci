@@ -70,7 +70,8 @@
         matrix:
           devstack:
             branch: "{{ item.name }}"
-      when: matrix.devstack.branch is not defined
+      when: (matrix.devstack is not defined
+            or matrix.devstack.branch is not defined)
             and item.ci == config.ci.branch
             and item.project == "default"
       with_items: "{{ config.matrix.branch }}"
