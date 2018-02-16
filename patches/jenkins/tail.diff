@@ -1,0 +1,41 @@
+diff --git a/core/src/main/java/hudson/model/DirectoryBrowserSupport.java b/core/src/main/java/hudson/model/DirectoryBrowserSupport.java
+index 1dfd2b3a3b3..2b33e2a1bb8 100644
+--- a/core/src/main/java/hudson/model/DirectoryBrowserSupport.java
++++ b/core/src/main/java/hudson/model/DirectoryBrowserSupport.java
+@@ -283,6 +283,7 @@ private void serveFile(StaplerRequest req, StaplerResponse rsp, VirtualFile root
+         }
+ 
+         boolean view = rest.equals("*view*");
++        boolean tail = rest.equals("*tail*");
+ 
+         if(rest.equals("*fingerprint*")) {
+             rsp.forward(Jenkins.getInstance().getFingerprint(Util.getDigestOf(baseFile.open())), "/", req);
+@@ -302,6 +303,13 @@ private void serveFile(StaplerRequest req, StaplerResponse rsp, VirtualFile root
+ 
+             // pseudo file name to let the Stapler set text/plain
+             rsp.serveFile(req, in, lastModified, -1, length, "plain.txt");
++            return;
++        } else if (tail) {
++            // serve the end of the file -- useful with programs logging to a file in the workspace
++            int tailLength = Integer.getInteger(this.getClass().getName() + ".tailKB", 4).intValue() * 1024;
++            long skip = Math.max(0, length - tailLength);
++            in.skip(skip);
++            rsp.serveFile(req, in, lastModified, -1, length - skip, "tail.txt");
+         } else {
+             rsp.serveFile(req, in, lastModified, -1, length, baseFile.getName() );
+         }
+diff --git a/core/src/main/resources/hudson/model/DirectoryBrowserSupport/dir.jelly b/core/src/main/resources/hudson/model/DirectoryBrowserSupport/dir.jelly
+index 72a87bd2405..a614f41af1b 100644
+--- a/core/src/main/resources/hudson/model/DirectoryBrowserSupport/dir.jelly
++++ b/core/src/main/resources/hudson/model/DirectoryBrowserSupport/dir.jelly
+@@ -80,6 +80,10 @@ THE SOFTWARE.
+                         </a>
+                         <st:nbsp/>
+                         <a href="${x.href}/*view*/">${%view}</a>
++                        <j:if test="${x.title.endsWith('.log')}">
++                          <st:nbsp/>
++                          <a href="${x.href}/*tail*/">${%tail}</a>
++                        </j:if>
+                       </j:if>                      
+                     </td>
+                   </j:if>
