@@ -195,21 +195,6 @@
             version: "{{ config.devstack.branch }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Stat DevStack patch
-          stat:
-            path: "{{ config.ci.base }}/{{ config.ci.destination }}/patches/devstack/{{ config.ci.branch }}.diff"
-          register: devstack_patch
-          delegate_to: "{{ config.vm.name }}"
-
-        - name: Patch DevStack source code
-          patch:
-            src: "{{ config.ci.base }}/{{ config.ci.destination }}/patches/devstack/{{ config.ci.branch }}.diff"
-            basedir: "{{ config.ci.base }}/{{ config.devstack.destination }}"
-            remote_src: yes
-            strip: 1
-          when: devstack_patch.stat.exists == True
-          delegate_to: "{{ config.vm.name }}"
-
         - name: Copy DevStack profile
           template:
             src: "{{ config.ci.source }}/templates/local.conf.j2"
@@ -217,11 +202,17 @@
             mode: 0644
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Copy CI environment
+        - name: Copy CI profile
           template:
             src: "{{ config.ci.source }}/templates/env.sh.j2"
             dest: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/env.sh"
             mode: 0755
+          delegate_to: "{{ config.vm.name }}"
+
+        - name: Patch DevStack source code
+          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/patch.sh"
+          args:
+            chdir: "{{ config.ci.base }}/{{ config.devstack.destination }}"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Install DevStack environment
