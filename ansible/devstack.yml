@@ -217,6 +217,13 @@
             mode: 0644
           delegate_to: "{{ config.vm.name }}"
 
+        - name: Copy CI environment
+          template:
+            src: "{{ config.ci.source }}/templates/env.sh.j2"
+            dest: "{{ config.ci.base }}/{{ config.ci.destination }}/env.sh"
+            mode: 0755
+          delegate_to: "{{ config.vm.name }}"
+
         - name: Install DevStack environment
           shell: "{{ config.ci.base }}/{{ config.devstack.destination }}/stack.sh"
           delegate_to: "{{ config.vm.name }}"
