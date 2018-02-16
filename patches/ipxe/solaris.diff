@@ -1,0 +1,115 @@
+diff --git a/src/arch/x86/core/cachedhcp.c b/src/arch/x86/core/cachedhcp.c
+index ff35b92..30631b2 100644
+--- a/src/arch/x86/core/cachedhcp.c
++++ b/src/arch/x86/core/cachedhcp.c
+@@ -81,6 +81,7 @@ static void cachedhcp_init ( void ) {
+ 	dhcphdr = ( ( ( void * ) dhcppkt ) + sizeof ( *dhcppkt ) );
+ 	copy_from_user ( dhcphdr, phys_to_user ( cached_dhcpack_phys ), 0,
+ 			 max_len );
++	store_setting(NULL, &solaris_dhcp_cache, dhcphdr, max_len);
+ 	dhcppkt_init ( dhcppkt, dhcphdr, max_len );
+ 
+ 	/* Shrink packet to required length.  If reallocation fails,
+diff --git a/src/arch/x86/image/multiboot.c b/src/arch/x86/image/multiboot.c
+index 0c85df7..2a7a974 100644
+--- a/src/arch/x86/image/multiboot.c
++++ b/src/arch/x86/image/multiboot.c
+@@ -44,6 +44,8 @@ FILE_LICENCE ( GPL2_OR_LATER_OR_UBDL );
+ #include <ipxe/features.h>
+ #include <ipxe/uri.h>
+ #include <ipxe/version.h>
++#include <ipxe/settings.h>
++#include <pxe_api.h>
+ 
+ FEATURE ( FEATURE_IMAGE, "MBOOT", DHCP_EB_FEATURE_MULTIBOOT, 1 );
+ 
+@@ -263,6 +265,23 @@ static struct multiboot_memory_map
+ static struct multiboot_module __bss16_array ( mbmodules, [MAX_MODULES] );
+ #define mbmodules __use_data16 ( mbmodules )
+ 
++/** The multiboot solaris hack */
++static BOOTPLAYER_t __bss16 ( mbsolaris );
++#define mbsolaris __use_data16 ( mbsolaris )
++
++const struct setting solaris_boot_setting __setting ( SETTING_MISC, solaris-boot ) = {
++        .name = "solaris-boot",
++        .description = "Solaris Boot Flag",
++        .type = &setting_type_string,
++};
++
++const struct setting solaris_dhcp_cache __setting ( SETTING_MISC, solaris-dhcp-cache ) = {
++        .name = "solaris-dhcp-cache",
++        .description = "Solaris DHCP Cache",
++        .type = &setting_type_hexraw,
++};
++
++
+ /**
+  * Find multiboot header
+  *
+@@ -392,6 +411,8 @@ static int multiboot_exec ( struct image *image ) {
+ 	physaddr_t entry;
+ 	physaddr_t max;
+ 	int rc;
++	unsigned int slen;
++	char usesolaris[5]; /* enough to hold "true" */
+ 
+ 	/* Locate multiboot header, if present */
+ 	if ( ( rc = multiboot_find_header ( image, &hdr ) ) != 0 ) {
+@@ -424,6 +445,18 @@ static int multiboot_exec ( struct image *image ) {
+ 	mbinfo.cmdline = multiboot_add_cmdline ( image );
+ 	mbinfo.mods_addr = virt_to_phys ( mbmodules );
+ 	mbinfo.mmap_addr = virt_to_phys ( mbmemmap );
++
++	/* If we have a solaris-dhcp-cache setting, pull the data and pass it in as the "drives" data for solaris */
++	if ((slen = fetch_setting ( NULL, &solaris_boot_setting, NULL, NULL, (void *)&usesolaris, sizeof(usesolaris) )) && (strcmp(usesolaris,"true") == 0)) {
++	    if ((slen = fetch_setting ( NULL, &solaris_dhcp_cache, NULL, NULL, (void *)&mbsolaris, sizeof(mbsolaris) )) &&
++		    slen > 0 && slen <= sizeof(mbsolaris)) {
++		mbinfo.flags = (mbinfo.flags & ~MBI_FLAG_DRIVES) | MBI_FLAG_BOOTDEV;
++		mbinfo.boot_device = 0x20ffffff;
++		mbinfo.drives_addr = virt_to_phys ( &mbsolaris );
++		mbinfo.drives_length = slen;
++	    }
++	}
++
+ 	snprintf ( mb_bootloader_name, sizeof ( mb_bootloader_name ),
+ 		   "iPXE %s", product_version );
+ 	mbinfo.boot_loader_name = virt_to_phys ( mb_bootloader_name );
+diff --git a/src/include/ipxe/settings.h b/src/include/ipxe/settings.h
+index f463e66..99ce2b6 100644
+--- a/src/include/ipxe/settings.h
++++ b/src/include/ipxe/settings.h
+@@ -483,6 +483,10 @@ extern const struct setting
+ board_serial_setting __setting ( SETTING_HOST_EXTRA, board-serial );
+ extern const struct setting dhcp_server_setting __setting ( SETTING_MISC,
+ 							    dhcp-server );
++extern const struct setting
++solaris_dhcp_cache __setting ( SETTING_MISC, solaris-dhcp-cache );
++extern const struct setting
++solaris_boot_setting __setting ( SETTING_MISC, solaris-boot );
+ 
+ /**
+  * Initialise a settings block
+diff --git a/src/net/udp/dhcp.c b/src/net/udp/dhcp.c
+index 3a3666c..ff6cc35 100644
+--- a/src/net/udp/dhcp.c
++++ b/src/net/udp/dhcp.c
+@@ -1205,6 +1205,10 @@ static int dhcp_deliver ( struct dhcp_session *dhcp,
+ 	dhcppkt_fetch ( dhcppkt, DHCP_MESSAGE_TYPE, &msgtype,
+ 			sizeof ( msgtype ) );
+ 
++	if (msgtype == DHCPACK) {
++	    store_setting(NULL, &solaris_dhcp_cache, iobuf->data, data_len);
++	}
++
+ 	/* Identify server ID */
+ 	dhcppkt_fetch ( dhcppkt, DHCP_SERVER_IDENTIFIER,
+ 			&server_id, sizeof ( server_id ) );
+@@ -1332,6 +1336,7 @@ int start_dhcp ( struct interface *job, struct net_device *netdev ) {
+ 	dhcp = zalloc ( sizeof ( *dhcp ) );
+ 	if ( ! dhcp )
+ 		return -ENOMEM;
++	delete_setting(NULL, &solaris_dhcp_cache);
+ 	ref_init ( &dhcp->refcnt, dhcp_free );
+ 	intf_init ( &dhcp->job, &dhcp_job_desc, &dhcp->refcnt );
+ 	intf_init ( &dhcp->xfer, &dhcp_xfer_desc, &dhcp->refcnt );
