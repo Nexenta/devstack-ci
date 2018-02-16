@@ -15,10 +15,10 @@ typeset _source=$(dirname $_script)
 
 source $_source/env.sh
 
-if [[ -f $_base/patches/$_project/$_branch.diff ]]; then
-    patch -p1 < $_base/patches/$_project/$_branch.diff
+if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
+    patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
 fi
 
-if [[ -d $_base/files/$_project ]]; then
-    (cd $_base/files/$_project && tar cf - .) | tar pxvf -
+if [[ -d $_base/$_ci/files/$_project ]]; then
+    (cd $_base/$_ci/files/$_project && tar cf - .) | tar pxvf -
 fi
