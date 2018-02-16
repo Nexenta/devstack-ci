@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-#
-# CI library
-#
 
 function ci_install {
 	if is_service_enabled cinder; then

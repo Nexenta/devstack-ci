@@ -9,16 +9,17 @@ set +o xtrace
 function configure_cinder_backend_ns5_nfs {
 	declare backend=$1
 	declare item share
+	declare -A NEXENTA_SHARE
 	declare -A opt
 
-	if [[ -n "$NEXENTA_POOL" ]]; then
-		share=$NEXENTA_POOL/$backend
+	if [[ -n "${NEXENTA_POOL[$backend]:-}" &&
+	      -n "${NEXENTA_DATASET[$backend]:-}" ]]; then
+		NEXENTA_SHARE[$backend]="$NEXENTA_POOL/$NEXENTA_DATASET"
 	fi
 
-	opt[volume_backend_name]=backend
 	opt[volume_driver]=NEXENTA_DRIVER
 	opt[nas_host]=NEXENTA_HOST
-	opt[nas_share_path]=share
+	opt[nas_share_path]=NEXENTA_SHARE
 	opt[nas_mount_options]=NEXENTA_OPTIONS
 	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
 	opt[nexenta_user]=NEXENTA_REST_USER
@@ -27,8 +28,12 @@ function configure_cinder_backend_ns5_nfs {
 	opt[nexenta_rest_port]=NEXENTA_REST_PORT
 	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
 
+	iniset $CINDER_CONF $backend volume_backend_name $backend
+	iniset $CINDER_CONF $backend nas_secure_file_operations False
+
 	for item in "${!opt[@]}"; do
-		declare -n var="${opt[$item]}"
+		declare -n var="${opt[$item]}[$backend]"
+
 		if [[ -n "${var:-}" ]]; then
 			iniset $CINDER_CONF $backend "${opt[$item]}" $var
 		fi
@@ -36,7 +41,7 @@ function configure_cinder_backend_ns5_nfs {
 }
 
 function cleanup_cinder_backend_ns5_nfs {
-	local mount_point
+	declare mount_point
 
 	for mount_point in $CINDER_STATE_PATH/mnt/*; do
 		sudo "umount -f $mount_point && rmdir $mount_point"

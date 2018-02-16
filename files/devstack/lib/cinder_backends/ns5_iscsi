@@ -11,20 +11,22 @@ function configure_cinder_backend_ns5_iscsi {
 	declare item
 	declare -A opt
 
-	opt[volume_backend_name]=backend
 	opt[volume_driver]=NEXENTA_DRIVER
 	opt[nexenta_host]=NEXENTA_HOST
 	opt[nexenta_volume]=NEXENTA_POOL
+	opt[nexenta_volume_group]=NEXENTA_DATASET
 	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
-	opt[nexenta_volume_group]=backend
 	opt[nexenta_user]=NEXENTA_REST_USER
 	opt[nexenta_password]=NEXENTA_REST_PASSWORD
 	opt[nexenta_rest_address]=NEXENTA_REST_HOST
 	opt[nexenta_rest_port]=NEXENTA_REST_PORT
 	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
 
+	iniset $CINDER_CONF $backend volume_backend_name $backend
+
 	for item in "${!opt[@]}"; do
-		declare -n var="${opt[$item]}"
+		declare -n var="${opt[$item]}[$backend]"
+
 		if [[ -n "${var:-}" ]]; then
 			iniset $CINDER_CONF $backend "${opt[$item]}" $var
 		fi

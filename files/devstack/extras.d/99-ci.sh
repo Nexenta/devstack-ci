@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-#
-# CI hooks
-#
 
 case "$1" in
 source)
