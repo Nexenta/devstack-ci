@@ -1,0 +1,37 @@
+--- ansible-2.4.3.0/lib/ansible/modules/cloud/vmware/vmware_guest.py.orig	2018-02-16 01:26:26.285417000 +0000
++++ ansible-2.4.3.0/lib/ansible/modules/cloud/vmware/vmware_guest.py	2018-02-16 01:26:29.564953000 +0000
+@@ -302,6 +302,7 @@
+ '''
+ 
+ import time
++import random
+ 
+ HAS_PYVMOMI = False
+ try:
+@@ -624,6 +625,7 @@
+         if vm_obj is None or self.params['guest_id'] != vm_obj.summary.config.guestId:
+             self.change_detected = True
+             self.configspec.guestId = self.params['guest_id']
++            self.configspec.uuid = self.params['uuid']
+ 
+     def configure_cpu_and_memory(self, vm_obj, vm_creation=False):
+         # set cpu/memory/etc
+@@ -1011,7 +1013,8 @@
+             if not hostsystems:
+                 self.module.fail_json(msg='No hosts found in cluster "%(cluster)s. Maybe you lack the right privileges ?"' % self.params)
+             # TODO: add a policy to select host
+-            hostsystem = hostsystems[0]
++            secure_random = random.SystemRandom()
++            hostsystem = secure_random.choice(hostsystems)
+         else:
+             hostsystem = self.cache.get_esx_host(self.params['esxi_hostname'])
+             if not hostsystem:
+@@ -1414,7 +1417,7 @@
+         while task.info.state not in ['error', 'success']:
+             time.sleep(1)
+ 
+-    def wait_for_vm_ip(self, vm, poll=100, sleep=5):
++    def wait_for_vm_ip(self, vm, poll=900, sleep=5):
+         ips = None
+         facts = {}
+         thispoll = 0
