@@ -18,7 +18,7 @@ function configure_cinder_backend_ns4_iscsi {
 	opt[nexenta_sparse]=NEXENTA_SPARSED
 	opt[nexenta_user]=NEXENTA_REST_USER
 	opt[nexenta_password]=NEXENTA_REST_PASSWORD
-	opt[nexenta_rest_address]=NEXENTA_REST_HOST
+	opt[nexenta_rest_address]=NEXENTA_HOST
 	opt[nexenta_rest_port]=NEXENTA_REST_PORT
 	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
 
