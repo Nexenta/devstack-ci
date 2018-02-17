@@ -20,7 +20,6 @@ function configure_cinder_backend_ns4_nfs {
 	iniset $CINDER_CONF $backend nas_secure_file_operations False
 	iniset $CINDER_CONF $backend nfs_shares_config \
 		$CINDER_CONF_DIR/$backend.conf
-	iniset $CINDER_CONF $backend volume_driver $NEXENTA_DRIVER
 
 	for item in "${!opt[@]}"; do
 		declare -n var="${opt[$item]}[$backend]"
@@ -33,7 +32,7 @@ function configure_cinder_backend_ns4_nfs {
 
 	printf "%s:/%s/%s/%s\t%s://%s:%s@%s:%d\n" \
 		$NEXENTA_HOST $prefix $NEXENTA_POOL \
-		$backend $NEXENTA_REST_PROTO $NEXENTA_USER \
+		$NEXENTA_DATASET $NEXENTA_REST_PROTO $NEXENTA_USER \
 		$NEXENTA_PASSWORD $NEXENTA_HOST \
 		$NEXENTA_REST_PORT >$CINDER_CONF_DIR/$backend.conf
 
