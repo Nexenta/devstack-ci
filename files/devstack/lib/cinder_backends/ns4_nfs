@@ -8,13 +8,15 @@ set +o xtrace
 
 function configure_cinder_backend_ns4_nfs {
 	declare backend=$1
-	declare prefix="volumes"
 	declare item
 	declare -A opt
+	declare -A NEXENTA_PREFIX
 
 	opt[volume_driver]=NEXENTA_DRIVER
 	opt[nas_mount_options]=NEXENTA_OPTIONS
 	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
+
+	NEXENTA_PREFIX[$backend]="volumes"
 
 	iniset $CINDER_CONF $backend volume_backend_name $backend
 	iniset $CINDER_CONF $backend nas_secure_file_operations False
@@ -30,10 +32,11 @@ function configure_cinder_backend_ns4_nfs {
 	done
 
 	printf "%s:/%s/%s/%s\t%s://%s:%s@%s:%d\n" \
-		$NEXENTA_HOST $prefix $NEXENTA_POOL \
-		$NEXENTA_DATASET $NEXENTA_REST_PROTO $NEXENTA_USER \
-		$NEXENTA_PASSWORD $NEXENTA_HOST \
-		$NEXENTA_REST_PORT >$CINDER_CONF_DIR/$backend.conf
+		${NEXENTA_HOST[$backend]} ${NEXENTA_PREFIX[$backend]} \
+		${NEXENTA_POOL[$backend]} ${NEXENTA_DATASET[$backend]} \
+		${NEXENTA_REST_PROTO[$backend]} ${NEXENTA_USER[$backend]} \
+		${NEXENTA_PASSWORD[$backend]} ${NEXENTA_HOST[$backend]} \
+		${NEXENTA_REST_PORT[$backend]} >$CINDER_CONF_DIR/$backend.conf
 }
 
 function cleanup_cinder_backend_ns4_nfs {
