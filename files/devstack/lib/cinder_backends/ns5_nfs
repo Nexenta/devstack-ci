@@ -14,9 +14,9 @@ function configure_cinder_backend_ns5_nfs {
 
 	if [[ -n "${NEXENTA_POOL[$backend]:-}" &&
 	      -n "${NEXENTA_DATASET[$backend]:-}" ]]; then
-		NEXENTA_SHARE[$backend]="$NEXENTA_POOL[$backend]"
+		NEXENTA_SHARE[$backend]="${NEXENTA_POOL[$backend]}"
         NEXENTA_SHARE[$backend]+="/"
-        NEXENTA_SHARE[$backend]+="$NEXENTA_DATASET[$backend]"
+        NEXENTA_SHARE[$backend]+="${NEXENTA_DATASET[$backend]}"
 	fi
 
 	opt[volume_driver]=NEXENTA_DRIVER
