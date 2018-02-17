@@ -36,6 +36,18 @@ USE_JOURNAL="False"
 {{ project.option }}="{{ value.found }}"
 {% endfor %}
 
+{% set value = namespace(list=[]) %}
+{% for instance in config.backend.instances %}
+{% do value.list.append(config.ci.backend ~ ':' ~ config.ci.backend ~ loop.index) %}
+{% endfor %}
+
+CINDER_VOLUME_CLEAR="none"
+CINDER_ENABLED_BACKENDS="{{ value.list|join(',') }}"
+TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"
+TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
+TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
+TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
+
 declare -A NEXENTA_DRIVER
 declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
 declare -A NEXENTA_REST_HOST NEXENTA_REST_PORT NEXENTA_REST_PROTO
@@ -56,4 +68,5 @@ NEXENTA_HOST[{{ backend }}]="{{ instance.host }}"
 NEXENTA_POOL[{{ backend }}]="{{ instance.pool }}"
 NEXENTA_DATASET[{{ backend }}]="{{ instance.dataset }}"
 NEXENTA_SPARSED[{{ backend }}]="{{ instance.sparsed }}"
+NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
 {% endfor %}
