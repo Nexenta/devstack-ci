@@ -25,17 +25,15 @@ function configure_cinder_backend_ns4_nfs {
 		declare -n var="${opt[$item]}[$backend]"
 
 		if [[ -n "${var:-}" ]]; then
-			iniset $CINDER_CONF $backend "${opt[$item]}" $var
+			iniset $CINDER_CONF $backend $item $var
 		fi
 	done
-
 
 	printf "%s:/%s/%s/%s\t%s://%s:%s@%s:%d\n" \
 		$NEXENTA_HOST $prefix $NEXENTA_POOL \
 		$NEXENTA_DATASET $NEXENTA_REST_PROTO $NEXENTA_USER \
 		$NEXENTA_PASSWORD $NEXENTA_HOST \
 		$NEXENTA_REST_PORT >$CINDER_CONF_DIR/$backend.conf
-
 }
 
 function cleanup_cinder_backend_ns4_nfs {

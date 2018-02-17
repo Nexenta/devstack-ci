@@ -28,7 +28,7 @@ function configure_cinder_backend_ns4_iscsi {
 		declare -n var="${opt[$item]}[$backend]"
 
 		if [[ -n "${var:-}" ]]; then
-			iniset $CINDER_CONF $backend "${opt[$item]}" $var
+			iniset $CINDER_CONF $backend $item $var
 		fi
 	done
 }

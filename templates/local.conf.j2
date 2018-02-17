@@ -35,7 +35,6 @@ USE_JOURNAL="False"
 {% endfor %}
 {{ project.option }}="{{ value.found }}"
 {% endfor %}
-
 {% set value = namespace(list=[]) %}
 {% for instance in config.backend.instances %}
 {% do value.list.append(config.ci.backend ~ ':' ~ config.ci.backend ~ loop.index) %}
@@ -47,14 +46,12 @@ TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
 TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
 TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
+NEXENTA_REPO="{{ config.nexenta.repository }}"
 
 declare -A NEXENTA_DRIVER
 declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
 declare -A NEXENTA_REST_HOST NEXENTA_REST_PORT NEXENTA_REST_PROTO
 declare -A NEXENTA_HOST NEXENTA_POOL NEXENTA_DATASET NEXENTA_SPARSED
-
-NEXENTA_REPO="{{ config.nexenta.repository }}"
-
 {% for instance in config.backend.instances %}
 {% set backend = config.ci.backend ~ loop.index %}
 
