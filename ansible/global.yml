@@ -1,5 +1,4 @@
 ---
-- error: False
 - required:
   - branch
   - backend

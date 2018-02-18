@@ -233,10 +233,9 @@
           delegate_to: "{{ config.vm.name }}"
 
       rescue:
-        - name: Set error flag
-          file:
-            path: "{{ config.ci.source }}/error"
-            state: touch
+        - name: Set failure flag
+          set_fact:
+            failure: True
 
       always:
         - name: Release backend lock
@@ -258,7 +257,7 @@
             state: "directory"
             recurse: "yes"
             mode: 0755
-          with_items: "{{ find.results }}"
+          with_items: "{{ find.result }}"
 
         - name: Fetch results files
           fetch:
@@ -302,5 +301,17 @@
             state: absent
             force: yes
           when: (config.vm.policy == "no") or
-                (config.vm.policy == "onerror" and not error)
+                (config.vm.policy == "onerror" and failure is undefined)
+
+        - name: Create success flag
+          file:
+            path: "{{ config.ci.source }}/success"
+            state: touch
+          when: failure is undefined
+
+        - name: Create failure flag
+          file:
+            path: "{{ config.ci.source }}/failure"
+            state: touch
+          when: failure is defined
 ...
