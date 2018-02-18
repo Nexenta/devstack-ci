@@ -286,7 +286,7 @@
         - name: Find log files
           find:
             paths: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}"
-            patterns: "{{ config.ci.logs | join(',') }}"
+            patterns: "{{ config.result.logs | join(',') }}"
             size: 1
             recurse: "yes"
           register: find
