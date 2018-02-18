@@ -257,7 +257,7 @@
             state: "directory"
             recurse: "yes"
             mode: 0755
-          with_items: "{{ find.result }}"
+          with_items: "{{ find.results }}"
 
         - name: Fetch results files
           fetch:
