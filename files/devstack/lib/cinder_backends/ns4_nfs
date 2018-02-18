@@ -34,8 +34,8 @@ function configure_cinder_backend_ns4_nfs {
 	printf "%s:/%s/%s/%s\t%s://%s:%s@%s:%d\n" \
 		${NEXENTA_HOST[$backend]} ${NEXENTA_PREFIX[$backend]} \
 		${NEXENTA_POOL[$backend]} ${NEXENTA_DATASET[$backend]} \
-		${NEXENTA_REST_PROTO[$backend]} ${NEXENTA_USER[$backend]} \
-		${NEXENTA_PASSWORD[$backend]} ${NEXENTA_HOST[$backend]} \
+		${NEXENTA_REST_PROTO[$backend]} ${NEXENTA_REST_USER[$backend]} \
+		${NEXENTA_REST_PASSWORD[$backend]} ${NEXENTA_HOST[$backend]} \
 		${NEXENTA_REST_PORT[$backend]} >$CINDER_CONF_DIR/$backend.conf
 }
 
