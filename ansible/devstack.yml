@@ -26,6 +26,16 @@
         workspace: "{{ lookup('env', 'PWD') }}"
       when: workspace == ""
 
+    - name: Set current build number
+      set_fact:
+        build: "{{ lookup('env', 'BUILD_NUMBER') }}"
+      when: build is undefined
+
+    - name: Set predefined build number
+      set_fact:
+        build: "0"
+      when: build == ""
+
     - name: Set common SSH options
       set_fact:
         ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
@@ -35,6 +45,7 @@
       set_fact:
         matrix:
           ci:
+            build: "{{ build }}"
             source: "{{ workspace }}"
             branch: "{{ branch }}"
             backend: "{{ backend }}"
@@ -247,13 +258,15 @@
           find:
             paths: "{{ item.source | regex_search('^/') | ternary('', config.ci.base + '/') + item.source }}"
             patterns: "{{ item.pattern }}"
+            file_type: "any"
+            follow: "yes"
           register: find
           with_items: "{{ config.result.tree }}"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Create results directories
           file:
-            path: "{{ config.ci.source }}/{{ item.item.destination }}"
+            path: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}/{{ item.item.destination }}"
             state: "directory"
             recurse: "yes"
             mode: 0755
@@ -262,7 +275,9 @@
         - name: Fetch results files
           fetch:
             src: "{{ item.1.path }}"
-            dest: "{{ config.ci.source }}/{{ config.ci.results }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
+            dest: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
+            validate_checksum: "no"
+            flat: "yes"
           with_subelements:
             - "{{ find.results }}"
             - files
@@ -270,14 +285,14 @@
 
         - name: Find log files
           find:
-            paths: "{{ config.ci.source }}/{{ config.ci.results }}"
+            paths: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}"
             patterns: "{{ config.ci.logs | join(',') }}"
             size: 1
             recurse: "yes"
           register: find
 
         - name: Tail log file
-          shell: "tail -50 {{ config.ci.source }}/{{ config.ci.results }}/{{ item }}"
+          shell: "tail -50 {{ item }}"
           with_first_found:
             - files: "{{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list }}"
               skip: True
