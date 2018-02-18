@@ -234,8 +234,9 @@
 
       rescue:
         - name: Set error flag
-          set_fact:
-            error: True
+          file:
+            path: "{{ config.ci.source }}/error"
+            state: touch
 
       always:
         - name: Release backend lock
@@ -245,10 +246,10 @@
 
         - name: Find results files
           find:
-            paths: "{{ config.ci.base }}/{{ item.source }}"
+            paths: "{{ item.source | regex_search('^/') | ternary('', config.ci.base + '/') + item.source }}"
             patterns: "{{ item.pattern }}"
           register: find
-          with_items: "{{ config.ci.tree }}"
+          with_items: "{{ config.result.tree }}"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Create results directories
