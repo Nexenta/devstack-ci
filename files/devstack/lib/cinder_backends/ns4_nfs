@@ -14,6 +14,7 @@ function configure_cinder_backend_ns4_nfs {
 
 	opt[volume_driver]=NEXENTA_DRIVER
 	opt[nas_mount_options]=NEXENTA_OPTIONS
+	opt[nfs_mount_options]=NEXENTA_OPTIONS
 	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
 
 	NEXENTA_PREFIX[$backend]="volumes"
