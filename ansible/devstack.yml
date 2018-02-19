@@ -318,15 +318,8 @@
           when: (config.vm.policy == "no") or
                 (config.vm.policy == "onerror" and failure is undefined)
 
-        - name: Create success flag
-          file:
-            path: "{{ config.ci.source }}/success"
-            state: touch
-          when: failure is undefined
-
-        - name: Create failure flag
-          file:
-            path: "{{ config.ci.source }}/failure"
-            state: touch
-          when: failure is defined
+    - name: Fail on error
+      fail:
+        msg: "Compound OpenStack task failed"
+      when: failure is defined
 ...
