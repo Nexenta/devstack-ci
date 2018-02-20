@@ -4,257 +4,303 @@
   vars_files:
     - global.yml
   tasks:
-    - name: Set required parameters
-      set_fact:
-        {"{{ item }}":"{{ lookup('env', item) }}"}
-      when: hostvars['localhost'][item] is undefined
-      with_items: "{{ required }}"
+    - name: Set Configuration Parameters
+      block:
+        - name: Set Global Required Parameters
+          set_fact:
+            {"{{ item }}":"{{ lookup('env', item) }}"}
+          when: hostvars['localhost'][item] is undefined
+          with_items: "{{ required }}"
 
-    - name: Check required parameters
-      fail:
-        msg: "Required parameter {{ item }} is not defined"
-      when: hostvars['localhost'][item] == ""
-      with_items: "{{ required }}"
+        - name: Check Required Parameters
+          fail:
+            msg: "Required parameter {{ item }} is not defined"
+          when: hostvars['localhost'][item] == ""
+          with_items: "{{ required }}"
 
-    - name: Set current workspace via Jenkins environment
-      set_fact:
-        workspace: "{{ lookup('env', 'WORKSPACE') }}"
-      when: workspace is undefined
+        - name: Set Current Workspace via Jenkins Environment
+          set_fact:
+            workspace: "{{ lookup('env', 'WORKSPACE') }}"
+          when: workspace is undefined
 
-    - name: Set current workspace via shell environment
-      set_fact:
-        workspace: "{{ lookup('env', 'PWD') }}"
-      when: workspace == ""
+        - name: Set Current Workspace via Shell Environment
+          set_fact:
+            workspace: "{{ lookup('env', 'PWD') }}"
+          when: workspace == ""
 
-    - name: Set current build number
-      set_fact:
-        build: "{{ lookup('env', 'BUILD_NUMBER') }}"
-      when: build is undefined
+        - name: Set Current Build Number
+          set_fact:
+            build: "{{ lookup('env', 'BUILD_NUMBER') }}"
+          when: build is undefined
 
-    - name: Set predefined build number
-      set_fact:
-        build: "0"
-      when: build == ""
+        - name: Set Predefined Build Number
+          set_fact:
+            build: 0
+          when: build == ""
 
-    - name: Set common SSH options
-      set_fact:
-        ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
-      with_items: "{{ config.ssh }}"
+        - name: Set Common SSH Options
+          set_fact:
+            ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
+          with_items: "{{ config.ssh }}"
 
-    - name: Set global parameters
-      set_fact:
-        matrix:
-          ci:
-            build: "{{ build }}"
-            source: "{{ workspace }}"
-            branch: "{{ branch }}"
-            backend: "{{ backend }}"
-            ssh: "{{ ssh }}"
+        - name: Set Global Parameters
+          set_fact:
+            matrix:
+              ci:
+                build: "{{ build }}"
+                source: "{{ workspace }}"
+                branch: "{{ branch }}"
+                backend: "{{ backend }}"
+                ssh: "{{ ssh }}"
 
-    - name: Combine global parameters
-      set_fact:
-        config: "{{ config | combine(matrix, recursive=True) }}"
+        - name: Combine Global Parameters
+          set_fact:
+            config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Set OS type and version
-      set_fact:
-        matrix:
-          ci:
+        - name: Set OS Type and Version
+          set_fact:
+            matrix:
+              ci:
             ostype: "{{ item.type }}"
             osversion: "{{ item.version }}"
-      when: item.branch == config.ci.branch
-      with_items: "{{ config.matrix.os }}"
+          when: item.branch == config.ci.branch
+          with_items: "{{ config.matrix.os }}"
 
-    - name: Combine OS type and version
-      set_fact:
-        config: "{{ config | combine(matrix, recursive=True) }}"
+        - name: Combine OS Type and Version
+          set_fact:
+            config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Set DevStack branch
-      set_fact:
-        matrix:
-          devstack:
-            branch: "{{ item.name }}"
-      when: item.ci == config.ci.branch and item.project == "devstack"
-      with_items: "{{ config.matrix.branch }}"
+        - name: Set Current DevStack Branch
+          set_fact:
+            matrix:
+              devstack:
+                branch: "{{ item.name }}"
+          when: item.ci == config.ci.branch and item.project == "devstack"
+          with_items: "{{ config.matrix.branch }}"
 
-    - name: Set default DevStack branch
-      set_fact:
-        matrix:
-          devstack:
-            branch: "{{ item.name }}"
-      when: (matrix.devstack is not defined
-            or matrix.devstack.branch is not defined)
-            and item.ci == config.ci.branch
-            and item.project == "default"
-      with_items: "{{ config.matrix.branch }}"
+        - name: Set Default DevStack Branch
+          set_fact:
+            matrix:
+              devstack:
+                branch: "{{ item.name }}"
+          when: (matrix.devstack is not defined
+                or matrix.devstack.branch is not defined)
+                and item.ci == config.ci.branch
+                and item.project == "default"
+          with_items: "{{ config.matrix.branch }}"
 
-    - name: Combine active DevStack branch
-      set_fact:
-        config: "{{ config | combine(matrix, recursive=True) }}"
+        - name: Combine Current DevStack Branch
+          set_fact:
+            config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Set current backend parameters
-      set_fact:
-        matrix:
-          backend: "{{ item.value }}"
-      when: item.key == config.ci.backend
-      with_dict: "{{ config }}"
+        - name: Set Current Backend Parameters
+          set_fact:
+            matrix:
+              backend: "{{ item.value }}"
+          when: item.key == config.ci.backend
+          with_dict: "{{ config }}"
 
-    - name: Combine active backend parameters
-      set_fact:
-        config: "{{ config | combine(matrix, recursive=True) }}"
+        - name: Combine Current Backend Parameters
+          set_fact:
+            config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Create unique pseudo-random BIOS UUID
-      bios_uuid:
-        project: "{{ config.ci.project }}"
-        branch: "{{ config.ci.branch }}"
-        backend: "{{ config.ci.backend }}"
-        ostype: "{{ config.ci.ostype }}"
-        osversion: "{{ config.ci.osversion }}"
-      register: bios
+        - name: Create Unique BIOS UUID
+          bios_uuid:
+            project: "{{ config.ci.project }}"
+            branch: "{{ config.ci.branch }}"
+            backend: "{{ config.ci.backend }}"
+            ostype: "{{ config.ci.ostype }}"
+            osversion: "{{ config.ci.osversion }}"
+          register: bios
 
-    - name: Set dependent parameters
-      set_fact:
-        matrix:
-          vm:
-            uuid: "{{ bios.uuid }}"
-            name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
+        - name: Set Dependent Parameters
+          set_fact:
+            matrix:
+              vm:
+                uuid: "{{ bios.uuid }}"
+                name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
 
-    - name: Combine dependent parameters
-      set_fact:
-        config: "{{ config | combine(matrix, recursive=True) }}"
+        - name: Combine Dependent Parameters
+          set_fact:
+            config: "{{ config | combine(matrix, recursive=True) }}"
 
-    - name: Print CI configuration
-      debug:
-        msg: "{{ config }}"
+        - name: Print Current Configuration
+          debug:
+            msg: "{{ config }}"
 
-    - name: Random delay
-      pause:
-        seconds: "{{ config.ci.delay | random }}"
+     rescue:
+       - name: Set Error Flag
+         set_fact:
+           error: "Configuration parameters task failed"
 
-    - name: Destroy VM
-      vmware_guest:
-        validate_certs: False
-        hostname: "{{ config.vsphere.host }}"
-        username: "{{ config.vsphere.user }}"
-        password: "{{ config.vsphere.password }}"
-        datacenter: "{{ config.vsphere.datacenter }}"
-        cluster: "{{ config.vsphere.cluster }}"
-        folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
-        name: "{{ config.vm.name }}"
-        state: absent
-        force: yes
+       - name: Stop Current Job
+         fail:
+           msg: "{{ error }}"
 
-    - name: Create new VM
-      vmware_guest:
-        validate_certs: False
-        hostname: "{{ config.vsphere.host }}"
-        username: "{{ config.vsphere.user }}"
-        password: "{{ config.vsphere.password }}"
-        datacenter: "{{ config.vsphere.datacenter }}"
-        cluster: "{{ config.vsphere.cluster }}"
-        resource_pool: "{{ config.vsphere.pool }}"
-        folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
-        uuid: "{{ config.vm.uuid }}"
-        name: "{{ config.vm.name }}"
-        guest_id: "{{ config.vm.guest }}"
-        disk: "{{ config.vm.disks }}"
-        networks: "{{ config.vm.networks }}"
-        hardware:
-          memory_mb: "{{ config.vm.ram }}"
-          num_cpus: "{{ config.vm.cpu }}"
-          scsi: "{{ config.vm.scsi }}"
-        wait_for_ip_address: True
-        state: "poweredon"
-      register: vm
+     always:
+       - name: Check Error Flag
+         debug:
+           msg: "Notify failure handler"
+         changed_when: True
+         when: error is defined
+         notify: failure
 
-    - name: Print VM parameters
-      debug:
-        var: vm
-
-    - name: Check VM IP address
-      fail:
-        msg: "VM IP address is not defined"
-      when: (vm.instance.ipv4 is not defined) or (vm.instance.ipv4 == "")
-
-    - name: Wait for SSH port to become open and contain "OpenSSH"
-      wait_for:
-        port: 22
-        host: "{{ vm.instance.ipv4 }}"
-        search_regex: "OpenSSH"
-
-    - name: Create inventory for VM IP address
-      add_host:
-        name: "{{ config.vm.name }}"
-        groups: "{{ config.ci.project }}"
-        ansible_host: "{{ vm.instance.ipv4 }}"
-        ansible_user: "{{ config.devstack.user }}"
-        ansible_connection: "ssh"
-        ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
-        ansible_ssh_common_args: "{{ config.ci.ssh }}"
-
-    - name: Compound OpenStack task
+    - name: Deploy Virtual Machine
       block:
-        - name: Checkout CI repository
+        - name: Random Delay
+          pause:
+            seconds: "{{ config.ci.delay | random }}"
+
+        - name: Destroy Virtual Machine
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            datacenter: "{{ config.vsphere.datacenter }}"
+            cluster: "{{ config.vsphere.cluster }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+            name: "{{ config.vm.name }}"
+            state: absent
+            force: yes
+
+        - name: Create Virtual Machine
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            datacenter: "{{ config.vsphere.datacenter }}"
+            cluster: "{{ config.vsphere.cluster }}"
+            resource_pool: "{{ config.vsphere.pool }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+            uuid: "{{ config.vm.uuid }}"
+            name: "{{ config.vm.name }}"
+            guest_id: "{{ config.vm.guest }}"
+            disk: "{{ config.vm.disks }}"
+            networks: "{{ config.vm.networks }}"
+            hardware: "{{ config.vm.hardware }}"
+            wait_for_ip_address: True
+            state: "poweredon"
+          register: vm
+
+        - name: Print Virtual Machine Parameters
+          debug:
+            var: vm
+
+        - name: Check Virtual Machine IP Address
+          fail:
+            msg: "Virtual Machine IP address is not defined"
+          when: (vm.instance.ipv4 is not defined) or (vm.instance.ipv4 == "")
+
+        - name: Wait for SSH Port to Become Open and Contain "OpenSSH"
+          wait_for:
+            port: 22
+            host: "{{ vm.instance.ipv4 }}"
+            search_regex: "OpenSSH"
+
+        - name: Create Inventory for Virtual Machine IP address
+          add_host:
+            name: "{{ config.vm.name }}"
+            groups: "{{ config.ci.project }}"
+            ansible_host: "{{ vm.instance.ipv4 }}"
+            ansible_user: "{{ config.devstack.user }}"
+            ansible_connection: "ssh"
+            ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
+            ansible_ssh_common_args: "{{ config.ci.ssh }}"
+
+     rescue:
+       - name: Set Error Flag
+         set_fact:
+           error: "Create virtual machine task failed"
+
+       - name: Stop Current Job
+         fail:
+           msg: "{{ error }}"
+
+     always:
+       - name: Check Error Flag
+         debug:
+           msg: "Notify failure handler"
+         changed_when: True
+         when: error is defined
+         notify: failure
+
+    - name: Compound DevStack Task
+      block:
+        - name: Checkout CI Repository
           git:
             repo: "{{ config.ci.repository }}"
             dest: "{{ config.ci.base }}/{{ config.ci.destination }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Checkout DevStack repository
+        - name: Checkout DevStack Repository
           git:
             repo: "{{ config.devstack.repository }}"
             dest: "{{ config.ci.base }}/{{ config.devstack.destination }}"
             version: "{{ config.devstack.branch }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Copy DevStack profile
+        - name: Copy DevStack Profile
           template:
             src: "{{ config.ci.source }}/templates/local.conf.j2"
             dest: "{{ config.ci.base }}/{{ config.devstack.destination }}/local.conf"
             mode: 0644
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Copy CI profile
+        - name: Copy CI Profile
           template:
             src: "{{ config.ci.source }}/templates/env.sh.j2"
             dest: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/env.sh"
             mode: 0755
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Patch DevStack source code
+        - name: Patch DevStack Source Code
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/patch.sh"
           args:
             chdir: "{{ config.ci.base }}/{{ config.devstack.destination }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Install DevStack environment
+        - name: Install DevStack Environment
           shell: "{{ config.ci.base }}/{{ config.devstack.destination }}/stack.sh"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Acquire backend lock
+        - name: Acquire Backend Lock
           flock:
             name: "{{ config.ci.project }}-{{ config.ci.backend }}"
             action: "acquire"
 
-        - name: Run test suite - first pass
+        - name: Run Test Suite - First Pass
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Run test suite - second pass
+        - name: Run Test Suite - Second Pass
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
       rescue:
-        - name: Set failure flag
+        - name: Set Error Flag
           set_fact:
-            failure: True
+            error: "Compound devstack task failed"
+
+        - name: Stop Current Job
+          fail:
+            msg: "{{ error }}"
 
       always:
-        - name: Release backend lock
+        - name: Check Error Flag
+          debug:
+            msg: "Notify failure handler"
+          changed_when: True
+          when: error is defined
+          notify: failure
+
+        - name: Release Backend Lock
           flock:
             name: "{{ config.ci.project }}-{{ config.ci.backend }}"
             action: "release"
 
-        - name: Find results files
+        - name: Find Results Files
           find:
             paths: "{{ item.source | regex_search('^/') | ternary('', config.ci.base + '/') + item.source }}"
             patterns: "{{ item.pattern }}"
@@ -264,7 +310,7 @@
           with_items: "{{ config.result.tree }}"
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Create results directories
+        - name: Create Results Directories
           file:
             path: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}/{{ item.item.destination }}"
             state: "directory"
@@ -272,7 +318,7 @@
             mode: 0755
           with_items: "{{ find.results }}"
 
-        - name: Fetch results files
+        - name: Fetch Results Files
           fetch:
             src: "{{ item.1.path }}"
             dest: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
@@ -283,7 +329,7 @@
             - files
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Find log files
+        - name: Find Log Files
           find:
             paths: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}"
             patterns: "{{ config.result.logs | join(',') }}"
@@ -291,19 +337,19 @@
             recurse: "yes"
           register: find
 
-        - name: Tail log file
+        - name: Tail Latest Log File
           shell: "tail -50 {{ item }}"
           with_first_found:
             - files: "{{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list }}"
               skip: True
           register: tail
 
-        - name: Display log file
+        - name: Display Latest Log File
           debug:
             msg: "{{ tail.results | map(attribute='stdout_lines') | list }}"
           when: tail.results
 
-        - name: Destroy VM
+        - name: Destroy Virtual Machine
           vmware_guest:
             validate_certs: False
             hostname: "{{ config.vsphere.host }}"
@@ -318,8 +364,9 @@
           when: (config.vm.policy == "no") or
                 (config.vm.policy == "onerror" and failure is undefined)
 
-    - name: Fail on error
+  handlers:
+    - name: Failure Handler
       fail:
-        msg: "Compound OpenStack task failed"
-      when: failure is defined
+        msg: "Failure: {{ error | default('unknown error') }}"
+      listen: failure
 ...
