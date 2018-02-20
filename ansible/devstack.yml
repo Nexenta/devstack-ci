@@ -70,10 +70,6 @@
           set_fact:
             config: "{{ config | combine(matrix, recursive=True) }}"
 
-        - name: Debug
-          debug:
-            msg: "{{ config }}"
-
         - name: Set Current DevStack Branch
           set_fact:
             matrix:
