@@ -19,7 +19,6 @@ function configure_cinder_backend_ns4_nfs {
 	NEXENTA_PREFIX[$backend]="volumes"
 
 	iniset $CINDER_CONF $backend volume_backend_name $backend
-	iniset $CINDER_CONF $backend nas_secure_file_operations False
 	iniset $CINDER_CONF $backend nexenta_shares_config \
 		$CINDER_CONF_DIR/$backend.conf
 

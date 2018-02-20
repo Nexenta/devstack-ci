@@ -31,7 +31,6 @@ function configure_cinder_backend_ns5_nfs {
 	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
 
 	iniset $CINDER_CONF $backend volume_backend_name $backend
-	iniset $CINDER_CONF $backend nas_secure_file_operations False
 
 	for item in "${!opt[@]}"; do
 		declare -n var="${opt[$item]}[$backend]"
