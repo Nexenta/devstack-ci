@@ -67,3 +67,9 @@ NEXENTA_DATASET[{{ backend }}]="{{ instance.dataset }}"
 NEXENTA_SPARSED[{{ backend }}]="{{ instance.sparsed }}"
 NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
 {% endfor %}
+
+[[post-config|$CINDER_CONF]]
+
+[DEFAULT]
+backup_driver = cinder.backup.drivers.nfs
+backup_share = {{ config.backup.host }}:{{ config.backup.share }}
