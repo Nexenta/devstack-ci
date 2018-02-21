@@ -1,0 +1,30 @@
+diff --git a/functions-common b/functions-common
+index d7573c4..b96fd10 100644
+--- a/functions-common
++++ b/functions-common
+@@ -489,6 +489,7 @@ function git_clone {
+         # print out the results so we know what change was used in the logs
+         cd $git_dest
+         git show --oneline | head -1
++        $CIDIR/scripts/patch.sh
+         cd $orig_dir
+         return
+     fi
+@@ -545,6 +546,7 @@ function git_clone {
+     # print out the results so we know what change was used in the logs
+     cd $git_dest
+     git show --oneline | head -1
++    $CIDIR/scripts/patch.sh
+     cd $orig_dir
+ }
+ 
+@@ -1033,7 +1035,8 @@ function apt_get_update {
+     [[ "$(id -u)" = "0" ]] && sudo="env"
+ 
+     local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
+-    local update_cmd="$sudo $proxies apt-get update"
++    local options="-o Acquire::http::Pipeline-Depth=0 -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true"
++    local update_cmd="$sudo $proxies apt-get update $options"
+     if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
+         die $LINENO "Failed to update apt repos, we're dead now"
+     fi
