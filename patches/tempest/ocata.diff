@@ -1,0 +1,12 @@
+diff --git a/tox.ini b/tox.ini
+index d8d390e..61d7626 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -10,6 +10,7 @@ setenv =
+     OS_TEST_PATH=./tempest/test_discover
+ deps =
+     setuptools
++    -c{env:UPPER_CONSTRAINTS_FILE:../requirements/upper-constraints.txt}
+     -r{toxinidir}/requirements.txt
+ 
+ [testenv]
