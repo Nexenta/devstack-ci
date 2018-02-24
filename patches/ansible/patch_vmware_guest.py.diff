@@ -1,37 +1,89 @@
---- ansible-2.4.3.0/lib/ansible/modules/cloud/vmware/vmware_guest.py.orig	2018-02-16 01:26:26.285417000 +0000
-+++ ansible-2.4.3.0/lib/ansible/modules/cloud/vmware/vmware_guest.py	2018-02-16 01:26:29.564953000 +0000
-@@ -302,6 +302,7 @@
- '''
- 
- import time
-+import random
- 
- HAS_PYVMOMI = False
- try:
-@@ -624,6 +625,7 @@
-         if vm_obj is None or self.params['guest_id'] != vm_obj.summary.config.guestId:
+--- ansible-2.4.3.0/lib/ansible/modules/cloud/vmware/vmware_guest.py.orig	2018-02-24 20:18:24.364547000 +0000
++++ ansible-2.4.3.0/lib/ansible/modules/cloud/vmware/vmware_guest.py	2018-02-24 20:22:04.893341000 +0000
+@@ -625,6 +625,14 @@
              self.change_detected = True
              self.configspec.guestId = self.params['guest_id']
-+            self.configspec.uuid = self.params['uuid']
  
++    def configure_uuid(self, vm_obj, vm_creation=False):
++        if self.params['uuid'] is None:
++            return
++
++        if vm_obj is None or self.params['uuid'] != vm_obj.summary.config.uuid:
++            self.change_detected = True
++            self.configspec.uuid = self.params['uuid']
++
      def configure_cpu_and_memory(self, vm_obj, vm_creation=False):
          # set cpu/memory/etc
-@@ -1011,7 +1013,8 @@
-             if not hostsystems:
-                 self.module.fail_json(msg='No hosts found in cluster "%(cluster)s. Maybe you lack the right privileges ?"' % self.params)
-             # TODO: add a policy to select host
--            hostsystem = hostsystems[0]
-+            secure_random = random.SystemRandom()
-+            hostsystem = secure_random.choice(hostsystems)
-         else:
-             hostsystem = self.cache.get_esx_host(self.params['esxi_hostname'])
-             if not hostsystem:
-@@ -1414,7 +1417,7 @@
+         if 'hardware' in self.params:
+@@ -1046,18 +1054,37 @@
+                 if datastores is None or len(datastores) == 0:
+                     self.module.fail_json(msg="Unable to find a datastore list when autoselecting")
+ 
+-                datastore_freespace = 0
++                memory_max = 0
++                disk_size = 0
++
++                for disk_spec in self.params.get('disk'):
++                    disk_size += int(2 * self.get_configured_disk_size(disk_spec) / 1024)
++
+                 for ds in datastores:
+-                    if (ds.summary.freeSpace > datastore_freespace) or (ds.summary.freeSpace == datastore_freespace and not datastore):
+-                        # If datastore field is provided, filter destination datastores
+-                        if 'datastore' in self.params['disk'][0] and \
+-                                isinstance(self.params['disk'][0]['datastore'], str) and \
+-                                ds.name.find(self.params['disk'][0]['datastore']) < 0:
++                    if not ds.summary.accessible:
++                        continue
++
++                    if 'datastore' in self.params['disk'][0] and ds.name.find(self.params['disk'][0]['datastore']) < 0:
++                        continue
++
++                    datastore_free = int(ds.summary.freeSpace / 1024 / 1024)
++                    if datastore_free < disk_size:
++                        continue
++
++                    for mount in ds.host:
++                        host = mount.key
++                        memory_total = host.hardware.memorySize / 1024 / 1024
++                        memory_usage = host.summary.quickStats.overallMemoryUsage
++                        memory_free = int(memory_total - memory_usage)
++
++                        if 'memory_mb' in self.params['hardware'] and int(self.params['hardware']['memory_mb']) > memory_free:
+                             continue
+ 
+-                        datastore = ds
+-                        datastore_name = datastore.name
+-                        datastore_freespace = ds.summary.freeSpace
++                        memory_free = 100 - int(100 * memory_usage / memory_total)
++                        if memory_free > memory_max:
++                            datastore = ds
++                            datastore_name = datastore.name
++                            memory_max = memory_free
+ 
+             elif 'datastore' in self.params['disk'][0]:
+                 datastore_name = self.params['disk'][0]['datastore']
+@@ -1238,6 +1265,7 @@
+         self.configspec = vim.vm.ConfigSpec(cpuHotAddEnabled=True, memoryHotAddEnabled=True)
+         self.configspec.deviceChange = []
+         self.configure_guestid(vm_obj=vm_obj, vm_creation=True)
++        self.configure_uuid(vm_obj=vm_obj, vm_creation=True)
+         self.configure_cpu_and_memory(vm_obj=vm_obj, vm_creation=True)
+         self.configure_disks(vm_obj=vm_obj)
+         self.configure_network(vm_obj=vm_obj)
+@@ -1355,6 +1383,7 @@
+         self.configspec.deviceChange = []
+ 
+         self.configure_guestid(vm_obj=self.current_vm_obj)
++        self.configure_uuid(vm_obj=self.current_vm_obj)
+         self.configure_cpu_and_memory(vm_obj=self.current_vm_obj)
+         self.configure_disks(vm_obj=self.current_vm_obj)
+         self.configure_network(vm_obj=self.current_vm_obj)
+@@ -1414,7 +1443,7 @@
          while task.info.state not in ['error', 'success']:
              time.sleep(1)
  
 -    def wait_for_vm_ip(self, vm, poll=100, sleep=5):
-+    def wait_for_vm_ip(self, vm, poll=900, sleep=5):
++    def wait_for_vm_ip(self, vm, poll=1000, sleep=5):
          ips = None
          facts = {}
          thispoll = 0
