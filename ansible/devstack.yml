@@ -331,11 +331,12 @@
 
         - name: Find Log Files
           find:
-            paths: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}"
+            paths: "{{ config.ci.base }}/{{ config.ci.logs }}"
             patterns: "{{ config.result.logs | join(',') }}"
             size: 1
             recurse: "yes"
           register: find
+          delegate_to: "{{ config.vm.name }}"
 
         - name: Tail Latest Log File
           shell: "tail -50 {{ item }}"
@@ -343,6 +344,7 @@
             - files: "{{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list }}"
               skip: True
           register: tail
+          delegate_to: "{{ config.vm.name }}"
 
         - name: Display Latest Log File
           debug:
