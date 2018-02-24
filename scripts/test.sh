@@ -15,7 +15,7 @@ typeset _error
 
 source $_source/env.sh
 
-exec > >(tee -a $_base/logs/$_ident.log | logger -t $_ident) 2>&1
+exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 
 cd $_base/tempest
 set +o errexit
@@ -34,7 +34,7 @@ testr last --subunit >report.sub
 cat report.sub | subunit-1to2 | subunit-trace >report.txt
 subunit2html report.sub report.html
 
-df -h >$_base/logs/df.log 2>&1
-mount >$_base/logs/mount.log 2>&1
+df -h >$_base/$_logs/df.log 2>&1
+mount >$_base/$_logs/mount.log 2>&1
 
 exit $_error

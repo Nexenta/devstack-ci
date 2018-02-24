@@ -16,7 +16,7 @@ typeset _source=$(dirname $_script)
 
 source $_source/env.sh
 
-exec > >(tee -a $_base/logs/$_ident.log | logger -t $_ident) 2>&1
+exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
     patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
