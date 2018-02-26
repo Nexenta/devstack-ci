@@ -73,6 +73,7 @@ NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
 [[post-config|$CINDER_CONF]]
 
 [DEFAULT]
+driver_ssl_cert_verify = False
 backup_driver = "cinder.backup.drivers.nfs"
 backup_share = "{{ config.backup.host }}:{{ config.backup.share }}"
 backup_mount_options = "{{ config.backup.options }}"
