@@ -333,23 +333,20 @@
           find:
             paths: "{{ config.ci.base }}/{{ config.ci.logs }}"
             patterns: "{{ config.result.logs | join(',') }}"
+            file_type: "any"
+            follow: "yes"
             size: 1
-            recurse: "yes"
           register: find
           delegate_to: "{{ config.vm.name }}"
 
         - name: Tail Latest Log File
-          shell: "tail -50 {{ item }}"
-          with_first_found:
-            - files: "{{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list }}"
-              skip: True
+          shell: "tail -50 {{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list | first }}"
           register: tail
           delegate_to: "{{ config.vm.name }}"
 
         - name: Display Latest Log File
           debug:
-            msg: "{{ tail.results | map(attribute='stdout_lines') | list }}"
-          when: tail.results
+            msg: "{{ tail.stdout_lines }}"
 
         - name: Destroy Virtual Machine
           vmware_guest:
