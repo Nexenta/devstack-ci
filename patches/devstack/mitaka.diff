@@ -37,3 +37,22 @@ index 5ae9745..daf83d6 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/tools/cap-pip.txt b/tools/cap-pip.txt
+index c280267..c1ae290 100644
+--- a/tools/cap-pip.txt
++++ b/tools/cap-pip.txt
+@@ -1 +1,2 @@
+ pip!=8
++setuptools==30.4.0
+diff --git a/tools/install_pip.sh b/tools/install_pip.sh
+index 5d314c8..62f4e0e 100755
+--- a/tools/install_pip.sh
++++ b/tools/install_pip.sh
+@@ -137,6 +137,6 @@ set -x
+ 
+ # Note setuptools is part of requirements.txt and we want to make sure
+ # we obey any versioning as described there.
+-pip_install_gr setuptools
++pip_install -U setuptools==30.4.0
+ 
+ get_versions

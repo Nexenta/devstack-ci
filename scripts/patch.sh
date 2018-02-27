@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
+unset PS4
+
 set -o nounset
 set -o xtrace
 set -o errexit
 set -o pipefail
 set -o noglob
-
-unset PS4
 
 typeset _pwd=$(pwd)
 typeset _project=$(basename $_pwd)

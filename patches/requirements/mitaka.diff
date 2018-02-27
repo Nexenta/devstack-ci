@@ -1,13 +1,12 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 0cdcd13..0e89fdb 100644
+index 0cdcd13..6b1e369 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -194,7 +194,7 @@ numpy===1.10.4
- oauth2client===2.0.1
- oauthlib===1.0.3
- openstack-doc-tools===0.33.0
--openstack.nose-plugin===0.11
-+openstack.nose-plugin===0.10
- openstackdocstheme===1.3.0
- openstacksdk===0.8.1
- ordereddict===1.1
+@@ -331,6 +331,7 @@ selenium===2.52.0
+ semantic-version===2.5.0
+ seqdiag===0.9.5
+ service-identity===16.0.0
++setuptools===30.4.0
+ simplegeneric===0.8.1
+ simplejson===3.8.2
+ singledispatch===3.4.0.3
