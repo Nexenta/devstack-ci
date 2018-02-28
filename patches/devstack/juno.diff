@@ -1,0 +1,95 @@
+diff --git a/functions-common b/functions-common
+index 7d2138d..0937c53 100644
+--- a/functions-common
++++ b/functions-common
+@@ -577,6 +577,7 @@ function git_clone {
+         # print out the results so we know what change was used in the logs
+         cd $git_dest
+         git show --oneline | head -1
++        $CIDIR/scripts/patch.sh
+         cd $orig_dir
+         return
+     fi
+@@ -627,6 +628,7 @@ function git_clone {
+     # print out the results so we know what change was used in the logs
+     cd $git_dest
+     git show --oneline | head -1
++    $CIDIR/scripts/patch.sh
+     cd $orig_dir
+ }
+ 
+@@ -1071,9 +1073,13 @@ function update_package_repo {
+         local xtrace=$(set +o | grep xtrace)
+         set +o xtrace
+         if [[ "$REPOS_UPDATED" != "True" || "$RETRY_UPDATE" = "True" ]]; then
+-            # if there are transient errors pulling the updates, that's fine.
+-            # It may be secondary repositories that we don't really care about.
+-            apt_get update  || /bin/true
++            local options="-o Acquire::http::Pipeline-Depth=0 -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true"
++            local retries=10
++            while ! apt_get update $options; do
++                if (( --retries == 0 )); then
++                    die $LINENO "Failed to update apt repository"
++                fi
++            done
+             REPOS_UPDATED=True
+         fi
+         $xtrace
+@@ -1571,12 +1577,19 @@ function pip_install {
+         pip_mirror_opt="--use-mirrors"
+     fi
+ 
++    local opt_pip="-v"
++
++    if [[ -f "$REQUIREMENTS_DIR/upper-constraints.txt" ]]; then
++        opt_pip="-c $REQUIREMENTS_DIR/upper-constraints.txt"
++    fi
++
+     $xtrace
+     $sudo_pip PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE:-/var/cache/pip} \
+         http_proxy=$http_proxy \
+         https_proxy=$https_proxy \
+         no_proxy=$no_proxy \
+         $cmd_pip install \
++        $opt_pip \
+         $pip_mirror_opt $@
+ 
+     if [[ "$INSTALL_TESTONLY_PACKAGES" == "True" ]]; then
+@@ -1665,8 +1678,8 @@ function setup_package_with_req_sync {
+     local update_requirements=$(cd $project_dir && git diff --exit-code >/dev/null || echo "changed")
+ 
+     if [[ $update_requirements != "changed" ]]; then
+-        (cd $REQUIREMENTS_DIR; \
+-            python update.py $project_dir)
++        cd $REQUIREMENTS_DIR
++        tox -e update -- $project_dir
+     fi
+ 
+     setup_package $project_dir $flags
+diff --git a/lib/infra b/lib/infra
+index ef5a136..c1a15d9 100644
+--- a/lib/infra
++++ b/lib/infra
+@@ -40,6 +40,8 @@ function install_infra {
+         # Always upgrade pbr to latest version as we may have pulled it
+         # in via system packages.
+         pip_install "-U" "pbr"
++        pip_install "-U" "tox"
++        pip_install "-U" "parsley"
+     fi
+ }
+ 
+diff --git a/lib/tempest b/lib/tempest
+index 24ac072..638dbab 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -495,6 +495,9 @@ function install_tempest {
+     install_tempest_lib
+     git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
+     pip_install tox
++    pip_install os-testr
++    pip_install testscenarios
++    pip_install tempest-lib
+ }
+ 
+ # init_tempest() - Initialize ec2 images
