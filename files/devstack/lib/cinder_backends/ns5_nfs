@@ -45,7 +45,7 @@ function cleanup_cinder_backend_ns5_nfs {
 	declare mount_point
 
 	for mount_point in $CINDER_STATE_PATH/mnt/*; do
-		sudo "umount -f $mount_point && rmdir $mount_point"
+		sudo umount -f $mount_point && rmdir $mount_point
 	done
 }
 

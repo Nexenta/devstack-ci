@@ -74,8 +74,10 @@ NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
 
 [DEFAULT]
 driver_ssl_cert_verify = False
+{% if config.ci.branch != "juno" %}
 backup_file_size = "134217728"
 backup_sha_block_size_bytes = "32768"
 backup_driver = "cinder.backup.drivers.nfs"
 backup_share = "{{ config.backup.host }}:{{ config.backup.share }}"
 backup_mount_options = "{{ config.backup.options }}"
+{% endif %}
