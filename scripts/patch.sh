@@ -26,7 +26,6 @@ if [[ -d $_base/$_ci/files/$_project ]]; then
     (cd $_base/$_ci/files/$_project && tar cf - .) | tar pxvf -
 fi
 
-git branch
-git show
-git status
-git diff
+for item in branch show status diff; do
+	git $item | tee -a $LOGDIR/git.$item.$_project.log
+done
