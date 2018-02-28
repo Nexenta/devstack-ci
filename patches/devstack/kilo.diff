@@ -1,0 +1,93 @@
+diff --git a/functions-common b/functions-common
+index b92fa55..44f4c71 100644
+--- a/functions-common
++++ b/functions-common
+@@ -610,6 +610,7 @@ function git_clone {
+         # print out the results so we know what change was used in the logs
+         cd $git_dest
+         git show --oneline | head -1
++        $CIDIR/scripts/patch.sh
+         cd $orig_dir
+         return
+     fi
+@@ -660,6 +661,7 @@ function git_clone {
+     # print out the results so we know what change was used in the logs
+     cd $git_dest
+     git show --oneline | head -1
++    $CIDIR/scripts/patch.sh
+     cd $orig_dir
+ }
+ 
+@@ -1154,9 +1156,14 @@ function update_package_repo {
+         local xtrace=$(set +o | grep xtrace)
+         set +o xtrace
+         if [[ "$REPOS_UPDATED" != "True" || "$RETRY_UPDATE" = "True" ]]; then
+-            # if there are transient errors pulling the updates, that's fine.
+-            # It may be secondary repositories that we don't really care about.
+-            apt_get update  || /bin/true
++            local options="-o Acquire::http::Pipeline-Depth=0 -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true"
++            local retries=10
++            while ! apt_get update $options; do
++                if (( --retries == 0 )); then
++                    die $LINENO "Failed to update apt repository"
++                fi
++                sleep $(( RANDOM % 60 ))
++            done
+             REPOS_UPDATED=True
+         fi
+         $xtrace
+@@ -1647,12 +1654,19 @@ function pip_install {
+             "meet minimum requirements (>=6)."
+     fi
+ 
++    local opt_pip="-v"
++
++    if [[ -f "$REQUIREMENTS_DIR/upper-constraints.txt" ]]; then
++        opt_pip="-c $REQUIREMENTS_DIR/upper-constraints.txt"
++    fi
++
+     $xtrace
+     $sudo_pip \
+         http_proxy=${http_proxy:-} \
+         https_proxy=${https_proxy:-} \
+         no_proxy=${no_proxy:-} \
+         $cmd_pip install \
++        $opt_pip \
+         $@
+ 
+     INSTALL_TESTONLY_PACKAGES=$(trueorfalse False INSTALL_TESTONLY_PACKAGES)
+@@ -1741,19 +1755,8 @@ function setup_package_with_req_sync {
+     local update_requirements=$(cd $project_dir && git diff --exit-code >/dev/null || echo "changed")
+ 
+     if [[ $update_requirements != "changed" ]]; then
+-        if [[ "$REQUIREMENTS_MODE" == "soft" ]]; then
+-            if is_in_projects_txt $project_dir; then
+-                (cd $REQUIREMENTS_DIR; \
+-                    python update.py $project_dir)
+-            else
+-                # soft update projects not found in requirements project.txt
+-                (cd $REQUIREMENTS_DIR; \
+-                    python update.py -s $project_dir)
+-            fi
+-        else
+-            (cd $REQUIREMENTS_DIR; \
+-                python update.py $project_dir)
+-        fi
++        cd $REQUIREMENTS_DIR
++        tox -e update -- $project_dir
+     fi
+ 
+     setup_package $project_dir $flags
+diff --git a/lib/infra b/lib/infra
+index c825b4e..5be54d3 100644
+--- a/lib/infra
++++ b/lib/infra
+@@ -40,6 +40,8 @@ function install_infra {
+         # Always upgrade pbr to latest version as we may have pulled it
+         # in via system packages.
+         pip_install "-U" "pbr"
++        pip_install "-U" "tox"
++        pip_install "-U" "parsley"
+     fi
+ }
+ 
