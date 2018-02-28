@@ -1,0 +1,75 @@
+diff --git a/functions-common b/functions-common
+index 304eed8..c736bb0 100644
+--- a/functions-common
++++ b/functions-common
+@@ -529,6 +529,7 @@ function git_clone {
+         # print out the results so we know what change was used in the logs
+         cd $GIT_DEST
+         git show --oneline | head -1
++        $CIDIR/scripts/patch.sh
+         cd $orig_dir
+         return
+     fi
+@@ -579,6 +580,7 @@ function git_clone {
+     # print out the results so we know what change was used in the logs
+     cd $GIT_DEST
+     git show --oneline | head -1
++    $CIDIR/scripts/patch.sh
+     cd $orig_dir
+ }
+ 
+@@ -902,10 +904,16 @@ function install_package {
+     local xtrace=$(set +o | grep xtrace)
+     set +o xtrace
+     if is_ubuntu; then
+-        # if there are transient errors pulling the updates, that's fine. It may
+-        # be secondary repositories that we don't really care about.
+-        [[ "$NO_UPDATE_REPOS" = "True" ]] || apt_get update || /bin/true
+-        NO_UPDATE_REPOS=True
++        if [[ "$REPOS_UPDATED" != "True" ]]; then
++            local options="-o Acquire::http::Pipeline-Depth=0 -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true"
++            local retries=10
++            while ! apt_get update $options; do
++                if (( --retries == 0 )); then
++                    die $LINENO "Failed to update apt repository"
++                fi
++            done
++            REPOS_UPDATED=True
++        fi
+ 
+         $xtrace
+         apt_get install "$@"
+@@ -1376,12 +1384,19 @@ function pip_install {
+     # this problem. See https://github.com/pypa/pip/issues/709
+     local pip_build_tmp=$(mktemp --tmpdir -d pip-build.XXXXX)
+ 
++    local opt_pip="-v"
++
++    if [[ -f "$REQUIREMENTS_DIR/upper-constraints.txt" ]]; then
++        opt_pip="-c $REQUIREMENTS_DIR/upper-constraints.txt"
++    fi
++
+     $xtrace
+     $SUDO_PIP PIP_DOWNLOAD_CACHE=${PIP_DOWNLOAD_CACHE:-/var/cache/pip} \
+         HTTP_PROXY=$http_proxy \
+         HTTPS_PROXY=$https_proxy \
+         NO_PROXY=$no_proxy \
+         $CMD_PIP install --build=${pip_build_tmp} \
++        $opt_pip \
+         $PIP_MIRROR_OPT $@ \
+         && $SUDO_PIP rm -rf ${pip_build_tmp}
+ }
+diff --git a/lib/tempest b/lib/tempest
+index 1ce4f56..7d4dfae 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -476,6 +476,9 @@ function install_tempest_lib {
+ function install_tempest {
+     git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
+     pip_install "tox<1.7"
++    pip_install os-testr
++    pip_install testscenarios
++    pip_install tempest-lib
+ }
+ 
+ # init_tempest() - Initialize ec2 images
