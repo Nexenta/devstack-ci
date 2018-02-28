@@ -1,0 +1,10 @@
+diff --git a/upper-constraints.txt b/upper-constraints.txt
+index 767e3aa..b25603e 100644
+--- a/upper-constraints.txt
++++ b/upper-constraints.txt
+@@ -1 +1,5 @@
+ # Empty because this is only supported in liberty and above.
++oslo.utils===1.4.1
++os-testr==0.2.0
++testscenarios==0.5.0
++tempest-lib==0.2.1
