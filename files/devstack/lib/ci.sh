@@ -2,23 +2,18 @@
 
 function ci_install {
 	if is_service_enabled cinder; then
-		local nex_drv=$(mktemp -d)
+		git clone -b $NEXENTA_BRANCH $NEXENTA_REPOSITORY $NEXENTA_DESTINATION
 
-		pushd $CINDER_DIR/cinder/volume/drivers
-		if [[ -d nexenta ]]; then
+		pushd $NEXENTA_DESTINATION
+		$CIDIR/scripts/patch.sh
+		cd $CINDER_DIR/cinder/volume/drivers
+
+		if [[ -d "nexenta" ]]; then
 			mv nexenta nexenta.orig
 		fi
+
+		ln -s $NEXENTA_DESTINATION/cinder/volume/drivers/nexenta
 		popd
-
-		git clone -b $NEXENTA_BRANCH $NEXENTA_REPO $nex_drv
-
-		pushd $nex_drv
-		git show | tee $LOGDIR/nexenta-cinder-git.log
-		cp -Rp cinder/volume/drivers/nexenta \
-			$CINDER_DIR/cinder/volume/drivers
-		popd
-
-		rm -rf $nex_drv
 	fi
 }
 

@@ -48,7 +48,8 @@ TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
 TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
 TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
-NEXENTA_REPO="{{ config.nexenta.repository }}"
+NEXENTA_REPOSITORY="{{ config.nexenta.repository }}"
+NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 
 declare -A NEXENTA_DRIVER
 declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
