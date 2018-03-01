@@ -28,3 +28,24 @@ index d7573c4..b96fd10 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
+diff --git a/lib/tempest b/lib/tempest
+index defd452..7a971d2 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -536,13 +536,16 @@ function configure_tempest {
+     # Using ``CINDER_ENABLED_BACKENDS``
+     if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
+         iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
++        local backends_list=''
+         local i=1
+         local be
+         for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
+             local be_name=${be##*:}
++            backends_list="${backends_list:+$backends_list,}$be_name"
+             iniset $TEMPEST_CONFIG volume "backend${i}_name" "$be_name"
+             i=$(( i + 1 ))
+         done
++        iniset $TEMPEST_CONFIG volume "backend_names" "$backends_list"
+     fi
+ 
+     if [ $TEMPEST_VOLUME_DRIVER != "default" -o \
