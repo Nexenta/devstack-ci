@@ -37,6 +37,27 @@ index 5ae9745..daf83d6 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index ef66d90..1ec401c 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -512,13 +512,16 @@ function configure_tempest {
+     # Using ``CINDER_ENABLED_BACKENDS``
+     if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
+         iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
++        local backends_list=''
+         local i=1
+         local be
+         for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
+             local be_name=${be##*:}
++            backends_list="${backends_list:+$backends_list,}$be_name"
+             iniset $TEMPEST_CONFIG volume "backend${i}_name" "$be_name"
+             i=$(( i + 1 ))
+         done
++        iniset $TEMPEST_CONFIG volume "backend_names" "$backends_list"
+     fi
+ 
+     if [ $TEMPEST_VOLUME_DRIVER != "default" -o \
 diff --git a/tools/cap-pip.txt b/tools/cap-pip.txt
 index c280267..c1ae290 100644
 --- a/tools/cap-pip.txt
