@@ -16,16 +16,20 @@ typeset _source=$(dirname $_script)
 
 source $_source/env.sh
 
+if [[ ! -d $_base/$_logs ]]; then
+	mkdir -p $_base/$_logs
+fi
+
 exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
-    patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
+	patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
 fi
 
 if [[ -d $_base/$_ci/files/$_project ]]; then
-    (cd $_base/$_ci/files/$_project && tar cf - .) | tar pxvf -
+	(cd $_base/$_ci/files/$_project && tar cf - .) | tar pxvf -
 fi
 
 for item in branch show status diff; do
-	git $item | tee -a $LOGDIR/git.$item.$_project.log
+	git $item | tee -a $_base/$_logs/git.$item.$_project.log
 done
