@@ -1,5 +1,8 @@
 [[local|localrc]]
-enable_service tempest c-bak
+enable_service tempest
+{% if config.ci.branch != "juno" and config.ci.branch != "icehouse" %}
+enable_service c-bak
+{% endif %}
 
 ADMIN_PASSWORD="{{ config.devstack.password }}"
 DATABASE_PASSWORD="{{ config.devstack.password }}"
