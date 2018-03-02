@@ -42,15 +42,35 @@ USE_JOURNAL="False"
 {% endfor %}
 {% set value = namespace(list=[]) %}
 {% for instance in config.backend.instances %}
+{% if 'manila' in config.ci.backend %}
+{% do value.list.append(config.ci.backend ~ loop.index) %}
+{% else %}
 {% do value.list.append(config.ci.backend ~ ':' ~ config.ci.backend ~ loop.index) %}
+{% endif %}
 {% endfor %}
 
+{% if 'manila' in config.ci.backend %}
+enable_plugin manila https://github.com/openstack/manila $MANILA_BRANCH
+enable_plugin manila-ui https://github.com/openstack/manila-ui $MANILA_UI_BRANCH
+MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="driver_handles_share_servers=False snapshot_support=True"
+MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
+{% for instance in config.backend.instances %}
+MANILA_BACKEND{{ loop.index }}_CONFIG_GROUP_NAME="{{ config.ci.backend }}{{ loop.index }}"
+MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ config.ci.backend }}{{ loop.index }}"
+{% endfor %}
+MANILA_UI_ENABLED="True"
+ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
+SHARE_DRIVER="{{ config.backend.driver }}"
+MANILA_SERVICE_VM_FLAVOR_RAM="512"
+{% else %}
 CINDER_VOLUME_CLEAR="none"
 CINDER_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
 TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
 TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
+{% endif %}
+
 NEXENTA_REPOSITORY="{{ config.nexenta.repository }}"
 NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 
@@ -84,4 +104,32 @@ backup_sha_block_size_bytes = "32768"
 backup_driver = "cinder.backup.drivers.nfs"
 backup_share = "{{ config.backup.host }}:{{ config.backup.share }}"
 backup_mount_options = "{{ config.backup.options }}"
+{% endif %}
+
+{% if 'manila' in config.ci.backend %}
+[[post-config|$TEMPEST_CONFIG]]
+
+[share]
+capability_storage_protocol = "{{ config.backend.rest.protocol }}"
+capability_snapshot_support = "True"
+capability_create_share_from_snapshot_support = "True"
+backend_names = "{{ value.list|join(',') }}"
+multi_backend = "True"
+multitenancy_enabled = "False"
+enable_protocols = "{{ config.backend.rest.protocol | lower }}"
+enable_ip_rules_for_protocols = "{{ config.backend.rest.protocol | lower }}"
+enable_ro_access_level_for_protocols = "{{ config.backend.rest.protocol | lower }}"
+run_quota_tests = "True"
+run_extend_tests = "True"
+{% if 'ns5' in config.ci.backend %}
+run_shrink_tests = "True"
+{% else %}
+run_shrink_tests = "False"
+{% endif %}
+run_snapshot_tests = "True"
+run_consistency_group_tests = "False"
+run_replication_tests = "False"
+run_migration_tests = "False"
+run_manage_unmanage_tests = "False"
+run_manage_unmanage_snapshot_tests = "False"
 {% endif %}
