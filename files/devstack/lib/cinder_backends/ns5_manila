@@ -12,7 +12,7 @@ function configure_cinder_backend_ns5_manila {
 	declare -A opt
 
 	opt[share_driver]=NEXENTA_DRIVER
-	opt[nexenta_host]=NEXENTA_REST_HOST
+	opt[nexenta_host]=NEXENTA_HOST
 	opt[nexenta_pool]=NEXENTA_POOL
 	opt[nexenta_nfs_share]=NEXENTA_DATASET
 	opt[nexenta_thin_provisioning]=NEXENTA_SPARSED
