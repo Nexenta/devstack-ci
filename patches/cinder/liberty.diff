@@ -1,0 +1,15 @@
+diff --git a/cinder/exception.py b/cinder/exception.py
+index de2e3b5..9db018f 100644
+--- a/cinder/exception.py
++++ b/cinder/exception.py
+@@ -599,6 +599,10 @@ class TransferNotFound(NotFound):
+     message = _("Transfer %(transfer_id)s could not be found.")
+ 
+ 
++class NexentaException(NotFound):
++    message = _("Nexenta Cinder Driver exception.")
++
++
+ class VolumeMigrationFailed(CinderException):
+     message = _("Volume migration failed: %(reason)s")
+ 
