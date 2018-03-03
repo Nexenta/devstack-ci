@@ -110,17 +110,20 @@ backup_mount_options = "{{ config.backup.options }}"
 [[post-config|$TEMPEST_CONFIG]]
 
 [share]
-capability_storage_protocol = "{{ config.backend.rest.protocol }}"
+capability_storage_protocol = "{{ config.backend.protocol }}"
 capability_snapshot_support = "True"
 capability_create_share_from_snapshot_support = "True"
 backend_names = "{{ value.list|join(',') }}"
 multi_backend = "True"
 multitenancy_enabled = "False"
-enable_protocols = "{{ config.backend.rest.protocol | lower }}"
-enable_ip_rules_for_protocols = "{{ config.backend.rest.protocol | lower }}"
-enable_ro_access_level_for_protocols = "{{ config.backend.rest.protocol | lower }}"
+enable_protocols = "{{ config.backend.protocol | lower }}"
+enable_ip_rules_for_protocols = "{{ config.backend.protocol | lower }}"
+enable_ro_access_level_for_protocols = "{{ config.backend.protocol | lower }}"
+run_mount_snapshot_tests = "True"
 run_quota_tests = "True"
 run_extend_tests = "True"
+run_revert_to_snapshot_tests = "True"
+run_share_group_tests = "True"
 {% if 'ns5' in config.ci.backend %}
 run_shrink_tests = "True"
 {% else %}

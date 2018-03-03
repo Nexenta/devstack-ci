@@ -1,0 +1,12 @@
+diff --git a/cinder/exception.py b/cinder/exception.py
+index 553f06e..bfcd5cd 100644
+--- a/cinder/exception.py
++++ b/cinder/exception.py
+@@ -720,3 +720,7 @@ class BrocadeZoningCliException(CinderException):
+ 
+ class NetAppDriverException(VolumeDriverException):
+     message = _("NetApp Cinder Driver exception.")
++
++
++class NexentaException(NotFound):
++    message = _("Nexenta Cinder Driver exception.")
