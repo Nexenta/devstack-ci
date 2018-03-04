@@ -26,6 +26,9 @@ SYSLOG="True"
 USE_SYSTEMD="False"
 USE_JOURNAL="False"
 
+NEXENTA_REPOSITORY="{{ config.nexenta.repository }}"
+NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
+
 {% for project in config.matrix.project %}
 {% set value = namespace(found=none) %}
 {% for branch in config.matrix.branch %}
@@ -52,16 +55,26 @@ USE_JOURNAL="False"
 {% if 'manila' in config.ci.backend %}
 enable_plugin manila https://github.com/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui https://github.com/openstack/manila-ui $MANILA_UI_BRANCH
-MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="driver_handles_share_servers=False snapshot_support=True"
-MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
-{% for instance in config.backend.instances %}
-MANILA_BACKEND{{ loop.index }}_CONFIG_GROUP_NAME="{{ config.ci.backend }}{{ loop.index }}"
-MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ config.ci.backend }}{{ loop.index }}"
-{% endfor %}
 MANILA_UI_ENABLED="True"
 ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
 SHARE_DRIVER="{{ config.backend.driver }}"
 MANILA_SERVICE_VM_FLAVOR_RAM="512"
+MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="snapshot_support=True create_share_from_snapshot_support=True revert_to_snapshot_support=True mount_snapshot_support=True"
+MANILA_MULTI_BACKEND="True"
+MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
+{% for instance in config.backend.instances %}
+MANILA_BACKEND{{ loop.index }}_CONFIG_GROUP_NAME="{{ config.ci.backend }}{{ loop.index }}"
+MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ config.ci.backend }}{{ loop.index }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_driver_handles_share_servers="False"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_host="{{ instance.host }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_pool="{{ instance.pool }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_nfs_share="{{ instance.dataset }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_thin_provisioning="{{ instance.sparsed }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_user="{{ config.backend.rest.user }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_password="{{ config.backend.rest.password }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_rest_port="{{ config.backend.rest.port }}"
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_rest_protocol="{{ config.backend.rest.protocol }}"
+{% endfor %}
 {% else %}
 CINDER_VOLUME_CLEAR="none"
 CINDER_ENABLED_BACKENDS="{{ value.list|join(',') }}"
@@ -69,10 +82,6 @@ TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
 TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
 TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
-{% endif %}
-
-NEXENTA_REPOSITORY="{{ config.nexenta.repository }}"
-NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 
 declare -A NEXENTA_DRIVER
 declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
@@ -93,6 +102,7 @@ NEXENTA_DATASET[{{ backend }}]="{{ instance.dataset }}"
 NEXENTA_SPARSED[{{ backend }}]="{{ instance.sparsed }}"
 NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
 {% endfor %}
+{% endif %}
 
 [[post-config|$CINDER_CONF]]
 
@@ -113,6 +123,8 @@ backup_mount_options = "{{ config.backup.options }}"
 capability_storage_protocol = "{{ config.backend.protocol }}"
 capability_snapshot_support = "True"
 capability_create_share_from_snapshot_support = "True"
+capability_revert_to_snapshot_support = "True"
+capability_mount_snapshot_support = "True"
 backend_names = "{{ value.list|join(',') }}"
 multi_backend = "True"
 multitenancy_enabled = "False"
