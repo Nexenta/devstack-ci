@@ -70,6 +70,7 @@ def main():
     if rc == 0:
         result = {
             'changed': True,
+            'path': lock_path(lock_name),
             'msg': 'Lock name: %s, action: %s, result: success' % (
                 lock_name, lock_action)
         }
