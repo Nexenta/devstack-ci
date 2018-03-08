@@ -269,6 +269,7 @@
           flock:
             name: "{{ config.ci.project }}-{{ config.ci.backend }}"
             action: "acquire"
+          register: lock
 
         - name: Run Test Suite - First Pass
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
@@ -299,6 +300,7 @@
           flock:
             name: "{{ config.ci.project }}-{{ config.ci.backend }}"
             action: "release"
+          when: lock is defined
 
         - name: Find Results Files
           find:
