@@ -283,6 +283,20 @@
             action: "acquire"
           register: lock
 
+        - name: Clean Backup Share
+          shell: |
+            backup=/net/{{ config.backup.host }}/{{ config.backup.share }}/{{ config.ci.backend }}
+            if [[ -d $backup ]]; then
+              for item in $(find $backup -mindepth 1 -maxdepth 1); do
+                rm -rf $item
+              done
+            fi
+          args:
+            executable: "{{ shell }}"
+          when: config.backup.host is defined and config.backup.host != ""
+                and config.backup.share is defined and config.backup.share != ""
+                and config.ci.backend is defined and config.ci.backend != ""
+
         - name: Clean NexentaStor5 LUN Mappings
           shell: |
             for mapping in $(lunmapping list -O basic -o volume); do
