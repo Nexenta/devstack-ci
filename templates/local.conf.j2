@@ -56,7 +56,7 @@ NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 enable_plugin manila https://github.com/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui https://github.com/openstack/manila-ui $MANILA_UI_BRANCH
 MANILA_UI_ENABLED="True"
-ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
+MANILA_ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
 SHARE_DRIVER="{{ config.backend.driver }}"
 MANILA_SERVICE_VM_FLAVOR_RAM="512"
 MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="snapshot_support=True create_share_from_snapshot_support=True revert_to_snapshot_support=True mount_snapshot_support=True"
