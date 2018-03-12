@@ -444,11 +444,7 @@
           with_items: "{{ config.backend.instances }}"
           when: config.ci.backend == "ns5_nfs" or config.ci.backend == "ns5_manila"
 
-        - name: Run Test Suite - First Pass
-          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
-          delegate_to: "{{ config.vm.name }}"
-
-        - name: Run Test Suite - Second Pass
+        - name: Run Test Suite
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
 
