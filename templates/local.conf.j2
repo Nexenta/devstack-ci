@@ -26,6 +26,7 @@ SYSLOG="True"
 USE_SYSTEMD="False"
 USE_JOURNAL="False"
 
+NEXENTA_BACKEND_NAME="{{ config.ci.backend }}"
 NEXENTA_REPOSITORY="{{ config.nexenta.repository }}"
 NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 
@@ -55,19 +56,24 @@ NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 {% if 'manila' in config.ci.backend %}
 enable_plugin manila https://github.com/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui https://github.com/openstack/manila-ui $MANILA_UI_BRANCH
+enable_plugin manila-tempest-plugin https://github.com/openstack/manila-tempest-plugin
+
 MANILA_UI_ENABLED="True"
-MANILA_ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
+ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
 SHARE_DRIVER="{{ config.backend.driver }}"
 MANILA_SERVICE_VM_FLAVOR_RAM="512"
 MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="snapshot_support=True create_share_from_snapshot_support=True revert_to_snapshot_support=True mount_snapshot_support=True"
-MANILA_MULTI_BACKEND="True"
 MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 {% for instance in config.backend.instances %}
 MANILA_BACKEND{{ loop.index }}_CONFIG_GROUP_NAME="{{ config.ci.backend }}{{ loop.index }}"
 MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ config.ci.backend }}{{ loop.index }}"
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_driver_handles_share_servers="False"
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_host="{{ instance.host }}"
+{% if config.ci.backend == 'ns5_manila' %}
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_pool="{{ instance.pool }}"
+{% else %}
+MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_volume="{{ instance.pool }}"
+{% endif %}
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_nfs_share="{{ instance.dataset }}"
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_thin_provisioning="{{ instance.sparsed }}"
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_user="{{ config.backend.rest.user }}"
@@ -114,37 +120,4 @@ backup_sha_block_size_bytes = "32768"
 backup_driver = "cinder.backup.drivers.nfs"
 backup_share = "{{ config.backup.host }}:{{ config.backup.share }}/{{ config.ci.backend }}"
 backup_mount_options = "{{ config.backup.options }}"
-{% endif %}
-
-{% if 'manila' in config.ci.backend %}
-[[post-config|$TEMPEST_CONFIG]]
-
-[share]
-capability_storage_protocol = "{{ config.backend.protocol }}"
-capability_snapshot_support = "True"
-capability_create_share_from_snapshot_support = "True"
-capability_revert_to_snapshot_support = "True"
-capability_mount_snapshot_support = "True"
-backend_names = "{{ value.list|join(',') }}"
-multi_backend = "True"
-multitenancy_enabled = "False"
-enable_protocols = "{{ config.backend.protocol | lower }}"
-enable_ip_rules_for_protocols = "{{ config.backend.protocol | lower }}"
-enable_ro_access_level_for_protocols = "{{ config.backend.protocol | lower }}"
-run_mount_snapshot_tests = "True"
-run_quota_tests = "True"
-run_extend_tests = "True"
-run_revert_to_snapshot_tests = "True"
-run_share_group_tests = "True"
-{% if 'ns5' in config.ci.backend %}
-run_shrink_tests = "True"
-{% else %}
-run_shrink_tests = "False"
-{% endif %}
-run_snapshot_tests = "True"
-run_consistency_group_tests = "False"
-run_replication_tests = "False"
-run_migration_tests = "False"
-run_manage_unmanage_tests = "False"
-run_manage_unmanage_snapshot_tests = "False"
 {% endif %}
