@@ -1,0 +1,31 @@
+diff --git a/tox.ini b/tox.ini
+index edfee15..bd7b71a 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -21,6 +21,18 @@ commands =
+          find . -type f -name "*.pyc" -delete
+          bash tools/pretty_tox.sh '{posargs}'
+ 
++[testenv:ci]
++envdir = .tox/tempest
++sitepackages = {[tempestenv]sitepackages}
++setenv = {[tempestenv]setenv}
++deps = {[tempestenv]deps}
++commands =
++    find . -type f -name '*.pyc' -delete
++    ostestr --no-slowest --serial --regex '{posargs}'
++    sh -c 'testr last --subunit >report.sub'
++    sh -c 'cat report.sub | subunit-1to2 | subunit-trace >report.txt'
++    subunit2html report.sub report.html
++
+ [testenv:genconfig]
+ commands = oslo-config-generator --config-file tools/config/config-generator.tempest.conf
+ 
+diff --git a/.stestr.conf b/.stestr.conf
+new file mode 100644
+index 0000000..2cd3380
+--- /dev/null
++++ b/.stestr.conf
+@@ -0,0 +1,2 @@
++[DEFAULT]
++test_path=./tempest/test_discover
