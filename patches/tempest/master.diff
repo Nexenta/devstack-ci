@@ -1,8 +1,8 @@
 diff --git a/tox.ini b/tox.ini
-index 9103175..183b3a4 100644
+index 9103175..69ddf42 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -32,6 +32,19 @@ commands =
+@@ -32,6 +32,20 @@ commands =
      find . -type f -name "*.pyc" -delete
      stestr --test-path ./tempest/tests run {posargs}
  
@@ -15,6 +15,7 @@ index 9103175..183b3a4 100644
 +commands =
 +    find . -type f -name '*.pyc' -delete
 +    ostestr --no-slowest --serial --regex '{posargs}'
++    sh -c 'test ! -d .testrepository && test -d .stestr && ln -s .stestr .testrepository'
 +    sh -c 'testr last --subunit >report.sub'
 +    sh -c 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html

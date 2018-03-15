@@ -10,7 +10,7 @@ index 44162fd..ac0049b 100644
      -r{toxinidir}/requirements.txt
  
  [testenv]
-@@ -27,6 +28,19 @@ commands =
+@@ -27,6 +28,20 @@ commands =
      find . -type f -name "*.pyc" -delete
      bash tools/pretty_tox.sh '{posargs}'
  
@@ -23,6 +23,7 @@ index 44162fd..ac0049b 100644
 +commands =
 +    find . -type f -name '*.pyc' -delete
 +    ostestr --no-slowest --serial --regex '{posargs}'
++    sh -c 'test ! -d .testrepository && test -d .stestr && ln -s .stestr .testrepository'
 +    sh -c 'testr last --subunit >report.sub'
 +    sh -c 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html

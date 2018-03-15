@@ -10,7 +10,7 @@ index 892f834..63904a9 100644
      -r{toxinidir}/requirements.txt
  
  [testenv]
-@@ -32,6 +33,19 @@ commands =
+@@ -32,6 +33,20 @@ commands =
      find . -type f -name "*.pyc" -delete
      ostestr {posargs}
  
@@ -23,6 +23,7 @@ index 892f834..63904a9 100644
 +commands =
 +    find . -type f -name '*.pyc' -delete
 +    ostestr --no-slowest --serial --regex '{posargs}'
++    sh -c 'test ! -d .testrepository && test -d .stestr && ln -s .stestr .testrepository'
 +    sh -c 'testr last --subunit >report.sub'
 +    sh -c 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html

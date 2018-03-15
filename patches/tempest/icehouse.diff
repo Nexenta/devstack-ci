@@ -2,7 +2,7 @@ diff --git a/tox.ini b/tox.ini
 index edfee15..fdb814d 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -21,6 +21,19 @@ commands =
+@@ -21,6 +21,20 @@ commands =
           find . -type f -name "*.pyc" -delete
           bash tools/pretty_tox.sh '{posargs}'
  
@@ -15,6 +15,7 @@ index edfee15..fdb814d 100644
 +commands =
 +    find . -type f -name '*.pyc' -delete
 +    ostestr --no-slowest --serial --regex '{posargs}'
++    sh -c 'test ! -d .testrepository && test -d .stestr && ln -s .stestr .testrepository'
 +    sh -c 'testr last --subunit >report.sub'
 +    sh -c 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html
