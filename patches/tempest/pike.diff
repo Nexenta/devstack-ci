@@ -1,0 +1,41 @@
+diff --git a/tox.ini b/tox.ini
+index 24e3b5d..c96ac10 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -11,6 +11,7 @@ setenv =
+     BRANCH_NAME=master
+     CLIENT_NAME=tempest
+ deps =
++    -c{env:UPPER_CONSTRAINTS_FILE:../requirements/upper-constraints.txt}
+     -r{toxinidir}/requirements.txt
+ 
+ [testenv]
+@@ -32,6 +33,19 @@ commands =
+     find . -type f -name "*.pyc" -delete
+     ostestr {posargs}
+ 
++[testenv:ci]
++envdir = .tox/tempest
++sitepackages = {[tempestenv]sitepackages}
++setenv = {[tempestenv]setenv}
++deps = {[tempestenv]deps}
++ignore_errors = True
++commands =
++    find . -type f -name '*.pyc' -delete
++    ostestr --no-slowest --serial --regex '{posargs}'
++    sh -c 'testr last --subunit >report.sub'
++    sh -c 'cat report.sub | subunit-trace >report.txt'
++    subunit2html report.sub report.html
++
+ [testenv:genconfig]
+ commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
+ 
+diff --git a/.stestr.conf b/.stestr.conf
+new file mode 100644
+index 0000000..2cd3380
+--- /dev/null
++++ b/.stestr.conf
+@@ -0,0 +1,3 @@
++[DEFAULT]
++test_path=./tempest/test_discover
++group_regex=([^\.]*\.)*
