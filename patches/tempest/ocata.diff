@@ -1,21 +1,21 @@
 diff --git a/tox.ini b/tox.ini
-index 892f834..63904a9 100644
+index d8d390e..efc6678 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -11,6 +11,7 @@ setenv =
-     BRANCH_NAME=master
-     CLIENT_NAME=tempest
+@@ -10,6 +10,7 @@ setenv =
+     OS_TEST_PATH=./tempest/test_discover
  deps =
+     setuptools
 +    -c{env:UPPER_CONSTRAINTS_FILE:../requirements/upper-constraints.txt}
      -r{toxinidir}/requirements.txt
  
  [testenv]
-@@ -32,6 +33,21 @@ commands =
+@@ -28,6 +29,21 @@ commands =
      find . -type f -name "*.pyc" -delete
      ostestr {posargs}
  
 +[testenv:ci]
-+envdir = .tox/ci
++envdir = .tox/tempest
 +sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
@@ -34,7 +34,7 @@ index 892f834..63904a9 100644
  
 diff --git a/.stestr.conf b/.stestr.conf
 new file mode 100644
-index 0000000..2cd3380
+index 0000000..818c743
 --- /dev/null
 +++ b/.stestr.conf
 @@ -0,0 +1,3 @@

@@ -15,7 +15,7 @@ index 02eef78..730acd3 100644
      ostestr {posargs}
  
 +[testenv:ci]
-+envdir = .tox/ci
++envdir = .tox/tempest
 +sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}

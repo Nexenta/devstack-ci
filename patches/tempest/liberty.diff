@@ -15,7 +15,7 @@ index 44162fd..ac0049b 100644
      bash tools/pretty_tox.sh '{posargs}'
  
 +[testenv:ci]
-+envdir = .tox/ci
++envdir = .tox/tempest
 +sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}

@@ -7,7 +7,7 @@ index 9103175..69ddf42 100644
      stestr --test-path ./tempest/tests run {posargs}
  
 +[testenv:ci]
-+envdir = .tox/ci
++envdir = .tox/tempest
 +sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
