@@ -10,17 +10,18 @@ index 24e3b5d..c96ac10 100644
      -r{toxinidir}/requirements.txt
  
  [testenv]
-@@ -32,6 +33,20 @@ commands =
+@@ -32,6 +33,21 @@ commands =
      find . -type f -name "*.pyc" -delete
      ostestr {posargs}
  
 +[testenv:ci]
-+envdir = .tox/tempest
++envdir = .tox/ci
 +sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
 +ignore_errors = True
 +commands =
++    sh -c 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find . -type f -name '*.pyc' -delete
 +    ostestr --no-slowest --serial --regex '{posargs}'
 +    sh -c 'test ! -e .testrepository -a -d .stestr && ln -s .stestr .testrepository || true'
