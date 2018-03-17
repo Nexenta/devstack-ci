@@ -16,10 +16,10 @@ index 24e3b5d..c96ac10 100644
  
 +[testenv:ci]
 +envdir = .tox/tempest
-+sitepackages = {[tempestenv]sitepackages}
++sitepackages = True
++ignore_errors = True
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
-+ignore_errors = True
 +commands =
 +    sh -c 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find . -type f -name '*.pyc' -delete
