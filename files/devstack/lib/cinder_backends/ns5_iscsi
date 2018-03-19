@@ -34,14 +34,7 @@ function configure_cinder_backend_ns5_iscsi {
 }
 
 function cleanup_cinder_backend_ns5_iscsi {
-	declare mount_point
-
-	iscsiadm -m node -u
-	iscsiadm -m node --op delete
-
-	for mount_point in $(df | awk 'if ($NF ~ "^'$CINDER_STATE_PATH'") print $NF}'); do
-		sudo umount -f $mount_point && rmdir $mount_point
-	done
+	ci_clean
 }
 
 $NEXENTA_XTRACE

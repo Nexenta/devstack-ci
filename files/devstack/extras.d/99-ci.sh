@@ -4,7 +4,7 @@ case "$1" in
 override_defaults)
 	;;
 source)
-	source $TOP_DIR/lib/ci.sh
+	source $TOP_DIR/lib/ci
 	;;
 stack)
 	case "$2" in
