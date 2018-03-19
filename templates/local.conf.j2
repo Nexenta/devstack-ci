@@ -1,6 +1,6 @@
 [[local|localrc]]
 enable_service tempest
-{% if config.ci.branch != "juno" and config.ci.branch != "icehouse" %}
+{% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
 enable_service c-bak
 {% endif %}
 
@@ -37,7 +37,7 @@ NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 {% if branch.project == project.name %}
 {% set value.found = branch.name %}
 {% break %}
-{% elif branch.project == "default" %}
+{% elif branch.project == 'default' %}
 {% set value.found = branch.name %}
 {% endif %}
 {% endif %}
@@ -56,7 +56,9 @@ NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 {% if 'manila' in config.ci.backend %}
 enable_plugin manila https://github.com/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui https://github.com/openstack/manila-ui $MANILA_UI_BRANCH
+{% if config.ci.branch == 'master' %}
 enable_plugin manila-tempest-plugin https://github.com/openstack/manila-tempest-plugin
+{% endif %}
 
 MANILA_UI_ENABLED="True"
 ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
@@ -114,7 +116,7 @@ NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
 
 [DEFAULT]
 driver_ssl_cert_verify = False
-{% if config.ci.branch != "juno" and config.ci.branch != "icehouse" %}
+{% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
 backup_file_size = "134217728"
 backup_sha_block_size_bytes = "32768"
 backup_driver = "cinder.backup.drivers.nfs"
