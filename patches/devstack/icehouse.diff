@@ -60,13 +60,16 @@ index 304eed8..c736bb0 100644
          && $SUDO_PIP rm -rf ${pip_build_tmp}
  }
 diff --git a/lib/tempest b/lib/tempest
-index 1ce4f56..7d4dfae 100644
+index 1ce4f56..100ccef 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -476,6 +476,9 @@ function install_tempest_lib {
+@@ -475,7 +475,11 @@ function install_tempest_lib {
+ # install_tempest() - Collect source and prepare
  function install_tempest {
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
-     pip_install "tox<1.7"
+-    pip_install "tox<1.7"
++    pip_install tox
++    pip_install virtualenv
 +    pip_install os-testr
 +    pip_install testscenarios
 +    pip_install tempest-lib
