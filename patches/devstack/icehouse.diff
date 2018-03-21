@@ -230,3 +230,16 @@ index 7af13aa..e8c5546 100755
  fi
  if is_service_enabled ceilometer; then
      echo_summary "Starting Ceilometer"
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index 15ed6e7..1f12832 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -84,7 +84,7 @@ fi
+ 
+ # Fix httplib2 0.8 permissions
+ # Don't specify --upgrade so we use the existing package if present
+-pip_install httplib2
++pip_install 'httplib2===0.9'
+ PACKAGE_DIR=$(get_package_path httplib2)
+ # Only fix version 0.8
+ dir=$(echo $PACKAGE_DIR-0.8*)
