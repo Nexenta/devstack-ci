@@ -80,13 +80,14 @@ index ef5a136..c1a15d9 100644
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 24ac072..638dbab 100644
+index 24ac072..389d67b 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -495,6 +495,9 @@ function install_tempest {
+@@ -495,6 +495,10 @@ function install_tempest {
      install_tempest_lib
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
      pip_install tox
++    pip_install virtualenv
 +    pip_install os-testr
 +    pip_install testscenarios
 +    pip_install tempest-lib
