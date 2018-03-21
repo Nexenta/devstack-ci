@@ -1,12 +1,12 @@
 diff --git a/tox.ini b/tox.ini
-index edfee15..b06baf2 100644
+index edfee15..cb92e4d 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -8,6 +8,7 @@ sitepackages = True
  setenv = VIRTUAL_ENV={envdir}
           OS_TEST_PATH=./tempest/test_discover
  deps = -r{toxinidir}/requirements.txt
-+       -c{env:basedir:{homedir}}/requirements/upper-constraints.txt
++       -c{env:basedir}/requirements/upper-constraints.txt
  
  [testenv]
  setenv = VIRTUAL_ENV={envdir}
@@ -24,7 +24,7 @@ index edfee15..b06baf2 100644
 +commands =
 +    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find {toxinidir} -type f -name '*.pyc' -delete
-+    bash -cexu 'mtp={env:basedir:{homedir}}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
++    bash -cexu 'mtp={env:basedir}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
 +    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
 +    bash -cexu 'testr last --subunit >report.sub'
