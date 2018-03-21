@@ -1,24 +1,43 @@
 diff --git a/tox.ini b/tox.ini
-index 9103175..69ddf42 100644
+index 9103175..306fd7a 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -32,6 +32,21 @@ commands =
+@@ -9,7 +9,7 @@ setenv =
+     VIRTUAL_ENV={envdir}
+     OS_TEST_PATH=./tempest/test_discover
+ deps =
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++    -c{env:basedir:{homedir}}/requirements/upper-constraints.txt
+     -r{toxinidir}/requirements.txt
+ 
+ [testenv]
+@@ -25,13 +25,30 @@ usedevelop = True
+ install_command = pip install {opts} {packages}
+ whitelist_externals = *
+ deps =
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++    -c{env:basedir:{homedir}}/requirements/upper-constraints.txt
+     -r{toxinidir}/requirements.txt
+     -r{toxinidir}/test-requirements.txt
+ commands =
      find . -type f -name "*.pyc" -delete
      stestr --test-path ./tempest/tests run {posargs}
  
 +[testenv:ci]
-+envdir = .tox/tempest
-+sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
 +ignore_errors = True
++sitepackages = True
++recreate = True
++envdir = .tox/ci
 +commands =
-+    sh -c 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
-+    find . -type f -name '*.pyc' -delete
++    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
++    find {toxinidir} -type f -name '*.pyc' -delete
++    bash -cexu 'mtp={env:basedir:{homedir}}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
-+    sh -c 'test ! -e .testrepository -a -d .stestr && ln -s .stestr .testrepository || true'
-+    sh -c 'testr last --subunit >report.sub'
-+    sh -c 'cat report.sub | subunit-trace >report.txt'
++    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
++    bash -cexu 'testr last --subunit >report.sub'
++    bash -cexu 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html
 +
  [testenv:genconfig]
