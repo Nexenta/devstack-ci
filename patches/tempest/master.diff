@@ -1,5 +1,5 @@
 diff --git a/tox.ini b/tox.ini
-index 9103175..306fd7a 100644
+index 9103175..6f69663 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -9,7 +9,7 @@ setenv =
@@ -7,7 +7,7 @@ index 9103175..306fd7a 100644
      OS_TEST_PATH=./tempest/test_discover
  deps =
 -    -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
-+    -c{env:basedir:{homedir}}/requirements/upper-constraints.txt
++    -c{env:basedir}/requirements/upper-constraints.txt
      -r{toxinidir}/requirements.txt
  
  [testenv]
@@ -16,7 +16,7 @@ index 9103175..306fd7a 100644
  whitelist_externals = *
  deps =
 -    -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
-+    -c{env:basedir:{homedir}}/requirements/upper-constraints.txt
++    -c{env:basedir}/requirements/upper-constraints.txt
      -r{toxinidir}/requirements.txt
      -r{toxinidir}/test-requirements.txt
  commands =
@@ -33,7 +33,7 @@ index 9103175..306fd7a 100644
 +commands =
 +    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find {toxinidir} -type f -name '*.pyc' -delete
-+    bash -cexu 'mtp={env:basedir:{homedir}}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
++    bash -cexu 'mtp={env:basedir}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
 +    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
 +    bash -cexu 'testr last --subunit >report.sub'
