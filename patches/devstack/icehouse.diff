@@ -59,6 +59,148 @@ index 304eed8..c736bb0 100644
          $PIP_MIRROR_OPT $@ \
          && $SUDO_PIP rm -rf ${pip_build_tmp}
  }
+diff --git a/lib/cinder b/lib/cinder
+index 8479ca7..f11b9a4 100644
+--- a/lib/cinder
++++ b/lib/cinder
+@@ -28,6 +28,7 @@ set +o xtrace
+ # set up default driver
+ CINDER_DRIVER=${CINDER_DRIVER:-default}
+ CINDER_PLUGINS=$TOP_DIR/lib/cinder_plugins
++CINDER_BACKENDS=$TOP_DIR/lib/cinder_backends
+ 
+ # grab plugin config if specified via cinder_driver
+ if [[ -r $CINDER_PLUGINS/$CINDER_DRIVER ]]; then
+@@ -89,6 +90,16 @@ VOLUME_NAME_PREFIX=${VOLUME_NAME_PREFIX:-volume-}
+ # Tell Tempest this project is present
+ TEMPEST_SERVICES+=,cinder
+ 
++# Source the enabled backends
++if is_service_enabled c-vol && [[ -n "$CINDER_ENABLED_BACKENDS" ]]; then
++    for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++        be_type=${be%%:*}
++        be_name=${be##*:}
++        if [[ -r $CINDER_BACKENDS/${be_type} ]]; then
++            source $CINDER_BACKENDS/${be_type}
++        fi
++    done
++fi
+ 
+ # Functions
+ # ---------
+@@ -179,6 +190,17 @@ function cleanup_cinder {
+         _clean_lvm_lv $VOLUME_GROUP2 $VOLUME_NAME_PREFIX
+         _clean_lvm_backing_file $VOLUME_GROUP2
+     fi
++
++    if is_service_enabled c-vol && [[ -n "$CINDER_ENABLED_BACKENDS" ]]; then
++        local be be_name be_type
++        for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++            be_type=${be%%:*}
++            be_name=${be##*:}
++            if type cleanup_cinder_backend_${be_type} >/dev/null 2>&1; then
++                cleanup_cinder_backend_${be_type} ${be_name}
++            fi
++        done
++    fi
+ }
+ 
+ # configure_cinder_rootwrap() - configure Cinder's rootwrap
+@@ -221,6 +243,8 @@ function configure_cinder {
+ 
+     cp -p $CINDER_DIR/etc/cinder/policy.json $CINDER_CONF_DIR
+ 
++    rm -f $CINDER_CONF
++
+     configure_cinder_rootwrap
+ 
+     cp $CINDER_DIR/etc/cinder/api-paste.ini $CINDER_API_PASTE_INI
+@@ -275,6 +299,27 @@ function configure_cinder {
+     iniset $CINDER_CONF DEFAULT lock_path $CINDER_STATE_PATH
+     iniset $CINDER_CONF DEFAULT periodic_interval $CINDER_PERIODIC_INTERVAL
+ 
++    if is_service_enabled c-vol && [[ -n "$CINDER_ENABLED_BACKENDS" ]]; then
++        local enabled_backends=""
++        local default_name=""
++        local be be_name be_type
++        for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++            be_type=${be%%:*}
++            be_name=${be##*:}
++            if type configure_cinder_backend_${be_type} >/dev/null 2>&1; then
++                configure_cinder_backend_${be_type} ${be_name}
++            fi
++            if [[ -z "$default_name" ]]; then
++                default_name=$be_name
++            fi
++            enabled_backends+=$be_name,
++        done
++        iniset $CINDER_CONF DEFAULT enabled_backends ${enabled_backends%,*}
++        if [[ -n "$default_name" ]]; then
++            iniset $CINDER_CONF DEFAULT default_volume_type ${default_name}
++        fi
++    fi
++
+     if is_service_enabled swift; then
+         iniset $CINDER_CONF DEFAULT backup_swift_url "http://$SERVICE_HOST:8080/v1/AUTH_"
+     fi
+@@ -445,26 +490,20 @@ function init_cinder {
+         $CINDER_BIN_DIR/cinder-manage db sync
+     fi
+ 
+-    if is_service_enabled c-vol; then
+-
+-        create_cinder_volume_group
+-
+-        if sudo vgs $VOLUME_GROUP; then
+-            if is_fedora || is_suse; then
+-                # service is not started by default
+-                start_service tgtd
+-            fi
++    if is_service_enabled c-vol && [[ -n "$CINDER_ENABLED_BACKENDS" ]]; then
++        local be be_name be_type
++        local has_lvm=0
++        for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++            be_type=${be%%:*}
++            be_name=${be##*:}
+ 
+-            # Remove iscsi targets
+-            sudo tgtadm --op show --mode target | grep $VOLUME_NAME_PREFIX | grep Target | cut -f3 -d ' ' | sudo xargs -n1 tgt-admin --delete || true
+-            # Start with a clean volume group
+-            _clean_lvm_lv $VOLUME_GROUP $VOLUME_NAME_PREFIX
+-            if [ "$CINDER_MULTI_LVM_BACKEND" = "True" ]; then
+-                _clean_lvm_lv $VOLUME_GROUP2 $VOLUME_NAME_PREFIX
++            if type init_cinder_backend_${be_type} >/dev/null 2>&1; then
++                init_cinder_backend_${be_type} ${be_name}
+             fi
+-        fi
++        done
+     fi
+ 
++    mkdir -p $CINDER_STATE_PATH/volumes
+     create_cinder_cache_dir
+ }
+ 
+@@ -553,6 +592,20 @@ function stop_cinder {
+     fi
+ }
+ 
++# create_volume_types() - Create Cinder's configured volume types
++function create_volume_types {
++    # Create volume types
++    if is_service_enabled c-api && [[ -n "$CINDER_ENABLED_BACKENDS" ]]; then
++        local be be_name be_type
++        for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++            be_type=${be%%:*}
++            be_name=${be##*:}
++            # openstack volume type create --property volume_backend_name="${be_type}" ${be_name}
++            cinder type-create ${be_name} && \
++                cinder type-key ${be_name} set volume_backend_name="${be_name}"
++        done
++    fi
++}
+ 
+ # Restore xtrace
+ $XTRACE
 diff --git a/lib/tempest b/lib/tempest
 index 1ce4f56..100ccef 100644
 --- a/lib/tempest
@@ -76,3 +218,15 @@ index 1ce4f56..100ccef 100644
  }
  
  # init_tempest() - Initialize ec2 images
+diff --git a/stack.sh b/stack.sh
+index 7af13aa..e8c5546 100755
+--- a/stack.sh
++++ b/stack.sh
+@@ -1206,6 +1206,7 @@ fi
+ if is_service_enabled cinder; then
+     echo_summary "Starting Cinder"
+     start_cinder
++    create_volume_types
+ fi
+ if is_service_enabled ceilometer; then
+     echo_summary "Starting Ceilometer"
