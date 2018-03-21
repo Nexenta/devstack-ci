@@ -1,15 +1,16 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
 new file mode 100644
-index 0000000..21266a2
+index 0000000..0ca46d1
 --- /dev/null
 +++ b/upper-constraints.txt
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,12 @@
 +cliff===1.8.0
 +eventlet===0.15.2
 +pyOpenSSL===16.2.0
 +os-testr===0.2.0
 +oslo.serialization===1.1.0
 +networkx===1.11
++pbr===0.11.1
 +stevedore===1.3.0
 +testscenarios===0.5.0
 +tempest-lib==0.1.0
