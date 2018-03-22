@@ -1,12 +1,12 @@
 diff --git a/tox.ini b/tox.ini
-index 44162fd..65f6440 100644
+index 44162fd..96266ef 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -11,6 +11,7 @@ setenv =
  deps =
      setuptools
      -r{toxinidir}/requirements.txt
-+    -c{env:basedir}/requirements/upper-constraints.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
  
  [testenv]
  setenv =
@@ -14,7 +14,7 @@ index 44162fd..65f6440 100644
  deps =
      -r{toxinidir}/requirements.txt
      -r{toxinidir}/test-requirements.txt
-+    -c{env:basedir}/requirements/upper-constraints.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
  commands =
      find . -type f -name "*.pyc" -delete
      bash tools/pretty_tox.sh '{posargs}'
@@ -29,7 +29,7 @@ index 44162fd..65f6440 100644
 +commands =
 +    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find {toxinidir} -type f -name '*.pyc' -delete
-+    bash -cexu 'mtp={env:basedir}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
++    bash -cexu 'mtp={toxinidir}/../manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
 +    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
 +    bash -cexu 'testr last --subunit >report.sub'
