@@ -1,16 +1,21 @@
 diff --git a/tox.ini b/tox.ini
-index edfee15..cdaa9b3 100644
+index edfee15..418f283 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -8,6 +8,7 @@ sitepackages = True
  setenv = VIRTUAL_ENV={envdir}
           OS_TEST_PATH=./tempest/test_discover
  deps = -r{toxinidir}/requirements.txt
-+       -c{env:basedir:{homedir}}/requirements/upper-constraints.txt
++       -c{env:basedir}/requirements/upper-constraints.txt
  
  [testenv]
  setenv = VIRTUAL_ENV={envdir}
-@@ -21,6 +22,23 @@ commands =
+@@ -17,10 +18,28 @@ install_command = pip install -U {opts} {packages}
+ whitelist_externals = *
+ deps = -r{toxinidir}/requirements.txt
+        -r{toxinidir}/test-requirements.txt
++       -c{env:basedir}/requirements/upper-constraints.txt
+ commands =
           find . -type f -name "*.pyc" -delete
           bash tools/pretty_tox.sh '{posargs}'
  
