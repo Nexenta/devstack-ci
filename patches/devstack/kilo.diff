@@ -1,3 +1,15 @@
+diff --git a/files/debs/general b/files/debs/general
+index e824d23..493f11c 100644
+--- a/files/debs/general
++++ b/files/debs/general
+@@ -16,7 +16,6 @@ iputils-ping
+ wget
+ curl
+ tcpdump
+-euca2ools # only for testing client
+ tar
+ python-cmd2 # dist:precise
+ python-dev
 diff --git a/functions-common b/functions-common
 index b92fa55..44f4c71 100644
 --- a/functions-common
@@ -91,3 +103,49 @@ index c825b4e..5be54d3 100644
      fi
  }
  
+diff --git a/lib/tempest b/lib/tempest
+index 1ae9457..a0a91b2 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -520,6 +520,10 @@ function install_tempest {
+     install_tempest_lib
+     git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
+     pip_install tox
++    pip_install virtualenv
++    pip_install os-testr
++    pip_install testscenarios
++    pip_install tempest-lib
+ }
+ 
+ # init_tempest() - Initialize ec2 images
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index cc5275f..6c44a24 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -9,9 +9,6 @@
+ # - prettytable 0.7.2 permissions are 600 in the package and
+ #   pip 1.4 doesn't fix it (1.3 did)
+ #
+-# - httplib2 0.8 permissions are 600 in the package and
+-#   pip 1.4 doesn't fix it (1.3 did)
+-#
+ # - Fedora:
+ #   - set selinux not enforcing
+ #   - uninstall firewalld (f20 only)
+@@ -91,16 +88,6 @@ if [[ -d $dir ]]; then
+     sudo chmod +r $dir/*
+ fi
+ 
+-# Fix httplib2 0.8 permissions
+-# Don't specify --upgrade so we use the existing package if present
+-pip_install httplib2
+-PACKAGE_DIR=$(get_package_path httplib2)
+-# Only fix version 0.8
+-dir=$(echo $PACKAGE_DIR-0.8*)
+-if [[ -d $dir ]]; then
+-    sudo chmod +r $dir/*
+-fi
+-
+ if is_fedora; then
+     # Disable selinux to avoid configuring to allow Apache access
+     # to Horizon files (LP#1175444)
