@@ -1,5 +1,5 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index f270ab0..21fe7ad 100644
+index f270ab0..0b6ba4c 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
 @@ -6,7 +6,7 @@ Mako===1.0.1
@@ -55,3 +55,12 @@ index f270ab0..21fe7ad 100644
  passlib===1.6.2
  pathlib===1.0.1;python_version=='2.7'
  pbr===1.2.0
+@@ -297,7 +298,7 @@ trollius===1.0.4
+ txaio===1.0.0
+ unittest2===1.1.0
+ urllib3===1.10.4
+-virtualenv===13.1.0
++virtualenv===15.1.0
+ waitress===0.8.9
+ warlock===1.1.0
+ webcolors===1.5
