@@ -17,4 +17,4 @@ source $_source/env.sh
 exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 
 cd $_base/tempest
-basedir=$_base tox -e ci -- $_regexp
+tox -e ci -- $_regexp
