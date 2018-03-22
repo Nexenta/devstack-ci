@@ -1,5 +1,5 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index f270ab0..403d951 100644
+index f270ab0..21fe7ad 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
 @@ -6,7 +6,7 @@ Mako===1.0.1
@@ -11,16 +11,15 @@ index f270ab0..403d951 100644
  PasteDeploy===1.5.2
  Pillow===2.8.2
  Pint===0.6
-@@ -50,7 +50,7 @@ XStatic-jquery-ui===1.11.0.1
+@@ -50,7 +50,6 @@ XStatic-jquery-ui===1.11.0.1
  XStatic-smart-table===1.4.5.3
  XStatic-term.js===0.0.4.2
  XenAPI===1.2
 -aioeventlet===0.4
-+aioeventlet===0.5.2
  alembic===0.7.6
  amqp===1.4.6
  anyjson===0.3.3
-@@ -134,6 +134,7 @@ kafka-python===0.9.4
+@@ -134,6 +133,7 @@ kafka-python===0.9.4
  kazoo===2.2.1
  kerberos===1.1.1;python_version=='2.7'
  keyring===5.3
@@ -28,7 +27,7 @@ index f270ab0..403d951 100644
  keystonemiddleware===2.0.0
  kombu===3.0.26
  ldappool===1.0
-@@ -163,7 +164,7 @@ openstackdocstheme===1.1.0
+@@ -163,7 +163,7 @@ openstackdocstheme===1.1.0
  ordereddict===1.1
  os-apply-config===0.1.31
  os-brick===0.2.0
@@ -37,7 +36,7 @@ index f270ab0..403d951 100644
  os-cloud-config===0.2.9
  os-collect-config===0.1.35
  os-net-config===0.1.4
-@@ -172,8 +173,8 @@ os-testr===0.2.0
+@@ -172,8 +172,8 @@ os-testr===0.2.0
  oslo.concurrency===2.2.0
  oslo.config===1.13.0
  oslo.context===0.4.0
@@ -48,7 +47,7 @@ index f270ab0..403d951 100644
  oslo.log===1.6.0
  oslo.messaging===1.15.0
  oslo.middleware===2.3.0
-@@ -190,6 +191,7 @@ osprofiler===0.3.0
+@@ -190,6 +190,7 @@ osprofiler===0.3.0
  ovs===2.4.0.dev0;python_version=='2.7'
  packaging===15.2
  paramiko===1.15.2
