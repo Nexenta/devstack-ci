@@ -256,15 +256,33 @@ index 7af13aa..e8c5546 100755
  if is_service_enabled ceilometer; then
      echo_summary "Starting Ceilometer"
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 15ed6e7..1f12832 100755
+index 15ed6e7..b14b086 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -84,7 +84,7 @@ fi
+@@ -9,9 +9,6 @@
+ # - prettytable 0.7.2 permissions are 600 in the package and
+ #   pip 1.4 doesn't fix it (1.3 did)
+ #
+-# - httplib2 0.8 permissions are 600 in the package and
+-#   pip 1.4 doesn't fix it (1.3 did)
+-#
+ # - RHEL6:
+ #
+ #   - set selinux not enforcing
+@@ -82,16 +79,6 @@ if [[ -d $dir ]]; then
+     sudo chmod +r $dir/*
+ fi
  
- # Fix httplib2 0.8 permissions
- # Don't specify --upgrade so we use the existing package if present
+-# Fix httplib2 0.8 permissions
+-# Don't specify --upgrade so we use the existing package if present
 -pip_install httplib2
-+pip_install 'httplib2===0.9'
- PACKAGE_DIR=$(get_package_path httplib2)
- # Only fix version 0.8
- dir=$(echo $PACKAGE_DIR-0.8*)
+-PACKAGE_DIR=$(get_package_path httplib2)
+-# Only fix version 0.8
+-dir=$(echo $PACKAGE_DIR-0.8*)
+-if [[ -d $dir ]]; then
+-    sudo chmod +r $dir/*
+-fi
+-
+ # Ubuntu 12.04
+ # ------------
+ 
