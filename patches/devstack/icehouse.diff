@@ -202,10 +202,35 @@ index 8479ca7..f11b9a4 100644
  # Restore xtrace
  $XTRACE
 diff --git a/lib/tempest b/lib/tempest
-index 1ce4f56..100ccef 100644
+index 1ce4f56..09e745d 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -475,7 +475,11 @@ function install_tempest_lib {
+@@ -380,7 +380,24 @@ function configure_tempest {
+     if ! is_service_enabled c-bak; then
+         iniset $TEMPEST_CONFIG volume-feature-enabled backup False
+     fi
++
++    # Using CINDER_ENABLED_BACKENDS
++    if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
++        iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
++        local backends_list=''
++        local i=1
++        local be
++        for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++            local be_name=${be##*:}
++            backends_list="${backends_list:+$backends_list,}$be_name"
++            iniset $TEMPEST_CONFIG volume "backend${i}_name" "$be_name"
++            i=$(( i + 1 ))
++        done
++        iniset $TEMPEST_CONFIG volume "backend_names" "$backends_list"
++    fi
++
+     CINDER_MULTI_LVM_BACKEND=$(trueorfalse False $CINDER_MULTI_LVM_BACKEND)
++
+     if [ $CINDER_MULTI_LVM_BACKEND == "True" ]; then
+         iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
+         iniset $TEMPEST_CONFIG volume backend1_name "LVM_iSCSI"
+@@ -475,7 +492,11 @@ function install_tempest_lib {
  # install_tempest() - Collect source and prepare
  function install_tempest {
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
