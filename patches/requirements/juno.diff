@@ -1,11 +1,21 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 767e3aa..3756bc2 100644
+index 767e3aa..2a07ad0 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -1 +1,6 @@
+@@ -1 +1,16 @@
 -# Empty because this is only supported in liberty and above.
++Routes===2.1
++cliff===1.9.0
++eventlet===0.15.2
++fixtures===1.0.0
++httplib2===0.9
 +oslo.utils===1.4.1
 +os-testr==0.2.0
++pbr===0.11.1
++setuptools===39.0.0
++six===1.9.0
++sqlalchemy-migrate===0.9.1
++suds===0.4
 +testscenarios==0.5.0
 +tempest-lib==0.2.1
 +tox===2.9.1
