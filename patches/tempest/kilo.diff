@@ -1,33 +1,39 @@
 diff --git a/tox.ini b/tox.ini
-index edfee15..1fd5a8c 100644
+index edfee15..418f283 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -13,7 +13,7 @@ deps = -r{toxinidir}/requirements.txt
+@@ -8,6 +8,7 @@ sitepackages = True
  setenv = VIRTUAL_ENV={envdir}
-          OS_TEST_PATH=./tempest/tests
- usedevelop = True
--install_command = pip install -U {opts} {packages}
-+install_command = pip install {opts} {packages}
+          OS_TEST_PATH=./tempest/test_discover
+ deps = -r{toxinidir}/requirements.txt
++       -c{env:basedir}/requirements/upper-constraints.txt
+ 
+ [testenv]
+ setenv = VIRTUAL_ENV={envdir}
+@@ -17,10 +18,28 @@ install_command = pip install -U {opts} {packages}
  whitelist_externals = *
  deps = -r{toxinidir}/requirements.txt
         -r{toxinidir}/test-requirements.txt
-@@ -21,6 +21,21 @@ commands =
++       -c{env:basedir}/requirements/upper-constraints.txt
+ commands =
           find . -type f -name "*.pyc" -delete
           bash tools/pretty_tox.sh '{posargs}'
  
 +[testenv:ci]
-+envdir = .tox/tempest
-+sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
 +ignore_errors = True
++sitepackages = True
++recreate = True
++envdir = .tox/ci
 +commands =
-+    sh -c 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
-+    find . -type f -name '*.pyc' -delete
++    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
++    find {toxinidir} -type f -name '*.pyc' -delete
++    bash -cexu 'mtp={env:basedir}/manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
-+    sh -c 'test ! -e .testrepository -a -d .stestr && ln -s .stestr .testrepository || true'
-+    sh -c 'testr last --subunit >report.sub'
-+    sh -c 'cat report.sub | subunit-trace >report.txt'
++    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
++    bash -cexu 'testr last --subunit >report.sub'
++    bash -cexu 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html
 +
  [testenv:genconfig]
@@ -35,7 +41,7 @@ index edfee15..1fd5a8c 100644
  
 diff --git a/.stestr.conf b/.stestr.conf
 new file mode 100644
-index 0000000..2cd3380
+index 0000000..818c743
 --- /dev/null
 +++ b/.stestr.conf
 @@ -0,0 +1,3 @@
