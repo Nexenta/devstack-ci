@@ -80,10 +80,35 @@ index ef5a136..c1a15d9 100644
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 24ac072..389d67b 100644
+index 24ac072..cdb669d 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -495,6 +495,10 @@ function install_tempest {
+@@ -418,7 +418,24 @@ function configure_tempest {
+     if ! is_service_enabled c-bak; then
+         iniset $TEMPEST_CONFIG volume-feature-enabled backup False
+     fi
++
++    # Using CINDER_ENABLED_BACKENDS
++    if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
++        iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
++        local backends_list=''
++        local i=1
++        local be
++        for be in ${CINDER_ENABLED_BACKENDS//,/ }; do
++            local be_name=${be##*:}
++            backends_list="${backends_list:+$backends_list,}$be_name"
++            iniset $TEMPEST_CONFIG volume "backend${i}_name" "$be_name"
++            i=$(( i + 1 ))
++        done
++        iniset $TEMPEST_CONFIG volume "backend_names" "$backends_list"
++    fi
++
+     CINDER_MULTI_LVM_BACKEND=$(trueorfalse False $CINDER_MULTI_LVM_BACKEND)
++
+     if [ $CINDER_MULTI_LVM_BACKEND == "True" ]; then
+         iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
+         iniset $TEMPEST_CONFIG volume backend1_name "LVM_iSCSI"
+@@ -495,6 +512,10 @@ function install_tempest {
      install_tempest_lib
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
      pip_install tox
@@ -94,3 +119,16 @@ index 24ac072..389d67b 100644
  }
  
  # init_tempest() - Initialize ec2 images
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index 9668973..e8a61b6 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -88,7 +88,7 @@ fi
+ 
+ # Fix httplib2 0.8 permissions
+ # Don't specify --upgrade so we use the existing package if present
+-pip_install httplib2
++pip_install 'httplib2===0.9'
+ PACKAGE_DIR=$(get_package_path httplib2)
+ # Only fix version 0.8
+ dir=$(echo $PACKAGE_DIR-0.8*)
