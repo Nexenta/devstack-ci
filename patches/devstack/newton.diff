@@ -37,3 +37,21 @@ index 9be0c91..b92d36a 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index 4dec95e..d126c4e 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -161,12 +161,4 @@ if is_fedora; then
+     fi
+ fi
+ 
+-# The version of pip(1.5.4) supported by python-virtualenv(1.11.4) has
+-# connection issues under proxy so re-install the latest version using
+-# pip. To avoid having pip's virtualenv overwritten by the distro's
+-# package (e.g. due to installing a distro package with a dependency
+-# on python-virtualenv), first install the distro python-virtualenv
+-# to satisfy any dependencies then use pip to overwrite it.
+-
+-install_package python-virtualenv
+-pip_install -U --force-reinstall virtualenv
++pip_install -U virtualenv
