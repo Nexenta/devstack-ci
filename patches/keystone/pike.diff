@@ -1,0 +1,12 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index efd9055..e5729f9 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -30,7 +30,5 @@ python-subunit>=0.0.18 # Apache-2.0/BSD
+ testrepository>=0.0.18 # Apache-2.0/BSD
+ testtools>=1.4.0 # MIT
+ 
+-tempest>=16.1.0 # Apache-2.0
+-
+ # Functional tests.
+ requests>=2.14.2 # Apache-2.0
