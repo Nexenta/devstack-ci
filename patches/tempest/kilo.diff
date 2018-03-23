@@ -1,8 +1,8 @@
 diff --git a/tox.ini b/tox.ini
-index edfee15..97692a5 100644
+index edfee15..7a32786 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -8,6 +8,7 @@ sitepackages = True
+@@ -8,19 +8,38 @@ sitepackages = True
  setenv = VIRTUAL_ENV={envdir}
           OS_TEST_PATH=./tempest/test_discover
  deps = -r{toxinidir}/requirements.txt
@@ -10,7 +10,10 @@ index edfee15..97692a5 100644
  
  [testenv]
  setenv = VIRTUAL_ENV={envdir}
-@@ -17,10 +18,28 @@ install_command = pip install -U {opts} {packages}
+          OS_TEST_PATH=./tempest/tests
+ usedevelop = True
+-install_command = pip install -U {opts} {packages}
++install_command = pip install -U {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
  whitelist_externals = *
  deps = -r{toxinidir}/requirements.txt
         -r{toxinidir}/test-requirements.txt
