@@ -1,32 +1,39 @@
 diff --git a/tox.ini b/tox.ini
-index 02eef78..730acd3 100644
+index 02eef78..c9e01a2 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -10,6 +10,7 @@ setenv =
-     OS_TEST_PATH=./tempest/test_discover
+@@ -11,6 +11,7 @@ setenv =
  deps =
      setuptools
-+    -c{env:UPPER_CONSTRAINTS_FILE:../requirements/upper-constraints.txt}
      -r{toxinidir}/requirements.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
  
  [testenv]
-@@ -28,6 +29,21 @@ commands =
+ setenv =
+@@ -24,10 +25,28 @@ whitelist_externals = *
+ deps =
+     -r{toxinidir}/requirements.txt
+     -r{toxinidir}/test-requirements.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
+ commands =
      find . -type f -name "*.pyc" -delete
      ostestr {posargs}
  
 +[testenv:ci]
-+envdir = .tox/tempest
-+sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
 +ignore_errors = True
++sitepackages = True
++recreate = True
++envdir = .tox/ci
 +commands =
-+    sh -c 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
-+    find . -type f -name '*.pyc' -delete
++    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
++    find {toxinidir} -type f -name '*.pyc' -delete
++    bash -cexu 'mtp={toxinidir}/../manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
-+    sh -c 'test ! -e .testrepository -a -d .stestr && ln -s .stestr .testrepository || true'
-+    sh -c 'testr last --subunit >report.sub'
-+    sh -c 'cat report.sub | subunit-trace >report.txt'
++    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
++    bash -cexu 'testr last --subunit >report.sub'
++    bash -cexu 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html
 +
  [testenv:genconfig]
@@ -34,7 +41,7 @@ index 02eef78..730acd3 100644
  
 diff --git a/.stestr.conf b/.stestr.conf
 new file mode 100644
-index 0000000..2cd3380
+index 0000000..818c743
 --- /dev/null
 +++ b/.stestr.conf
 @@ -0,0 +1,3 @@
