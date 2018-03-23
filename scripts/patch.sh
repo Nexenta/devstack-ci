@@ -27,7 +27,7 @@ if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
 fi
 
 if [[ -d $_base/$_ci/files/$_project ]]; then
-	(cd $_base/$_ci/files/$_project && tar cf - .) | tar pxvf -
+	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
 
 for item in branch show status diff; do
