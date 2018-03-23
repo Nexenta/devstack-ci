@@ -1,32 +1,58 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index f7d63a8..3468b9a 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -1,7 +1,7 @@
+ # The order of packages is significant, because pip processes them in the order
+ # of appearance. Changing the order has an impact on the overall integration
+ # process, which may cause wedges in the gate later.
+-hacking<0.13,>=0.12.0 # Apache-2.0
++hacking<0.11,>=0.10.0
+ # needed for doc build
+ sphinx!=1.3b1,<1.4,>=1.2.1 # BSD
+ oslosphinx>=4.7.0 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index d8d390e..efc6678 100644
+index d8d390e..19111e0 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -10,6 +10,7 @@ setenv =
-     OS_TEST_PATH=./tempest/test_discover
+@@ -11,6 +11,7 @@ setenv =
  deps =
      setuptools
-+    -c{env:UPPER_CONSTRAINTS_FILE:../requirements/upper-constraints.txt}
      -r{toxinidir}/requirements.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
  
  [testenv]
-@@ -28,6 +29,21 @@ commands =
+ setenv =
+@@ -19,15 +20,33 @@ setenv =
+     PYTHONWARNINGS=default::DeprecationWarning
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY
+ usedevelop = True
+-install_command = pip install -U {opts} {packages}
++install_command = pip install -U {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
+ whitelist_externals = *
+ deps =
+     -r{toxinidir}/requirements.txt
+     -r{toxinidir}/test-requirements.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
+ commands =
      find . -type f -name "*.pyc" -delete
      ostestr {posargs}
  
 +[testenv:ci]
-+envdir = .tox/tempest
-+sitepackages = {[tempestenv]sitepackages}
 +setenv = {[tempestenv]setenv}
 +deps = {[tempestenv]deps}
 +ignore_errors = True
++sitepackages = True
++recreate = True
++envdir = .tox/ci
 +commands =
-+    sh -c 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
-+    find . -type f -name '*.pyc' -delete
++    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
++    find {toxinidir} -type f -name '*.pyc' -delete
++    bash -cexu 'mtp={toxinidir}/../manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
 +    ostestr --no-slowest --serial --regex '{posargs}'
-+    sh -c 'test ! -e .testrepository -a -d .stestr && ln -s .stestr .testrepository || true'
-+    sh -c 'testr last --subunit >report.sub'
-+    sh -c 'cat report.sub | subunit-trace >report.txt'
++    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
++    bash -cexu 'testr last --subunit >report.sub'
++    bash -cexu 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html
 +
  [testenv:genconfig]
