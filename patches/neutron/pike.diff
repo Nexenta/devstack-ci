@@ -1,0 +1,10 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index 3db1b10..b27bde8 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -24,5 +24,4 @@ pylint==1.4.5 # GPLv2
+ reno!=2.3.1,>=1.8.0 # Apache-2.0
+ # Needed to run DB commands in virtualenvs
+ PyMySQL>=0.7.6 # MIT License
+-tempest>=16.1.0 # Apache-2.0
+ bashate>=0.2 # Apache-2.0
