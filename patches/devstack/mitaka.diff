@@ -37,6 +37,20 @@ index 5ae9745..daf83d6 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/infra b/lib/infra
+index cf003cc..0a9ee4f 100644
+--- a/lib/infra
++++ b/lib/infra
+@@ -29,7 +29,8 @@ GITDIR["pbr"]=$DEST/pbr
+ # install_infra() - Collect source and prepare
+ function install_infra {
+     local PIP_VIRTUAL_ENV="$REQUIREMENTS_DIR/.venv"
+-    [ ! -d $PIP_VIRTUAL_ENV ] && virtualenv $PIP_VIRTUAL_ENV
++    [ ! -d $PIP_VIRTUAL_ENV ] && virtualenv --no-setuptools $PIP_VIRTUAL_ENV
++    PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install -U setuptools
+     # We don't care about testing git pbr in the requirements venv.
+     PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install -U pbr
+     PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install $REQUIREMENTS_DIR
 diff --git a/lib/tempest b/lib/tempest
 index ef66d90..1ec401c 100644
 --- a/lib/tempest
@@ -66,14 +80,15 @@ index c280267..c1ae290 100644
  pip!=8
 +setuptools==30.4.0
 diff --git a/tools/install_pip.sh b/tools/install_pip.sh
-index 5d314c8..62f4e0e 100755
+index 5d314c8..a2f79c3 100755
 --- a/tools/install_pip.sh
 +++ b/tools/install_pip.sh
-@@ -137,6 +137,6 @@ set -x
+@@ -135,8 +135,4 @@ fi
  
- # Note setuptools is part of requirements.txt and we want to make sure
- # we obey any versioning as described there.
+ set -x
+ 
+-# Note setuptools is part of requirements.txt and we want to make sure
+-# we obey any versioning as described there.
 -pip_install_gr setuptools
-+pip_install -U setuptools==30.4.0
- 
+-
  get_versions
