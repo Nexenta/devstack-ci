@@ -23,12 +23,8 @@ branch:
 exclude:
   - branch: master
     backend: ned_nbd
-  - branch: master
-    backend: ned_iscsi
   - branch: icehouse
     backend: ned_nbd
-  - branch: icehouse
-    backend: ned_iscsi
   - branch: icehouse
     backend: ns4_manila
   - branch: icehouse
@@ -36,35 +32,21 @@ exclude:
   - branch: juno
     backend: ned_nbd
   - branch: juno
-    backend: ned_iscsi
-  - branch: juno
     backend: ns4_manila
   - branch: juno
     backend: ns5_manila
   - branch: kilo
     backend: ned_nbd
   - branch: kilo
-    backend: ned_iscsi
-  - branch: kilo
     backend: ns5_manila
   - branch: liberty
     backend: ned_nbd
-  - branch: liberty
-    backend: ned_iscsi
   - branch: mitaka
     backend: ned_nbd
-  - branch: mitaka
-    backend: ned_iscsi
   - branch: newton
     backend: ned_nbd
-  - branch: newton
-    backend: ned_iscsi
   - branch: ocata
     backend: ned_nbd
-  - branch: ocata
-    backend: ned_iscsi
   - branch: pike
     backend: ned_nbd
-  - branch: pike
-    backend: ned_iscsi
 ...
