@@ -91,10 +91,14 @@ TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
 TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
 TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
 
-declare -A NEXENTA_DRIVER
+declare -A NEXENTA_DRIVER NEXENTA_HOST
 declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
 declare -A NEXENTA_REST_HOST NEXENTA_REST_PORT NEXENTA_REST_PROTO
-declare -A NEXENTA_HOST NEXENTA_POOL NEXENTA_DATASET NEXENTA_SPARSED
+{% if config.ci.backend == 'ned_iscsi' %}
+declare -A NEXENTA_ISCSI_CONTAINER NEXENTA_ISCSI_SERVICE
+{% else %}
+declare -A NEXENTA_POOL NEXENTA_DATASET NEXENTA_SPARSED
+{% endif %}
 {% for instance in config.backend.instances %}
 {% set backend = config.ci.backend ~ loop.index %}
 
@@ -105,10 +109,15 @@ NEXENTA_REST_PROTO[{{ backend }}]="{{ config.backend.rest.protocol }}"
 NEXENTA_REST_USER[{{ backend }}]="{{ config.backend.rest.user }}"
 NEXENTA_REST_PASSWORD[{{ backend }}]="{{ config.backend.rest.password }}"
 NEXENTA_HOST[{{ backend }}]="{{ instance.host }}"
+{% if config.ci.backend == 'ned_iscsi' %}
+NEXENTA_ISCSI_CONTAINER[{{ backend }}]="{{ instance.container }}"
+NEXENTA_ISCSI_SERVICE[{{ backend }}]="{{ instance.service }}"
+{% else %}
 NEXENTA_POOL[{{ backend }}]="{{ instance.pool }}"
 NEXENTA_DATASET[{{ backend }}]="{{ instance.dataset }}"
 NEXENTA_SPARSED[{{ backend }}]="{{ instance.sparsed }}"
 NEXENTA_OPTIONS[{{ backend }}]="{{ instance.options }}"
+{% endif %}
 {% endfor %}
 {% endif %}
 

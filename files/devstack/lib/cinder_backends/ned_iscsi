@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Configure the NexentaEdge iSCSI backend
+#
+
+NEXENTA_XTRACE=$(set +o | grep xtrace)
+set +o xtrace
+
+function configure_cinder_backend_ned_iscsi {
+	declare backend=$1
+	declare item
+	declare -A opt
+
+	opt[volume_driver]=NEXENTA_DRIVER
+	opt[nexenta_client_address]=NEXENTA_HOST
+	opt[nexenta_lun_container]=NEXENTA_ISCSI_CONTAINER
+	opt[nexenta_iscsi_service]=NEXENTA_ISCSI_SERVICE
+	opt[nexenta_rest_user]=NEXENTA_REST_USER
+	opt[nexenta_rest_password]=NEXENTA_REST_PASSWORD
+	opt[nexenta_rest_address]=NEXENTA_REST_HOST
+	opt[nexenta_rest_port]=NEXENTA_REST_PORT
+	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
+
+	iniset $CINDER_CONF $backend volume_backend_name $backend
+
+	for item in "${!opt[@]}"; do
+		declare -n var="${opt[$item]}[$backend]"
+
+		if [[ -n "${var:-}" ]]; then
+			iniset $CINDER_CONF $backend $item $var
+		fi
+	done
+}
+
+function cleanup_cinder_backend_ned_iscsi {
+	ci_clean
+}
+
+$NEXENTA_XTRACE
