@@ -20,7 +20,9 @@ if [[ ! -d $_base/$_logs ]]; then
 	mkdir -p $_base/$_logs
 fi
 
-exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
+if pstree $$ | grep -q ansible; then
+	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
+fi
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
 	patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
