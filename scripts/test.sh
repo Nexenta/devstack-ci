@@ -13,8 +13,11 @@ typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
 
 source $_source/env.sh
-exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 cd $_base/tempest
+
+if pstree $$ | grep -q ansible; then
+	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
+fi
 
 for i in $(seq $_retries); do
 	if tox -e ci -- $_regexp; then
