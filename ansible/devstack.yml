@@ -447,6 +447,7 @@
         - name: Run Test Suite
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
           delegate_to: "{{ config.vm.name }}"
+          when: config.ci.tests == "yes"
 
       rescue:
         - name: Set Error Flag
