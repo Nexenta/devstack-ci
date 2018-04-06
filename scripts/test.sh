@@ -15,7 +15,7 @@ typeset _source=$(dirname $_script)
 source $_source/env.sh
 cd $_base/tempest
 
-if pstree $$ | grep -q ansible; then
+if pstree $$ | grep -q python; then
 	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 fi
 
