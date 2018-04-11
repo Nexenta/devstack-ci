@@ -1,5 +1,5 @@
 diff --git a/test-requirements.txt b/test-requirements.txt
-index 29f0865..328d451 100644
+index 37644d0..0effa74 100644
 --- a/test-requirements.txt
 +++ b/test-requirements.txt
 @@ -9,4 +9,4 @@ reno>=2.5.0 # Apache-2.0
@@ -9,7 +9,7 @@ index 29f0865..328d451 100644
 -flake8-import-order==0.11 # LGPLv3
 +flake8-import-order==0.12 # LGPLv3
 diff --git a/tox.ini b/tox.ini
-index 24e3b5d..d069789 100644
+index 21696eb..c57a7b7 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -12,6 +12,7 @@ setenv =
@@ -21,7 +21,7 @@ index 24e3b5d..d069789 100644
  [testenv]
  setenv =
 @@ -23,15 +24,33 @@ setenv =
- passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST
  usedevelop = True
  install_command =
 -    {toxinidir}/tools/tox_install.sh {env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt} {opts} {packages}
@@ -33,7 +33,7 @@ index 24e3b5d..d069789 100644
 +    -c{toxinidir}/../requirements/upper-constraints.txt
  commands =
      find . -type f -name "*.pyc" -delete
-     ostestr {posargs}
+     stestr --test-path ./tempest/tests run {posargs}
  
 +[testenv:ci]
 +setenv = {[tempestenv]setenv}
@@ -55,12 +55,3 @@ index 24e3b5d..d069789 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
-diff --git a/.stestr.conf b/.stestr.conf
-new file mode 100644
-index 0000000..818c743
---- /dev/null
-+++ b/.stestr.conf
-@@ -0,0 +1,3 @@
-+[DEFAULT]
-+test_path=./tempest/test_discover
-+group_regex=([^\.]*\.)*
