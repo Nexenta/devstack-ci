@@ -12,7 +12,7 @@ index 13950bd..5811d6f 100644
  sphinx>=1.5.1 # BSD
  oslosphinx>=4.7.0 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index 892f834..2a720f5 100644
+index 892f834..a8e077c 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -12,6 +12,7 @@ setenv =
@@ -23,10 +23,11 @@ index 892f834..2a720f5 100644
  
  [testenv]
  setenv =
-@@ -24,14 +25,33 @@ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH
+@@ -23,15 +24,33 @@ setenv =
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION
  usedevelop = True
  install_command =
-     {toxinidir}/tools/tox_install.sh {env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt} {opts} {packages}
+-    {toxinidir}/tools/tox_install.sh {env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt} {opts} {packages}
 +    {toxinidir}/tools/tox_install.sh {toxinidir}/../requirements/upper-constraints.txt {opts} {packages}
  whitelist_externals = *
  deps =
