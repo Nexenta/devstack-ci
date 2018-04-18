@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index 5ae9745..daf83d6 100644
+index 5ae97455..daf83d60 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -509,6 +509,7 @@ function git_clone {
@@ -37,8 +37,21 @@ index 5ae9745..daf83d6 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/inc/python b/inc/python
+index ea6e92d7..bbbdf64d 100644
+--- a/inc/python
++++ b/inc/python
+@@ -141,7 +141,7 @@ function pip_install {
+     # packages like setuptools?
+     local pip_version
+     pip_version=$(python -c "import pip; \
+-                        print(pip.__version__.strip('.')[0])")
++                        print(pip.__version__.split('.')[0])")
+     if (( pip_version<6 )); then
+         die $LINENO "Currently installed pip version ${pip_version} does not" \
+             "meet minimum requirements (>=6)."
 diff --git a/lib/infra b/lib/infra
-index cf003cc..0a9ee4f 100644
+index cf003cce..0a9ee4fa 100644
 --- a/lib/infra
 +++ b/lib/infra
 @@ -29,7 +29,8 @@ GITDIR["pbr"]=$DEST/pbr
@@ -52,7 +65,7 @@ index cf003cc..0a9ee4f 100644
      PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install -U pbr
      PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install $REQUIREMENTS_DIR
 diff --git a/lib/tempest b/lib/tempest
-index ef66d90..1ec401c 100644
+index ef66d902..1ec401c2 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -512,13 +512,16 @@ function configure_tempest {
@@ -73,14 +86,15 @@ index ef66d90..1ec401c 100644
  
      if [ $TEMPEST_VOLUME_DRIVER != "default" -o \
 diff --git a/tools/cap-pip.txt b/tools/cap-pip.txt
-index c280267..c1ae290 100644
+index c2802676..375d937c 100644
 --- a/tools/cap-pip.txt
 +++ b/tools/cap-pip.txt
 @@ -1 +1,2 @@
- pip!=8
+-pip!=8
++pip!=8,<10
 +setuptools==30.4.0
 diff --git a/tools/install_pip.sh b/tools/install_pip.sh
-index 5d314c8..a2f79c3 100755
+index 5d314c83..a2f79c35 100755
 --- a/tools/install_pip.sh
 +++ b/tools/install_pip.sh
 @@ -135,8 +135,4 @@ fi

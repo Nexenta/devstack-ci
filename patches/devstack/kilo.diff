@@ -1,5 +1,5 @@
 diff --git a/files/debs/general b/files/debs/general
-index e824d23..493f11c 100644
+index e824d239..493f11c2 100644
 --- a/files/debs/general
 +++ b/files/debs/general
 @@ -16,7 +16,6 @@ iputils-ping
@@ -11,7 +11,7 @@ index e824d23..493f11c 100644
  python-cmd2 # dist:precise
  python-dev
 diff --git a/functions-common b/functions-common
-index b92fa55..44f4c71 100644
+index b92fa556..c2361160 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -610,6 +610,7 @@ function git_clone {
@@ -48,7 +48,14 @@ index b92fa55..44f4c71 100644
              REPOS_UPDATED=True
          fi
          $xtrace
-@@ -1647,12 +1654,19 @@ function pip_install {
+@@ -1641,18 +1648,25 @@ function pip_install {
+     fi
+ 
+     local pip_version=$(python -c "import pip; \
+-                        print(pip.__version__.strip('.')[0])")
++                        print(pip.__version__.split('.')[0])")
+     if (( pip_version<6 )); then
+         die $LINENO "Currently installed pip version ${pip_version} does not" \
              "meet minimum requirements (>=6)."
      fi
  
@@ -91,7 +98,7 @@ index b92fa55..44f4c71 100644
  
      setup_package $project_dir $flags
 diff --git a/lib/infra b/lib/infra
-index c825b4e..5be54d3 100644
+index c825b4ee..5be54d37 100644
 --- a/lib/infra
 +++ b/lib/infra
 @@ -40,6 +40,8 @@ function install_infra {
@@ -104,7 +111,7 @@ index c825b4e..5be54d3 100644
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 1ae9457..a0a91b2 100644
+index 1ae94577..a0a91b2d 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -520,6 +520,10 @@ function install_tempest {
@@ -119,7 +126,7 @@ index 1ae9457..a0a91b2 100644
  
  # init_tempest() - Initialize ec2 images
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index cc5275f..6c44a24 100755
+index cc5275fe..6c44a246 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@
