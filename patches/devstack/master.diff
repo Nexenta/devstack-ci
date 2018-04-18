@@ -1,8 +1,8 @@
 diff --git a/functions-common b/functions-common
-index df295a3..a544f24 100644
+index b1b0995a..550aa1d2 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -506,6 +506,7 @@ function git_clone {
+@@ -509,6 +509,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
          git show --oneline | head -1
@@ -10,7 +10,7 @@ index df295a3..a544f24 100644
          cd $orig_dir
          return
      fi
-@@ -560,6 +561,7 @@ function git_clone {
+@@ -563,6 +564,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -18,7 +18,7 @@ index df295a3..a544f24 100644
      cd $orig_dir
  }
  
-@@ -1048,7 +1050,8 @@ function apt_get_update {
+@@ -1051,7 +1053,8 @@ function apt_get_update {
      time_start "apt-get-update"
  
      local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
@@ -28,7 +28,7 @@ index df295a3..a544f24 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
-@@ -1681,7 +1684,7 @@ function run_phase {
+@@ -1684,7 +1687,7 @@ function run_phase {
              # white listed elements in tree. We want these to move out
              # over time as well, but they are in tree, so we need to
              # manage that.
