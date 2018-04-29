@@ -36,37 +36,50 @@ function ci_extra {
 }
 
 function ci_test_config {
-	if is_service_enabled manila; then
-		iniset $TEMPEST_CONFIG share capability_storage_protocol NFS
-		iniset $TEMPEST_CONFIG share capability_snapshot_support True
-		iniset $TEMPEST_CONFIG share capability_create_share_from_snapshot_support True
-		iniset $TEMPEST_CONFIG share capability_revert_to_snapshot_support True
-		iniset $TEMPEST_CONFIG share capability_mount_snapshot_support True
-		iniset $TEMPEST_CONFIG share backend_names $MANILA_ENABLED_BACKENDS
-		iniset $TEMPEST_CONFIG share multi_backend True
-		iniset $TEMPEST_CONFIG share multitenancy_enabled False
-		iniset $TEMPEST_CONFIG share enable_protocols nfs
-		iniset $TEMPEST_CONFIG share enable_ip_rules_for_protocols nfs
-		iniset $TEMPEST_CONFIG share enable_ro_access_level_for_protocols nfs
-		iniset $TEMPEST_CONFIG share run_mount_snapshot_tests True
-		iniset $TEMPEST_CONFIG share run_quota_tests True
-		iniset $TEMPEST_CONFIG share run_extend_tests True
-		iniset $TEMPEST_CONFIG share run_revert_to_snapshot_tests True
-		iniset $TEMPEST_CONFIG share run_share_group_tests True
-		iniset $TEMPEST_CONFIG share run_snapshot_tests True
-		iniset $TEMPEST_CONFIG share run_consistency_group_tests False
-		iniset $TEMPEST_CONFIG share run_replication_tests False
-		iniset $TEMPEST_CONFIG share run_migration_tests False
-		iniset $TEMPEST_CONFIG share run_manage_unmanage_tests False
-		iniset $TEMPEST_CONFIG share run_manage_unmanage_snapshot_tests False
-		case "$NEXENTA_BACKEND_NAME" in
-		ns4_manila)
-			iniset $TEMPEST_CONFIG share run_shrink_tests False
-			;;
-		ns5_manila)
-			iniset $TEMPEST_CONFIG share run_shrink_tests True
-			;;
-		esac
+	if is_service_enabled tempest; then
+		if is_service_enabled cinder; then
+			case "$CI_BRANCH" in
+			pike|queens|master)
+				iniset $TEMPEST_CONFIG volume-feature-enabled volume_revert True
+				;;
+			*)
+				;;
+			esac
+		fi
+
+		if is_service_enabled manila; then
+			iniset $TEMPEST_CONFIG share capability_storage_protocol NFS
+			iniset $TEMPEST_CONFIG share capability_snapshot_support True
+			iniset $TEMPEST_CONFIG share capability_create_share_from_snapshot_support True
+			iniset $TEMPEST_CONFIG share capability_revert_to_snapshot_support True
+			iniset $TEMPEST_CONFIG share capability_mount_snapshot_support True
+			iniset $TEMPEST_CONFIG share backend_names $MANILA_ENABLED_BACKENDS
+			iniset $TEMPEST_CONFIG share multi_backend True
+			iniset $TEMPEST_CONFIG share multitenancy_enabled False
+			iniset $TEMPEST_CONFIG share enable_protocols nfs
+			iniset $TEMPEST_CONFIG share enable_ip_rules_for_protocols nfs
+			iniset $TEMPEST_CONFIG share enable_ro_access_level_for_protocols nfs
+			iniset $TEMPEST_CONFIG share run_mount_snapshot_tests True
+			iniset $TEMPEST_CONFIG share run_quota_tests True
+			iniset $TEMPEST_CONFIG share run_extend_tests True
+			iniset $TEMPEST_CONFIG share run_revert_to_snapshot_tests True
+			iniset $TEMPEST_CONFIG share run_share_group_tests True
+			iniset $TEMPEST_CONFIG share run_snapshot_tests True
+			iniset $TEMPEST_CONFIG share run_consistency_group_tests False
+			iniset $TEMPEST_CONFIG share run_replication_tests False
+			iniset $TEMPEST_CONFIG share run_migration_tests False
+			iniset $TEMPEST_CONFIG share run_manage_unmanage_tests False
+			iniset $TEMPEST_CONFIG share run_manage_unmanage_snapshot_tests False
+	
+			case "$NEXENTA_BACKEND_NAME" in
+			ns4_manila)
+				iniset $TEMPEST_CONFIG share run_shrink_tests False
+				;;
+			ns5_manila)
+				iniset $TEMPEST_CONFIG share run_shrink_tests True
+				;;
+			esac
+		fi
 	fi
 }
 
