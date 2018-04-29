@@ -55,10 +55,10 @@ NEXENTA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}"
 {% endfor %}
 
 {% if 'manila' in config.ci.backend %}
-enable_plugin manila https://github.com/openstack/manila $MANILA_BRANCH
-enable_plugin manila-ui https://github.com/openstack/manila-ui $MANILA_UI_BRANCH
+enable_plugin manila git://git.openstack.org/openstack/manila $MANILA_BRANCH
+enable_plugin manila-ui git://git.openstack.org/openstack/manila-ui $MANILA_UI_BRANCH
 {% if config.ci.branch == 'master' %}
-enable_plugin manila-tempest-plugin https://github.com/openstack/manila-tempest-plugin
+enable_plugin manila-tempest-plugin git://git.openstack.org/openstack/manila-tempest-plugin master
 {% endif %}
 
 MANILA_UI_ENABLED="True"
@@ -85,6 +85,9 @@ MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_rest_port="{{ co
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_rest_protocol="{{ config.backend.rest.protocol }}"
 {% endfor %}
 {% else %}
+{% if config.ci.branch == 'master' %}
+enable_plugin cinder-tempest-plugin git://git.openstack.org/openstack/cinder-tempest-plugin master
+{% endif %}
 CINDER_VOLUME_CLEAR="none"
 CINDER_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"

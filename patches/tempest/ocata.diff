@@ -48,7 +48,7 @@ index 892f834..a8e077c 100644
 +commands =
 +    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find {toxinidir} -type f -name '*.pyc' -delete
-+    bash -cexu 'mtp={toxinidir}/../manila-tempest-plugin; if [[ -d $mtp ]]; then pip install $mtp; fi'
++    bash -cexu 'find {toxinidir}/.. -mindepth 1 -maxdepth 1 -type d -name *-tempest-plugin | xargs -L1 -rt pip install'
 +    ostestr --no-slowest --serial --regex '{posargs}'
 +    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
 +    bash -cexu 'testr last --subunit >report.sub'
