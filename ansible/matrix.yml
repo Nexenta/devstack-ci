@@ -11,6 +11,7 @@ backend:
 
 branch:
   - master
+  - queens
   - pike
   - ocata
   - newton

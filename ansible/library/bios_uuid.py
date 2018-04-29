@@ -16,7 +16,8 @@ openstack_branches = {
     'mitaka':           0xa5,
     'newton':           0xa6,
     'ocata':            0xa7,
-    'pike':             0xa8
+    'pike':             0xa8,
+    'queens':           0xa9
 }
 
 docker_branches = {
