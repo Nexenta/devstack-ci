@@ -1,0 +1,13 @@
+diff --git a/cinder_tempest_plugin/services/volume_revert_client.py b/cinder_tempest_plugin/services/volume_revert_client.py
+index 0d54701..285494a 100644
+--- a/cinder_tempest_plugin/services/volume_revert_client.py
++++ b/cinder_tempest_plugin/services/volume_revert_client.py
+@@ -15,7 +15,7 @@
+ 
+ from oslo_serialization import jsonutils as json
+ from tempest.lib.common import rest_client
+-from tempest.lib.services.volume import base_client
++from tempest.lib.services.volume.v3 import base_client
+ 
+ 
+ class VolumeRevertClient(base_client.BaseClient):
