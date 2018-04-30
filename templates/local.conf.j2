@@ -1,6 +1,6 @@
 [[local|localrc]]
 enable_service tempest
-{% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
+{% if config.ci.branch not in ['juno', 'icehouse'] %}
 enable_service c-bak
 {% endif %}
 
@@ -86,7 +86,7 @@ MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_rest_port="{{ co
 MANILA_OPTGROUP_{{ config.ci.backend }}{{ loop.index }}_nexenta_rest_protocol="{{ config.backend.rest.protocol }}"
 {% endfor %}
 {% else %}
-{% if config.ci.branch == 'master' %}
+{% if config.ci.branch in ['master', 'queens'] %}
 enable_plugin cinder-tempest-plugin git://git.openstack.org/openstack/cinder-tempest-plugin $CINDER_TEMPEST_PLUGIN_BRANCH
 {% endif %}
 CINDER_VOLUME_CLEAR="none"
