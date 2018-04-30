@@ -1,0 +1,12 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index c13260b..326960e 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -30,7 +30,5 @@ WebTest>=2.0.27 # MIT
+ stestr>=1.0.0 # Apache-2.0
+ testtools>=2.2.0 # MIT
+ 
+-tempest>=17.1.0 # Apache-2.0
+-
+ # Functional tests.
+ requests>=2.14.2 # Apache-2.0
