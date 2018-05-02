@@ -59,7 +59,7 @@ CI_BRANCH="{{ config.ci.branch }}"
 {% if 'manila' in config.ci.backend %}
 enable_plugin manila git://git.openstack.org/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui git://git.openstack.org/openstack/manila-ui $MANILA_UI_BRANCH
-{% if config.ci.branch == 'master' %}
+{% if config.ci.branch in ['master', 'queens'] %}
 enable_plugin manila-tempest-plugin git://git.openstack.org/openstack/manila-tempest-plugin $MANILA_TEMPEST_PLUGIN_BRANCH
 {% endif %}
 
