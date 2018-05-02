@@ -1,8 +1,20 @@
 diff --git a/functions-common b/functions-common
-index 7d2138d..0937c53 100644
+index 7d2138dc..6f11df12 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -577,6 +577,7 @@ function git_clone {
+@@ -569,14 +569,19 @@ function git_clone {
+     local git_dest=$2
+     local git_ref=$3
+     local orig_dir=$(pwd)
++    local git_clone_flags="--branch $git_ref"
+ 
+     RECLONE=$(trueorfalse False $RECLONE)
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
++    fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
+         echo "Running in offline mode, clones already exist"
          # print out the results so we know what change was used in the logs
          cd $git_dest
          git show --oneline | head -1
@@ -10,7 +22,19 @@ index 7d2138d..0937c53 100644
          cd $orig_dir
          return
      fi
-@@ -627,6 +628,7 @@ function git_clone {
+@@ -595,10 +600,7 @@ function git_clone {
+         if [[ ! -d $git_dest ]]; then
+             [[ "$ERROR_ON_CLONE" = "True" ]] && \
+                 die $LINENO "Cloning not allowed in this configuration"
+-            git_timed clone $git_remote $git_dest
+-            cd $git_dest
+-            # This checkout syntax works for both branches and tags
+-            git checkout $git_ref
++            git_timed clone $git_clone_flags -- $git_remote $git_dest
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $git_dest
+@@ -627,6 +629,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -18,7 +42,7 @@ index 7d2138d..0937c53 100644
      cd $orig_dir
  }
  
-@@ -1071,9 +1073,13 @@ function update_package_repo {
+@@ -1071,9 +1074,13 @@ function update_package_repo {
          local xtrace=$(set +o | grep xtrace)
          set +o xtrace
          if [[ "$REPOS_UPDATED" != "True" || "$RETRY_UPDATE" = "True" ]]; then
@@ -35,7 +59,7 @@ index 7d2138d..0937c53 100644
              REPOS_UPDATED=True
          fi
          $xtrace
-@@ -1571,12 +1577,19 @@ function pip_install {
+@@ -1571,12 +1578,19 @@ function pip_install {
          pip_mirror_opt="--use-mirrors"
      fi
  
@@ -55,7 +79,7 @@ index 7d2138d..0937c53 100644
          $pip_mirror_opt $@
  
      if [[ "$INSTALL_TESTONLY_PACKAGES" == "True" ]]; then
-@@ -1665,8 +1678,8 @@ function setup_package_with_req_sync {
+@@ -1665,8 +1679,8 @@ function setup_package_with_req_sync {
      local update_requirements=$(cd $project_dir && git diff --exit-code >/dev/null || echo "changed")
  
      if [[ $update_requirements != "changed" ]]; then
@@ -67,7 +91,7 @@ index 7d2138d..0937c53 100644
  
      setup_package $project_dir $flags
 diff --git a/lib/infra b/lib/infra
-index ef5a136..c1a15d9 100644
+index ef5a136b..c1a15d97 100644
 --- a/lib/infra
 +++ b/lib/infra
 @@ -40,6 +40,8 @@ function install_infra {
@@ -80,7 +104,7 @@ index ef5a136..c1a15d9 100644
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 24ac072..cdb669d 100644
+index 24ac0726..cdb669de 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -418,7 +418,24 @@ function configure_tempest {
@@ -119,8 +143,23 @@ index 24ac072..cdb669d 100644
  }
  
  # init_tempest() - Initialize ec2 images
+diff --git a/stack.sh b/stack.sh
+index ca90e04c..8ef062b1 100755
+--- a/stack.sh
++++ b/stack.sh
+@@ -521,6 +521,10 @@ SYSLOG_PORT=${SYSLOG_PORT:-516}
+ # Use color for logging output (only available if syslog is not used)
+ LOG_COLOR=`trueorfalse True $LOG_COLOR`
+ 
++# Set global ``GIT_DEPTH=<number>`` to limit the history depth of the git clone
++# Set to 0 to disable shallow cloning
++GIT_DEPTH=${GIT_DEPTH:-0}
++
+ # Reset the bundle of CA certificates
+ SSL_BUNDLE_FILE="$DATA_DIR/ca-bundle.pem"
+ rm -f $SSL_BUNDLE_FILE
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 9668973..8b6af90 100755
+index 9668973c..8b6af906 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@

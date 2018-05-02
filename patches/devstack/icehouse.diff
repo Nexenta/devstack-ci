@@ -1,8 +1,19 @@
 diff --git a/functions-common b/functions-common
-index 304eed8..c736bb0 100644
+index 304eed8f..a7b0d606 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -529,6 +529,7 @@ function git_clone {
+@@ -523,12 +523,18 @@ function git_clone {
+     GIT_REF=$3
+     RECLONE=$(trueorfalse False $RECLONE)
+     local orig_dir=`pwd`
++    local git_clone_flags="--branch $GIT_REF"
++
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
++    fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
+         echo "Running in offline mode, clones already exist"
          # print out the results so we know what change was used in the logs
          cd $GIT_DEST
          git show --oneline | head -1
@@ -10,7 +21,19 @@ index 304eed8..c736bb0 100644
          cd $orig_dir
          return
      fi
-@@ -579,6 +580,7 @@ function git_clone {
+@@ -547,10 +553,7 @@ function git_clone {
+         if [[ ! -d $GIT_DEST ]]; then
+             [[ "$ERROR_ON_CLONE" = "True" ]] && \
+                 die $LINENO "Cloning not allowed in this configuration"
+-            git_timed clone $GIT_REMOTE $GIT_DEST
+-            cd $GIT_DEST
+-            # This checkout syntax works for both branches and tags
+-            git checkout $GIT_REF
++            git_timed clone $git_clone_flags -- $GIT_REMOTE $GIT_DEST
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $GIT_DEST
+@@ -579,6 +582,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $GIT_DEST
      git show --oneline | head -1
@@ -18,7 +41,7 @@ index 304eed8..c736bb0 100644
      cd $orig_dir
  }
  
-@@ -902,10 +904,16 @@ function install_package {
+@@ -902,10 +906,16 @@ function install_package {
      local xtrace=$(set +o | grep xtrace)
      set +o xtrace
      if is_ubuntu; then
@@ -39,7 +62,7 @@ index 304eed8..c736bb0 100644
  
          $xtrace
          apt_get install "$@"
-@@ -1376,12 +1384,19 @@ function pip_install {
+@@ -1376,12 +1386,19 @@ function pip_install {
      # this problem. See https://github.com/pypa/pip/issues/709
      local pip_build_tmp=$(mktemp --tmpdir -d pip-build.XXXXX)
  
@@ -60,7 +83,7 @@ index 304eed8..c736bb0 100644
          && $SUDO_PIP rm -rf ${pip_build_tmp}
  }
 diff --git a/lib/cinder b/lib/cinder
-index 8479ca7..f11b9a4 100644
+index 8479ca78..f11b9a43 100644
 --- a/lib/cinder
 +++ b/lib/cinder
 @@ -28,6 +28,7 @@ set +o xtrace
@@ -202,7 +225,7 @@ index 8479ca7..f11b9a4 100644
  # Restore xtrace
  $XTRACE
 diff --git a/lib/tempest b/lib/tempest
-index 1ce4f56..09e745d 100644
+index 1ce4f563..09e745d2 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -380,7 +380,24 @@ function configure_tempest {
@@ -244,10 +267,21 @@ index 1ce4f56..09e745d 100644
  
  # init_tempest() - Initialize ec2 images
 diff --git a/stack.sh b/stack.sh
-index 7af13aa..e8c5546 100755
+index 7af13aa5..eae4e298 100755
 --- a/stack.sh
 +++ b/stack.sh
-@@ -1206,6 +1206,7 @@ fi
+@@ -317,6 +317,10 @@ DSTAT_FILE=${DSTAT_FILE:-"dstat.txt"}
+ # Use color for logging output (only available if syslog is not used)
+ LOG_COLOR=`trueorfalse True $LOG_COLOR`
+ 
++# Set global ``GIT_DEPTH=<number>`` to limit the history depth of the git clone
++# Set to 0 to disable shallow cloning
++GIT_DEPTH=${GIT_DEPTH:-0}
++
+ # Service startup timeout
+ SERVICE_TIMEOUT=${SERVICE_TIMEOUT:-60}
+ 
+@@ -1206,6 +1210,7 @@ fi
  if is_service_enabled cinder; then
      echo_summary "Starting Cinder"
      start_cinder
@@ -256,7 +290,7 @@ index 7af13aa..e8c5546 100755
  if is_service_enabled ceilometer; then
      echo_summary "Starting Ceilometer"
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 15ed6e7..b14b086 100755
+index 15ed6e7a..b14b0866 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@

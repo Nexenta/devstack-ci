@@ -1,7 +1,22 @@
 diff --git a/functions-common b/functions-common
-index 660df795..81594d35 100644
+index 660df795..e02baa38 100644
 --- a/functions-common
 +++ b/functions-common
+@@ -498,11 +498,11 @@ function git_clone {
+     local git_ref=$3
+     local orig_dir
+     orig_dir=$(pwd)
+-    local git_clone_flags=""
++    local git_clone_flags="--branch $git_ref"
+ 
+     RECLONE=$(trueorfalse False RECLONE)
+-    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
+-        git_clone_flags="$git_clone_flags --depth $GIT_DEPTH"
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
+     fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
 @@ -510,6 +510,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
@@ -10,7 +25,17 @@ index 660df795..81594d35 100644
          cd $orig_dir
          return
      fi
-@@ -564,6 +565,7 @@ function git_clone {
+@@ -534,8 +535,7 @@ function git_clone {
+                 echo "the project to the \$PROJECTS variable in the job definition."
+                 die $LINENO "Cloning not allowed in this configuration"
+             fi
+-            # '--branch' can also take tags
+-            git_timed clone $git_clone_flags $git_remote $git_dest --branch $git_ref
++            git_timed clone $git_clone_flags -- $git_remote $git_dest
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $git_dest
+@@ -564,6 +564,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -18,7 +43,7 @@ index 660df795..81594d35 100644
      cd $orig_dir
  }
  
-@@ -1052,7 +1054,8 @@ function apt_get_update {
+@@ -1052,7 +1053,8 @@ function apt_get_update {
      time_start "apt-get-update"
  
      local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
@@ -28,7 +53,7 @@ index 660df795..81594d35 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
-@@ -1986,7 +1989,7 @@ function run_phase {
+@@ -1986,7 +1988,7 @@ function run_phase {
              # white listed elements in tree. We want these to move out
              # over time as well, but they are in tree, so we need to
              # manage that.

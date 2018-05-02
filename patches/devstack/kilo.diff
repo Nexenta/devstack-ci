@@ -11,9 +11,24 @@ index e824d239..493f11c2 100644
  python-cmd2 # dist:precise
  python-dev
 diff --git a/functions-common b/functions-common
-index b92fa556..c2361160 100644
+index b92fa556..6ebab394 100644
 --- a/functions-common
 +++ b/functions-common
+@@ -598,11 +598,11 @@ function git_clone {
+     local git_dest=$2
+     local git_ref=$3
+     local orig_dir=$(pwd)
+-    local git_clone_flags=""
++    local git_clone_flags="--branch $git_ref"
+ 
+     RECLONE=$(trueorfalse False RECLONE)
+-    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
+-        git_clone_flags="$git_clone_flags --depth $GIT_DEPTH"
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
+     fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
 @@ -610,6 +610,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
@@ -22,7 +37,19 @@ index b92fa556..c2361160 100644
          cd $orig_dir
          return
      fi
-@@ -660,6 +661,7 @@ function git_clone {
+@@ -628,10 +629,7 @@ function git_clone {
+         if [[ ! -d $git_dest ]]; then
+             [[ "$ERROR_ON_CLONE" = "True" ]] && \
+                 die $LINENO "Cloning not allowed in this configuration"
+-            git_timed clone $git_clone_flags $git_remote $git_dest
+-            cd $git_dest
+-            # This checkout syntax works for both branches and tags
+-            git checkout $git_ref
++            git_timed clone $git_clone_flags -- $git_remote $git_dest
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $git_dest
+@@ -660,6 +658,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -30,7 +57,7 @@ index b92fa556..c2361160 100644
      cd $orig_dir
  }
  
-@@ -1154,9 +1156,14 @@ function update_package_repo {
+@@ -1154,9 +1153,14 @@ function update_package_repo {
          local xtrace=$(set +o | grep xtrace)
          set +o xtrace
          if [[ "$REPOS_UPDATED" != "True" || "$RETRY_UPDATE" = "True" ]]; then
@@ -48,7 +75,7 @@ index b92fa556..c2361160 100644
              REPOS_UPDATED=True
          fi
          $xtrace
-@@ -1641,18 +1648,25 @@ function pip_install {
+@@ -1641,18 +1645,25 @@ function pip_install {
      fi
  
      local pip_version=$(python -c "import pip; \
@@ -75,7 +102,7 @@ index b92fa556..c2361160 100644
          $@
  
      INSTALL_TESTONLY_PACKAGES=$(trueorfalse False INSTALL_TESTONLY_PACKAGES)
-@@ -1741,19 +1755,8 @@ function setup_package_with_req_sync {
+@@ -1741,19 +1752,8 @@ function setup_package_with_req_sync {
      local update_requirements=$(cd $project_dir && git diff --exit-code >/dev/null || echo "changed")
  
      if [[ $update_requirements != "changed" ]]; then

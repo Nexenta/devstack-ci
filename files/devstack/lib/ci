@@ -2,11 +2,9 @@
 
 function ci_install {
 	if is_service_enabled cinder; then
-		git clone -b $NEXENTA_BRANCH $NEXENTA_REPOSITORY $NEXENTA_DESTINATION
+		git_clone $NEXENTA_REPOSITORY $NEXENTA_DESTINATION $NEXENTA_BRANCH
 
-		pushd $NEXENTA_DESTINATION
-		$CIDIR/scripts/patch.sh
-		cd $CINDER_DIR/cinder/volume/drivers
+		pushd $CINDER_DIR/cinder/volume/drivers
 
 		if [[ -d "nexenta" ]]; then
 			mv nexenta nexenta.orig
