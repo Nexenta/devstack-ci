@@ -245,6 +245,7 @@
           git:
             repo: "{{ config.ci.repository }}"
             dest: "{{ config.ci.base }}/{{ config.ci.destination }}"
+            depth: 1
           delegate_to: "{{ config.vm.name }}"
 
         - name: Checkout DevStack Repository
@@ -252,6 +253,7 @@
             repo: "{{ config.devstack.repository }}"
             dest: "{{ config.ci.base }}/{{ config.devstack.destination }}"
             version: "{{ config.devstack.branch }}"
+            depth: 1
           delegate_to: "{{ config.vm.name }}"
 
         - name: Copy DevStack Profile
