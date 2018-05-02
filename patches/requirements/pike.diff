@@ -11,14 +11,14 @@ index 1dab774..b361df6 100644
  tooz>=1.47.0 # Apache-2.0
  tosca-parser>=0.8.1  # Apache-2.0
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index acbf2bd..2aa53ab 100644
+index ff60bc0..3d5a427 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
 @@ -355,7 +355,6 @@ numpy===1.13.1
  repoze.who===2.3
  Sphinx===1.6.3
  oslo.config===4.11.1
--tempest===17.0.0
+-tempest===17.1.0
  django-floppyforms===1.7.0
  openstackdocstheme===1.16.1
  progressbar2===3.32.1
