@@ -14,17 +14,18 @@ typeset _script=$(readlink -f $0)
 typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
 
+typeset -A _git
+_git[branch]='branch --verbose'
+_git[status]='status --short --branch'
+_git[diff]='diff --patch-with-stat'
+
 source $_source/env.sh
 
 if [[ ! -d $_base/$_logs ]]; then
 	mkdir -p $_base/$_logs
 fi
 
-if [[ -t 1 ]]; then
-	exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
-else
-	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
-fi
+exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
 	patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
@@ -34,6 +35,6 @@ if [[ -d $_base/$_ci/files/$_project ]]; then
 	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
 
-for item in branch show status diff; do
-	git $item | tee -a $_base/$_logs/git.$item.$_project.log
+for item in "${!_git[@]}"; do
+	git ${_git[$item]} | tee -a $_base/$_logs/git.$item.$_project.log
 done
