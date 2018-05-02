@@ -43,7 +43,7 @@ function ci_extra {
 
 			key_file+='.pub'
 			if [[ -r "$key_file" ]]; then
-				nova keypair-add --pub_key=$key_file $HOSTNAME
+				openstack keypair create --public-key $key_file $HOSTNAME
 				break
 			fi
 		done
