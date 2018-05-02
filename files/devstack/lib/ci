@@ -16,6 +16,9 @@ function ci_install {
 }
 
 function ci_extra {
+	local key_type key_file
+	local tnt pid gid
+
 	if is_service_enabled nova; then
 		case "$VIRT_DRIVER" in
 		libvirt)
@@ -30,6 +33,36 @@ function ci_extra {
 		*)
 			;;
 		esac
+
+		source $TOP_DIR/openrc
+		for key_type in rsa dsa ecdsa ed25519; do
+			key_file="$HOME/.ssh/id_${key_type}.key"
+			if [[ ! -r "$key_file" ]]; then
+				ssh-keygen -N '' -t $key_type -f $key_file
+			fi
+
+			key_file+='.pub'
+			if [[ -r "$key_file" ]]; then
+				nova keypair-add --pub_key=$key_file $HOSTNAME
+				break
+			fi
+		done
+
+		source $TOP_DIR/openrc admin admin
+		for tnt in admin demo; do
+			pid=$(openstack project list | awk '{if ($4=="'$tnt'") {print $2}}')
+			if [[ -z "$pid" ]]; then
+				continue
+			fi
+
+			gid=$(openstack security group list | awk '{if ($(NF-1)=="'$pid'") {print $2}}')
+			if [[ -z "$gid" ]]; then
+				continue
+			fi
+
+			openstack security group rule create --proto icmp --dst-port 0 $gid
+			openstack security group rule create --proto tcp --dst-port 22 $gid
+		done
 	fi
 }
 
