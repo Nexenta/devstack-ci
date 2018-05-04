@@ -50,4 +50,6 @@ exclude:
     backend: ned_nbd
   - branch: pike
     backend: ned_nbd
+  - branch: queens
+    backend: ned_nbd
 ...
