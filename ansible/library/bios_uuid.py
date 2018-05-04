@@ -65,16 +65,19 @@ kubernetes_ostypes = {
 
 openstack_osversions = {
     'ubuntu14':         0x14,
-    'ubuntu16':         0x16
+    'ubuntu16':         0x16,
+    'ubuntu18':         0x18
 }
 
 docker_osversions = {
     'ubuntu14':         0x14,
-    'ubuntu16':         0x16
+    'ubuntu16':         0x16,
+    'ubuntu18':         0x18
 }
 
 kubernetes_osversions = {
-    'ubuntu16':         0x16
+    'ubuntu16':         0x16,
+    'ubuntu18':         0x18
 }
 
 config = {
