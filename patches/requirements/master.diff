@@ -1,8 +1,8 @@
 diff --git a/global-requirements.txt b/global-requirements.txt
-index 799e553..3b498de 100644
+index 043c7bd..8f25db1 100644
 --- a/global-requirements.txt
 +++ b/global-requirements.txt
-@@ -315,7 +315,6 @@ sysv-ipc  # BSD License
+@@ -319,7 +319,6 @@ sysv-ipc  # BSD License
  suds-jurko  # LGPLv3+
  sympy  # BSD
  taskflow  # Apache-2.0
@@ -11,7 +11,7 @@ index 799e553..3b498de 100644
  tosca-parser  # Apache-2.0
  tripleo-common  # Apache-2.0
 diff --git a/lower-constraints.txt b/lower-constraints.txt
-index 08340a9..d75f988 100644
+index 61ea1c6..73b76a8 100644
 --- a/lower-constraints.txt
 +++ b/lower-constraints.txt
 @@ -360,7 +360,6 @@ repoze.who===2.3
@@ -23,13 +23,13 @@ index 08340a9..d75f988 100644
  openstackdocstheme===1.18.1
  zake===0.1.6
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 19a90bd..3014ab0 100644
+index 502ede8..2052f8e 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -338,7 +338,6 @@ numpy===1.14.2
+@@ -356,7 +356,6 @@ numpy===1.14.3
  msgpack===0.5.6
- Sphinx===1.6.5
- oslo.config===6.2.0
+ Sphinx===1.7.4
+ oslo.config===6.2.1
 -tempest===18.0.0
  django-floppyforms===1.7.0
  openstackdocstheme===1.20.1
