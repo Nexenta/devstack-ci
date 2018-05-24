@@ -1,5 +1,27 @@
+diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
+index c93a088af..00950c2e7 100644
+--- a/cinder/api/openstack/wsgi.py
++++ b/cinder/api/openstack/wsgi.py
+@@ -17,6 +17,7 @@
+ import inspect
+ import math
+ import time
++import sys
+ 
+ from lxml import etree
+ import six
+@@ -35,6 +36,9 @@ from cinder import wsgi
+ XMLNS_V1 = 'http://docs.openstack.org/volume/api/v1'
+ XMLNS_ATOM = 'http://www.w3.org/2005/Atom'
+ 
++reload(sys)
++sys.setdefaultencoding('utf-8')
++
+ LOG = logging.getLogger(__name__)
+ 
+ SUPPORTED_CONTENT_TYPES = (
 diff --git a/cinder/exception.py b/cinder/exception.py
-index 553f06e..bfcd5cd 100644
+index 553f06e71..bfcd5cd4c 100644
 --- a/cinder/exception.py
 +++ b/cinder/exception.py
 @@ -720,3 +720,7 @@ class BrocadeZoningCliException(CinderException):
