@@ -34,7 +34,8 @@ function ci_extra {
 			;;
 		esac
 
-		source $TOP_DIR/openrc
+		source $TOP_DIR/userrc_early
+
 		for key_type in rsa dsa ecdsa ed25519; do
 			key_file="$HOME/.ssh/id_${key_type}.key"
 			if [[ ! -r "$key_file" ]]; then
@@ -48,7 +49,6 @@ function ci_extra {
 			fi
 		done
 
-		source $TOP_DIR/openrc admin admin
 		for tnt in admin demo; do
 			pid=$(openstack project list | awk '{if ($4=="'$tnt'") {print $2}}')
 			if [[ -z "$pid" ]]; then
