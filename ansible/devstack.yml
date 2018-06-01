@@ -524,6 +524,12 @@
             msg: "{{ tail.stdout_lines }}"
           when: tail is defined
 
+        - name: Create Latest Link
+          file:
+            path: "{{ config.ci.source }}/{{ config.result.base }}/latest"
+            src: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}"
+            state: "link"
+
         - name: Destroy Virtual Machine
           vmware_guest:
             validate_certs: False
