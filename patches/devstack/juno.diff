@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index 7d2138dc..6f11df12 100644
+index 7d2138d..6f11df1 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -569,14 +569,19 @@ function git_clone {
@@ -91,20 +91,22 @@ index 7d2138dc..6f11df12 100644
  
      setup_package $project_dir $flags
 diff --git a/lib/infra b/lib/infra
-index ef5a136b..c1a15d97 100644
+index ef5a136..76f3af2 100644
 --- a/lib/infra
 +++ b/lib/infra
-@@ -40,6 +40,8 @@ function install_infra {
+@@ -39,7 +39,9 @@ function install_infra {
+     else
          # Always upgrade pbr to latest version as we may have pulled it
          # in via system packages.
-         pip_install "-U" "pbr"
-+        pip_install "-U" "tox"
-+        pip_install "-U" "parsley"
+-        pip_install "-U" "pbr"
++        pip_install pbr
++        pip_install tox
++        pip_install parsley
      fi
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 24ac0726..cdb669de 100644
+index 24ac072..cdb669d 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -418,7 +418,24 @@ function configure_tempest {
@@ -144,7 +146,7 @@ index 24ac0726..cdb669de 100644
  
  # init_tempest() - Initialize ec2 images
 diff --git a/stack.sh b/stack.sh
-index ca90e04c..8ef062b1 100755
+index ca90e04..8ef062b 100755
 --- a/stack.sh
 +++ b/stack.sh
 @@ -521,6 +521,10 @@ SYSLOG_PORT=${SYSLOG_PORT:-516}
@@ -159,7 +161,7 @@ index ca90e04c..8ef062b1 100755
  SSL_BUNDLE_FILE="$DATA_DIR/ca-bundle.pem"
  rm -f $SSL_BUNDLE_FILE
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 9668973c..8b6af906 100755
+index 9668973..8b6af90 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@
@@ -189,3 +191,23 @@ index 9668973c..8b6af906 100755
  if is_fedora; then
      # Disable selinux to avoid configuring to allow Apache access
      # to Horizon files (LP#1175444)
+diff --git a/tools/install_pip.sh b/tools/install_pip.sh
+index d57a687..28bdc20 100755
+--- a/tools/install_pip.sh
++++ b/tools/install_pip.sh
+@@ -46,7 +46,7 @@ function install_get_pip {
+         curl -o $LOCAL_PIP $PIP_GET_PIP_URL || \
+             die $LINENO "Download of get-pip.py failed"
+     fi
+-    sudo -H -E python $LOCAL_PIP
++    sudo -H -E python $LOCAL_PIP -c $TOOLS_DIR/cap-pip.txt
+ }
+ 
+ 
+diff --git a/tools/cap-pip.txt b/tools/cap-pip.txt
+new file mode 100644
+index 0000000..f5278d7
+--- /dev/null
++++ b/tools/cap-pip.txt
+@@ -0,0 +1 @@
++pip!=8,<10
