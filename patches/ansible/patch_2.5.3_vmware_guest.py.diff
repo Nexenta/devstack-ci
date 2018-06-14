@@ -1,6 +1,59 @@
---- ansible-2.5.3/lib/ansible/modules/cloud/vmware/vmware_guest.py.orig	2018-05-17 23:47:30.000000000 +0000
-+++ ansible-2.5.3/lib/ansible/modules/cloud/vmware/vmware_guest.py		2018-06-13 19:04:00.602581000 +0000
-@@ -725,6 +725,14 @@
+--- ansible-2.5.3/lib/ansible/module_utils/vmware.py.orig	2018-06-14 16:09:44.870085000 +0000
++++ ansible-2.5.3/lib/ansible/module_utils/vmware.py	2018-06-14 16:10:22.472221000 +0000
+@@ -753,7 +753,7 @@
+     return None, cluster
+ 
+ 
+-def set_vm_power_state(content, vm, state, force):
++def set_vm_power_state(content, vm, state, force, timeout=0):
+     """
+     Set the power status for a VM determined by the current and
+     requested states. force is forceful
+@@ -801,6 +801,8 @@
+                     if vm.guest.toolsRunningStatus == 'guestToolsRunning':
+                         if expected_state == 'shutdownguest':
+                             task = vm.ShutdownGuest()
++                            if timeout > 0:
++                                result.update(wait_for_poweroff(vm, timeout))
+                         else:
+                             task = vm.RebootGuest()
+                         # Set result['changed'] immediately because
+@@ -835,6 +837,18 @@
+ 
+     return result
+ 
++def wait_for_poweroff(vm, timeout=300):
++    result = dict()
++    interval = 15
++    while timeout > 0:
++        if vm.runtime.powerState.lower() == 'poweredoff':
++            break
++        time.sleep(interval)
++        timeout -= interval
++    else:
++        result['failed'] = True
++        result['msg'] = 'Timeout while waiting for VM power off.'
++    return result
+ 
+ class PyVmomi(object):
+     def __init__(self, module):
+--- ansible-2.5.3/lib/ansible/modules/cloud/vmware/vmware_guest.py.orig	2018-06-14 16:09:55.997283000 +0000
++++ ansible-2.5.3/lib/ansible/modules/cloud/vmware/vmware_guest.py	2018-06-14 16:10:35.502542000 +0000
+@@ -157,6 +157,13 @@
+     - "vmware-tools needs to be installed on given virtual machine in order to work with this parameter."
+     default: 'no'
+     type: bool
++  state_change_timeout:
++    description:
++    - If the C(state) is set to C(shutdownguest), by default the module will return immediately after sending the shutdown signal.
++    - If this argument is set to a positive integer, the module will instead wait for the VM to reach the poweredoff state.
++    - The value sets a timeout in seconds for the module to wait for the state change.
++    default: 0
++    version_added: '2.6'
+   snapshot_src:
+     description:
+     - Name of the existing snapshot to use to create a clone of a VM.
+@@ -725,6 +732,14 @@
              self.configspec.cpuAllocation = cpu_allocation
              self.change_detected = True
  
@@ -15,7 +68,7 @@
      def configure_cpu_and_memory(self, vm_obj, vm_creation=False):
          # set cpu/memory/etc
          if 'hardware' in self.params:
-@@ -1398,18 +1406,37 @@
+@@ -1398,18 +1413,37 @@
                  if datastores is None or len(datastores) == 0:
                      self.module.fail_json(msg="Unable to find a datastore list when autoselecting")
  
@@ -62,7 +115,7 @@
  
              elif 'datastore' in self.params['disk'][0]:
                  datastore_name = self.params['disk'][0]['datastore']
-@@ -1628,6 +1655,7 @@
+@@ -1628,6 +1662,7 @@
          self.configspec = vim.vm.ConfigSpec()
          self.configspec.deviceChange = []
          self.configure_guestid(vm_obj=vm_obj, vm_creation=True)
@@ -70,7 +123,7 @@
          self.configure_cpu_and_memory(vm_obj=vm_obj, vm_creation=True)
          self.configure_hardware_params(vm_obj=vm_obj)
          self.configure_resource_alloc_info(vm_obj=vm_obj)
-@@ -1764,6 +1792,7 @@
+@@ -1764,6 +1799,7 @@
          self.configspec.deviceChange = []
  
          self.configure_guestid(vm_obj=self.current_vm_obj)
@@ -78,7 +131,7 @@
          self.configure_cpu_and_memory(vm_obj=self.current_vm_obj)
          self.configure_hardware_params(vm_obj=self.current_vm_obj)
          self.configure_disks(vm_obj=self.current_vm_obj)
-@@ -1859,14 +1888,13 @@
+@@ -1859,14 +1895,13 @@
          while task.info.state not in ['error', 'success']:
              time.sleep(1)
  
@@ -96,9 +149,20 @@
                  ips = True
              else:
                  time.sleep(sleep)
-@@ -1958,6 +1986,9 @@
+@@ -1897,6 +1932,7 @@
+         esxi_hostname=dict(type='str'),
+         cluster=dict(type='str'),
+         wait_for_ip_address=dict(type='bool', default=False),
++        state_change_timeout=dict(type='int', default=0),
+         snapshot_src=dict(type='str'),
+         linked_clone=dict(type='bool', default=False),
+         networks=dict(type='list', default=[]),
+@@ -1956,8 +1992,11 @@
+                 )
+                 module.exit_json(**result)
              # set powerstate
-             tmp_result = set_vm_power_state(pyv.content, vm, module.params['state'], module.params['force'])
+-            tmp_result = set_vm_power_state(pyv.content, vm, module.params['state'], module.params['force'])
++            tmp_result = set_vm_power_state(pyv.content, vm, module.params['state'], module.params['force'], module.params['state_change_timeout'])
              if tmp_result['changed']:
 +                if module.params['state'] in ['poweredon', 'restarted', 'rebootguest']:
 +                    if module.params['wait_for_ip_address']:
@@ -106,3 +170,55 @@
                  result["changed"] = True
              if not tmp_result["failed"]:
                  result["failed"] = False
+--- ansible-2.5.3/lib/ansible/modules/cloud/vmware/vmware_guest_powerstate.py.orig	2018-06-14 16:10:09.046455000 +0000
++++ ansible-2.5.3/lib/ansible/modules/cloud/vmware/vmware_guest_powerstate.py	2018-06-14 16:10:52.038524000 +0000
+@@ -65,6 +65,13 @@
+     - Date and time in string format at which specificed task needs to be performed.
+     - "The required format for date and time - 'dd/mm/yyyy hh:mm'."
+     - Scheduling task requires vCenter server. A standalone ESXi server does not support this option.
++  state_change_timeout:
++    description:
++    - If the C(state) is set to C(shutdown-guest), by default the module will return immediately after sending the shutdown signal.
++    - If this argument is set to a positive integer, the module will instead wait for the VM to reach the poweredoff state.
++    - The value sets a timeout in seconds for the module to wait for the state change.
++   default: 0
++   version_added: '2.6'
+   force:
+     description:
+     - Ignore warnings and complete the actions.
+@@ -100,6 +107,18 @@
+     scheduled_at: "09/01/2018 10:18"
+   delegate_to: localhost
+   register: deploy_at_schedule_datetime
++
++- name: Wait for the virtual machine to shutdown
++  vmware_guest_powerstate:
++    hostname: 192.0.2.44
++    username: administrator@vsphere.local
++    password: vmware
++    validate_certs: no
++    name: testvm_2
++    state: shutdown-guest
++    state_change_timeout: 200
++  delegate_to: localhost
++  register: deploy
+ '''
+ 
+ RETURN = r''' # '''
+@@ -126,6 +145,7 @@
+         folder=dict(type='str', default='/vm'),
+         force=dict(type='bool', default=False),
+         scheduled_at=dict(type='str'),
++        state_change_timeout=dict(type='int', default=0),
+     )
+ 
+     module = AnsibleModule(argument_spec=argument_spec,
+@@ -190,7 +210,7 @@
+                                      "given are invalid: %s" % (module.params.get('state'),
+                                                                 to_native(e.msg)))
+         else:
+-            result = set_vm_power_state(pyv.content, vm, module.params['state'], module.params['force'])
++            result = set_vm_power_state(pyv.content, vm, module.params['state'], module.params['force'], module.params['state_change_timeout'])
+     else:
+         module.fail_json(msg="Unable to set power state for non-existing virtual machine : '%s'" % (module.params.get('uuid') or module.params.get('name')))
+ 
