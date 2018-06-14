@@ -99,7 +99,9 @@ TEMPEST_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 TEMPEST_VOLUME_VENDOR="{{ config.backend.vendor }}"
 TEMPEST_VOLUME_DRIVER="{{ config.backend.driver }}"
 TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
+{% if 'iscsi' in config.ci.backend %}
 TEMPEST_EXTEND_ATTACHED_VOLUME="True"
+{% endif %}
 
 declare -A NEXENTA_DRIVER NEXENTA_HOST
 declare -A NEXENTA_REST_USER NEXENTA_REST_PASSWORD
