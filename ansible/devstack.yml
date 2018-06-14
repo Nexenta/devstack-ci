@@ -234,6 +234,7 @@
             hostname: "{{ config.vsphere.host }}"
             username: "{{ config.vsphere.user }}"
             password: "{{ config.vsphere.password }}"
+            datacenter: "{{ config.vsphere.datacenter }}"
             uuid: "{{ config.vm.uuid }}"
             name: "{{ config.vm.name }}"
           register: vm
