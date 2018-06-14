@@ -173,7 +173,7 @@
             cluster: "{{ config.vsphere.cluster }}"
             folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
             name: "{{ config.vm.name }}"
-            state: absent
+            state: "absent"
             force: yes
 
         - name: Create Virtual Machine
@@ -190,10 +190,52 @@
             name: "{{ config.vm.name }}"
             guest_id: "{{ config.vm.guest }}"
             disk: "{{ config.vm.disks }}"
-            networks: "{{ config.vm.networks }}"
+            networks: "{{ config.vm.install_networks }}"
             hardware: "{{ config.vm.hardware }}"
             wait_for_ip_address: True
             state: "poweredon"
+
+        - name: Shutdown Virtual Machine
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            uuid: "{{ config.vm.uuid }}"
+            name: "{{ config.vm.name }}"
+            state_change_timeout: "{{ config.vm.timeout }}"
+            state: "shutdownguest"
+
+        - name: Change Virtual Machine Network
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            uuid: "{{ config.vm.uuid }}"
+            name: "{{ config.vm.name }}"
+            networks: "{{ config.vm.tempest_networks }}"
+
+        - name: Poweron Virtual Machine
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            uuid: "{{ config.vm.uuid }}"
+            name: "{{ config.vm.name }}"
+            wait_for_ip_address: True
+            state_change_timeout: "{{ config.vm.timeout }}"
+            state: "poweredon"
+
+        - name: Identify Virtual Machine
+          vmware_guest_facts:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            uuid: "{{ config.vm.uuid }}"
+            name: "{{ config.vm.name }}"
           register: vm
 
         - name: Print Virtual Machine Parameters
