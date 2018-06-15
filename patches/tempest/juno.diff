@@ -1,3 +1,16 @@
+diff --git a/tempest/api/volume/test_extensions.py b/tempest/api/volume/test_extensions.py
+index 66ea9b7..0f6c2d6 100644
+--- a/tempest/api/volume/test_extensions.py
++++ b/tempest/api/volume/test_extensions.py
+@@ -39,7 +39,7 @@ class ExtensionsV2TestJSON(base.BaseVolumeTest):
+         if ext == 'all':
+             self.assertIn('Hosts', map(lambda x: x['name'], extensions))
+         elif ext:
+-            self.assertIn(ext, map(lambda x: x['name'], extensions))
++            self.assertIn(ext, map(lambda x: x['alias'], extensions))
+         else:
+             raise self.skipException('There are not any extensions configured')
+ 
 diff --git a/tox.ini b/tox.ini
 index edfee15..7a32786 100644
 --- a/tox.ini
