@@ -1,15 +1,15 @@
 diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index 1fc085951..e6d9adee7 100644
+index 1fc0859..122bc78 100644
 --- a/cinder/api/openstack/wsgi.py
 +++ b/cinder/api/openstack/wsgi.py
-@@ -17,6 +17,7 @@
+@@ -16,6 +16,7 @@
+ 
  import inspect
  import math
- import time
 +import sys
+ import time
  from xml.dom import minidom
  from xml.parsers import expat
- 
 @@ -37,6 +38,9 @@ XML_NS_V1 = 'http://docs.openstack.org/api/openstack-block-storage/1.0/content'
  XML_NS_V2 = 'http://docs.openstack.org/api/openstack-block-storage/2.0/content'
  XML_NS_ATOM = 'http://www.w3.org/2005/Atom'
@@ -21,7 +21,7 @@ index 1fc085951..e6d9adee7 100644
  
  SUPPORTED_CONTENT_TYPES = (
 diff --git a/cinder/exception.py b/cinder/exception.py
-index 60c571c11..413910cb9 100644
+index 60c571c..413910c 100644
 --- a/cinder/exception.py
 +++ b/cinder/exception.py
 @@ -457,6 +457,10 @@ class FailedCmdWithDump(VolumeDriverException):
