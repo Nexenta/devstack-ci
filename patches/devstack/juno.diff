@@ -106,10 +106,21 @@ index ef5a136..76f3af2 100644
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 24ac072..cdb669d 100644
+index 24ac072..5ba6c7e 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -418,7 +418,24 @@ function configure_tempest {
+@@ -293,8 +293,10 @@ function configure_tempest {
+     iniset $TEMPEST_CONFIG compute ssh_timeout $BUILD_TIMEOUT
+     iniset $TEMPEST_CONFIG compute image_ref $image_uuid
+     iniset $TEMPEST_CONFIG compute image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute image_ref_alt $image_uuid_alt
+     iniset $TEMPEST_CONFIG compute image_alt_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_alt_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute flavor_ref $flavor_ref
+     iniset $TEMPEST_CONFIG compute flavor_ref_alt $flavor_ref_alt
+     iniset $TEMPEST_CONFIG compute ssh_connect_method $ssh_connect_method
+@@ -418,7 +420,24 @@ function configure_tempest {
      if ! is_service_enabled c-bak; then
          iniset $TEMPEST_CONFIG volume-feature-enabled backup False
      fi
@@ -134,7 +145,7 @@ index 24ac072..cdb669d 100644
      if [ $CINDER_MULTI_LVM_BACKEND == "True" ]; then
          iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
          iniset $TEMPEST_CONFIG volume backend1_name "LVM_iSCSI"
-@@ -495,6 +512,10 @@ function install_tempest {
+@@ -495,6 +514,10 @@ function install_tempest {
      install_tempest_lib
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
      pip_install tox
