@@ -2,7 +2,7 @@ diff --git a/upper-constraints.txt b/upper-constraints.txt
 index 767e3aa..bc872e4 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -1 +1,17 @@
+@@ -1 +1,18 @@
 -# Empty because this is only supported in liberty and above.
 +Routes===2.1
 +cliff===1.9.0
@@ -21,3 +21,4 @@ index 767e3aa..bc872e4 100644
 +tempest-lib==0.2.1
 +tox===2.9.1
 +virtualenv===15.1.0
++ipaddress===1.0.22
