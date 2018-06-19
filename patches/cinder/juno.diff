@@ -13,3 +13,15 @@ index 60c571c..413910c 100644
  class GlanceMetadataExists(Invalid):
      message = _("Glance metadata cannot be updated, key %(key)s"
                  " exists for volume id %(volume_id)s")
+diff --git a/requirements.txt b/requirements.txt
+index 782aa64..d4910c6 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -8,6 +8,7 @@ argparse
+ Babel<=1.3,>=1.3
+ eventlet<=0.15.2,>=0.15.1
+ greenlet<=0.4.2,>=0.3.2
++ipaddress==1.0.22
+ iso8601<=0.1.10,>=0.1.9
+ keystonemiddleware<1.4.0,>=1.0.0
+ kombu<=3.0.15,>=2.5.0
