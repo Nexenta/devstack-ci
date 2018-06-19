@@ -517,6 +517,18 @@
             action: "release"
           when: lock is defined
 
+        - name: Collect Journal Logs
+          shell: |
+            if systemctl --version; then
+              for unit in $(systemctl --no-legend --no-pager list-unit-files devstack@* | awk '{print $1}'); do
+                log="{{ config.ci.base }}/{{ config.ci.logs }}/$unit.log"
+                journalctl --all --merge --no-pager --output=cat --unit=$unit >$log
+              done
+            fi
+          args:
+            executable: "{{ shell }}"
+          delegate_to: "{{ config.vm.name }}"
+
         - name: Find Results Files
           find:
             paths: "{{ item.source | regex_search('^/') | ternary('', config.ci.base + '/') + item.source }}"

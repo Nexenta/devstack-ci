@@ -13,13 +13,22 @@ typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
 
 source $_source/env.sh
-cd $_base/tempest
 
 if [[ -t 1 ]]; then
 	exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
 else
 	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 fi
+
+cd $_base/cinder
+
+if grep -q genopts tox.ini; then
+	tox -e genopts
+fi
+
+tox -e pep8
+
+cd $_base/tempest
 
 for i in $(seq $_retries); do
 	if tox -e ci -- $_regexp; then

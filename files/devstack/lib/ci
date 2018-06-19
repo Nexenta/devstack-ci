@@ -3,11 +3,10 @@
 function ci_install {
 	if is_service_enabled cinder; then
 		git_clone $NEXENTA_REPOSITORY $NEXENTA_DESTINATION $NEXENTA_BRANCH
-
 		pushd $CINDER_DIR/cinder/volume/drivers
 
 		if [[ -d "nexenta" ]]; then
-			mv nexenta nexenta.orig
+			rm -rf nexenta
 		fi
 
 		ln -s $NEXENTA_DESTINATION/cinder/volume/drivers/nexenta
@@ -34,15 +33,21 @@ function ci_extra {
 			;;
 		esac
 
+		if [[ ! -e "$TOP_DIR/userrc_early" ]]; then
+			return
+		fi
+
 		source $TOP_DIR/userrc_early
 
 		for key_type in rsa dsa ecdsa ed25519; do
 			key_file="$HOME/.ssh/id_${key_type}.key"
+
 			if [[ ! -r "$key_file" ]]; then
 				ssh-keygen -N '' -t $key_type -f $key_file
 			fi
 
 			key_file+='.pub'
+
 			if [[ -r "$key_file" ]]; then
 				openstack keypair create --public-key $key_file $HOSTNAME
 				break
@@ -51,11 +56,13 @@ function ci_extra {
 
 		for tnt in admin demo; do
 			pid=$(openstack project list | awk '{if ($4=="'$tnt'") {print $2}}')
+
 			if [[ -z "$pid" ]]; then
 				continue
 			fi
 
 			gid=$(openstack security group list | awk '{if ($(NF-1)=="'$pid'") {print $2}}')
+
 			if [[ -z "$gid" ]]; then
 				continue
 			fi
