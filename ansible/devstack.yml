@@ -551,6 +551,7 @@
             src: "{{ item.1.path }}"
             dest: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}/{{ item.0.item.destination }}/{{ item.1.path | basename }}"
             validate_checksum: "no"
+            fail_on_missing: "no"
             flat: "yes"
           with_subelements:
             - "{{ find.results }}"
