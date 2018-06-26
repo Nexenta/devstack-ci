@@ -184,7 +184,6 @@
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
             cluster: "{{ config.vsphere.cluster }}"
-#            resource_pool: "{{ config.vsphere.pool }}"
             folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
             uuid: "{{ config.vm.uuid }}"
             name: "{{ config.vm.name }}"
