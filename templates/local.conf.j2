@@ -1,10 +1,12 @@
 [[local|localrc]]
+{% if config.ci.branch == 'mitaka' %}
 disable_service n-net
 enable_service q-svc
 enable_service q-agt
 enable_service q-dhcp
 enable_service q-l3
 enable_service q-meta
+{% endif %}
 enable_service tempest
 {% if config.ci.branch not in ['juno', 'icehouse'] %}
 enable_service c-bak
