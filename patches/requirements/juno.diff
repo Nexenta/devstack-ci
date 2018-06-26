@@ -1,12 +1,13 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 767e3aa..bc872e4 100644
+index 767e3aa..29787ba 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -1 +1,18 @@
+@@ -1 +1,19 @@
 -# Empty because this is only supported in liberty and above.
 +Routes===2.1
 +cliff===1.9.0
 +cmd2===0.6.7
++decorator===3.4.0
 +eventlet===0.15.2
 +fixtures===1.0.0
 +httplib2===0.9
