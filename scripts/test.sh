@@ -20,6 +20,17 @@ else
 	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 fi
 
+openstack --help --debug >$_base/$_logs/openstack.log 2>&1
+
+if grep -q Traceback $_base/$_logs/openstack.log; then
+	exit 1
+fi
+
+if grep -q Uninstalling $_base/$_logs/stack.log; then
+	echo 'Warning: devstack conflicts:'
+	grep Uninstalling $_base/$_logs/stack.log
+fi
+
 cd $_base/cinder
 
 if grep -q genopts tox.ini; then
