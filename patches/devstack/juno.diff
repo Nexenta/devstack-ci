@@ -1,3 +1,114 @@
+diff --git a/files/apts/general b/files/apts/general
+index 8e20833..6c55fc1 100644
+--- a/files/apts/general
++++ b/files/apts/general
+@@ -1,5 +1,4 @@
+ bridge-utils
+-python-setuptools
+ screen
+ unzip
+ wget
+@@ -10,12 +9,10 @@ graphviz # testonly - docs
+ lsof # useful when debugging
+ openssh-server
+ openssl
+-python-virtualenv
+ iputils-ping
+ wget
+ curl
+ tcpdump
+-euca2ools # only for testing client
+ tar
+ python-cmd2 # dist:precise
+ python-dev
+diff --git a/files/apts/glance b/files/apts/glance
+index 15e09aa..0e5ff89 100644
+--- a/files/apts/glance
++++ b/files/apts/glance
+@@ -3,8 +3,6 @@ libpq-dev           # testonly
+ libssl-dev          # testonly
+ libxml2-dev
+ libxslt1-dev        # testonly
+-python-eventlet
+-python-routes
+ python-greenlet
+ python-sqlalchemy
+ python-wsgiref
+diff --git a/files/apts/horizon b/files/apts/horizon
+index f79f435..c28e1d1 100644
+--- a/files/apts/horizon
++++ b/files/apts/horizon
+@@ -5,13 +5,9 @@ python-dateutil
+ python-paste
+ python-pastedeploy
+ python-anyjson
+-python-routes
+ python-xattr
+ python-sqlalchemy
+ python-webob
+-python-eventlet
+ python-sphinx
+ python-mox
+ python-coverage
+-python-cherrypy3 # why?
+-python-migrate
+diff --git a/files/apts/keystone b/files/apts/keystone
+index d316a42..71897ba 100644
+--- a/files/apts/keystone
++++ b/files/apts/keystone
+@@ -1,5 +1,4 @@
+ python-lxml
+-python-pastescript
+ python-pastedeploy
+ python-paste
+ sqlite3
+@@ -9,7 +8,6 @@ python-mysqldb
+ python-mysql.connector
+ python-webob
+ python-greenlet
+-python-routes
+ libldap2-dev
+ libsasl2-dev
+ libkrb5-dev
+diff --git a/files/apts/neutron b/files/apts/neutron
+index a48a800..b90869b 100644
+--- a/files/apts/neutron
++++ b/files/apts/neutron
+@@ -7,11 +7,8 @@ mysql-server #NOPRIME
+ sudo
+ python-iso8601
+ python-paste
+-python-routes
+-python-suds
+ python-pastedeploy
+ python-greenlet
+-python-eventlet
+ python-sqlalchemy
+ python-mysqldb
+ python-mysql.connector
+diff --git a/files/apts/nova b/files/apts/nova
+index 66f29c4..426269a 100644
+--- a/files/apts/nova
++++ b/files/apts/nova
+@@ -29,18 +29,14 @@ qpidd # NOPRIME
+ socat # used by ajaxterm
+ python-mox
+ python-paste
+-python-migrate
+ python-greenlet
+ python-libvirt # NOPRIME
+ python-libxml2
+-python-routes
+ python-numpy # used by websockify for spice console
+ python-pastedeploy
+-python-eventlet
+ python-cheetah
+ python-tempita
+ python-sqlalchemy
+-python-suds
+ python-lockfile
+ python-m2crypto
+ python-feedparser
 diff --git a/functions-common b/functions-common
 index 7d2138d..6f11df1 100644
 --- a/functions-common
