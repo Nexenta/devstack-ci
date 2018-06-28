@@ -1,34 +1,34 @@
 diff --git a/test-requirements.txt b/test-requirements.txt
-index 13950bd..5811d6f 100644
+index f7d63a8..3468b9a 100644
 --- a/test-requirements.txt
 +++ b/test-requirements.txt
 @@ -1,7 +1,7 @@
  # The order of packages is significant, because pip processes them in the order
  # of appearance. Changing the order has an impact on the overall integration
  # process, which may cause wedges in the gate later.
--hacking!=0.13.0,<0.14,>=0.12.0 # Apache-2.0
+-hacking<0.13,>=0.12.0 # Apache-2.0
 +hacking<0.11,>=0.10.0
  # needed for doc build
- sphinx>=1.5.1 # BSD
+ sphinx!=1.3b1,<1.4,>=1.2.1 # BSD
  oslosphinx>=4.7.0 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index 892f834..a8e077c 100644
+index d8d390e..c2288d0 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -12,6 +12,7 @@ setenv =
-     CLIENT_NAME=tempest
+@@ -11,6 +11,7 @@ setenv =
  deps =
+     setuptools
      -r{toxinidir}/requirements.txt
 +    -c{toxinidir}/../requirements/upper-constraints.txt
  
  [testenv]
  setenv =
-@@ -23,15 +24,33 @@ setenv =
- passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION
+@@ -19,15 +20,33 @@ setenv =
+     PYTHONWARNINGS=default::DeprecationWarning
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY
  usedevelop = True
- install_command =
--    {toxinidir}/tools/tox_install.sh {env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt} {opts} {packages}
-+    {toxinidir}/tools/tox_install.sh {toxinidir}/../requirements/upper-constraints.txt {opts} {packages}
+-install_command = pip install -U {opts} {packages}
++install_command = pip install -U {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
  whitelist_externals = *
  deps =
      -r{toxinidir}/requirements.txt
