@@ -1,5 +1,5 @@
 diff --git a/test-requirements.txt b/test-requirements.txt
-index e33f207..277e983 100644
+index e33f2079d..277e9835e 100644
 --- a/test-requirements.txt
 +++ b/test-requirements.txt
 @@ -5,4 +5,4 @@ hacking!=0.13.0,<0.14,>=0.12.0 # Apache-2.0
@@ -9,7 +9,7 @@ index e33f207..277e983 100644
 -flake8-import-order==0.11 # LGPLv3
 +flake8-import-order==0.12 # LGPLv3
 diff --git a/tox.ini b/tox.ini
-index 5644641..b16b3bd 100644
+index 5644641fd..59a328bef 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -9,8 +9,8 @@ setenv =
@@ -58,3 +58,38 @@ index 5644641..b16b3bd 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
+@@ -127,7 +144,7 @@ commands =
+ 
+ [testenv:venv]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands = {posargs}
+@@ -141,7 +158,7 @@ commands = {posargs}
+ 
+ [testenv:docs]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+@@ -174,7 +191,7 @@ import-order-style = pep8
+ 
+ [testenv:releasenotes]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+@@ -190,6 +207,7 @@ whitelist_externals = rm
+ # of the requirements.txt files
+ deps = pip_check_reqs
+        -r{toxinidir}/requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands=
+     pip-extra-reqs -d --ignore-file=tempest/tests/* tempest
+     pip-missing-reqs -d --ignore-file=tempest/tests/* tempest
