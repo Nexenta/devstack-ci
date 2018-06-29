@@ -1,5 +1,5 @@
 diff --git a/test-requirements.txt b/test-requirements.txt
-index f7d63a8..3468b9a 100644
+index f7d63a803..3468b9a03 100644
 --- a/test-requirements.txt
 +++ b/test-requirements.txt
 @@ -1,7 +1,7 @@
@@ -12,7 +12,7 @@ index f7d63a8..3468b9a 100644
  sphinx!=1.3b1,<1.4,>=1.2.1 # BSD
  oslosphinx>=4.7.0 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index d8d390e..c2288d0 100644
+index d8d390e5b..6f3a6842f 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -11,6 +11,7 @@ setenv =
@@ -28,7 +28,7 @@ index d8d390e..c2288d0 100644
  passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY
  usedevelop = True
 -install_command = pip install -U {opts} {packages}
-+install_command = pip install -U {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
++install_command = pip install {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
  whitelist_externals = *
  deps =
      -r{toxinidir}/requirements.txt
@@ -58,9 +58,17 @@ index d8d390e..c2288d0 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
+@@ -159,6 +178,7 @@ commands = sphinx-build -a -E -W -d releasenotes/build/doctrees -b html releasen
+ # of the requirements.txt files
+ deps = pip_check_reqs
+        -r{toxinidir}/requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands=
+     pip-extra-reqs -d --ignore-file=tempest/tests/* tempest
+     pip-missing-reqs -d --ignore-file=tempest/tests/* tempest
 diff --git a/.stestr.conf b/.stestr.conf
 new file mode 100644
-index 0000000..818c743
+index 000000000..818c7436a
 --- /dev/null
 +++ b/.stestr.conf
 @@ -0,0 +1,3 @@
