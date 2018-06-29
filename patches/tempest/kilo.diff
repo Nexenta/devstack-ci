@@ -1,5 +1,5 @@
 diff --git a/tox.ini b/tox.ini
-index edfee15..7a32786 100644
+index edfee15b3..77191d23f 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -8,19 +8,38 @@ sitepackages = True
@@ -13,7 +13,7 @@ index edfee15..7a32786 100644
           OS_TEST_PATH=./tempest/tests
  usedevelop = True
 -install_command = pip install -U {opts} {packages}
-+install_command = pip install -U {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
++install_command = pip install {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
  whitelist_externals = *
  deps = -r{toxinidir}/requirements.txt
         -r{toxinidir}/test-requirements.txt
@@ -44,7 +44,7 @@ index edfee15..7a32786 100644
  
 diff --git a/.stestr.conf b/.stestr.conf
 new file mode 100644
-index 0000000..818c743
+index 000000000..818c7436a
 --- /dev/null
 +++ b/.stestr.conf
 @@ -0,0 +1,3 @@
