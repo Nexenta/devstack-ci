@@ -1,5 +1,5 @@
 diff --git a/test-requirements.txt b/test-requirements.txt
-index 37644d0..0effa74 100644
+index 37644d0c9..0effa7431 100644
 --- a/test-requirements.txt
 +++ b/test-requirements.txt
 @@ -9,4 +9,4 @@ reno>=2.5.0 # Apache-2.0
@@ -9,7 +9,7 @@ index 37644d0..0effa74 100644
 -flake8-import-order==0.11 # LGPLv3
 +flake8-import-order==0.12 # LGPLv3
 diff --git a/tox.ini b/tox.ini
-index 21696eb..c57a7b7 100644
+index 21696eb51..10c45836c 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -12,6 +12,7 @@ setenv =
@@ -55,3 +55,11 @@ index 21696eb..c57a7b7 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
+@@ -176,6 +195,7 @@ commands =
+ # of the requirements.txt files
+ deps = pip_check_reqs
+        -r{toxinidir}/requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands=
+     pip-extra-reqs -d --ignore-file=tempest/tests/* tempest
+     pip-missing-reqs -d --ignore-file=tempest/tests/* tempest
