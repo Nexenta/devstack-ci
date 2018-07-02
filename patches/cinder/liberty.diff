@@ -1,27 +1,5 @@
-diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index fdb752c35..eb70ee77d 100644
---- a/cinder/api/openstack/wsgi.py
-+++ b/cinder/api/openstack/wsgi.py
-@@ -17,6 +17,7 @@
- import inspect
- import math
- import time
-+import sys
- from xml.dom import minidom
- from xml.parsers import expat
- 
-@@ -38,6 +39,9 @@ XML_NS_V1 = 'http://docs.openstack.org/api/openstack-block-storage/1.0/content'
- XML_NS_V2 = 'http://docs.openstack.org/api/openstack-block-storage/2.0/content'
- XML_NS_ATOM = 'http://www.w3.org/2005/Atom'
- 
-+reload(sys)
-+sys.setdefaultencoding('utf-8')
-+
- LOG = logging.getLogger(__name__)
- 
- SUPPORTED_CONTENT_TYPES = (
 diff --git a/cinder/exception.py b/cinder/exception.py
-index de2e3b55f..9db018f5e 100644
+index de2e3b5..9db018f 100644
 --- a/cinder/exception.py
 +++ b/cinder/exception.py
 @@ -599,6 +599,10 @@ class TransferNotFound(NotFound):
@@ -35,3 +13,16 @@ index de2e3b55f..9db018f5e 100644
  class VolumeMigrationFailed(CinderException):
      message = _("Volume migration failed: %(reason)s")
  
+diff --git a/tox.ini b/tox.ini
+index 02e5b55..7f7c0bc 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -9,7 +9,7 @@ envlist = py27,pep8
+ setenv = VIRTUAL_ENV={envdir}
+          PYTHONHASHSEED=0
+ usedevelop = True
+-install_command = pip install -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt?h=stable/liberty} {opts} {packages}
++install_command = pip install -c{toxinidir}/../requirements/upper-constraints.txt {opts} {packages}
+ 
+ deps = -r{toxinidir}/requirements.txt
+        -r{toxinidir}/test-requirements.txt

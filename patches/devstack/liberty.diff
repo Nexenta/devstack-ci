@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index d7573c4d..4a1cab89 100644
+index d7573c4..4a1cab8 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -477,11 +477,11 @@ function git_clone {
@@ -56,7 +56,7 @@ index d7573c4d..4a1cab89 100644
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
 diff --git a/inc/python b/inc/python
-index 29429fca..80fa584e 100644
+index 29429fc..80fa584 100644
 --- a/inc/python
 +++ b/inc/python
 @@ -108,7 +108,7 @@ function pip_install {
@@ -69,10 +69,20 @@ index 29429fca..80fa584e 100644
          die $LINENO "Currently installed pip version ${pip_version} does not" \
              "meet minimum requirements (>=6)."
 diff --git a/lib/tempest b/lib/tempest
-index defd4526..7a971d2b 100644
+index defd452..34d6b65 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -536,13 +536,16 @@ function configure_tempest {
+@@ -499,6 +499,9 @@ function configure_tempest {
+     iniset $TEMPEST_CONFIG object-storage-feature-enabled discoverable_apis $object_storage_api_extensions
+ 
+     # Validation
++    iniset $TEMPEST_CONFIG validation ip_version_for_ssh 4
++    iniset $TEMPEST_CONFIG validation image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG validation image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG validation run_validation ${TEMPEST_RUN_VALIDATION:-False}
+ 
+     # Volume
+@@ -536,13 +539,16 @@ function configure_tempest {
      # Using ``CINDER_ENABLED_BACKENDS``
      if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
          iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
@@ -90,7 +100,7 @@ index defd4526..7a971d2b 100644
  
      if [ $TEMPEST_VOLUME_DRIVER != "default" -o \
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index b57d140d..709564b2 100755
+index b57d140..709564b 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@
