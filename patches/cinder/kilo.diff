@@ -1,27 +1,5 @@
-diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index 266931e3d..6ca4bc307 100644
---- a/cinder/api/openstack/wsgi.py
-+++ b/cinder/api/openstack/wsgi.py
-@@ -17,6 +17,7 @@
- import inspect
- import math
- import time
-+import sys
- from xml.dom import minidom
- from xml.parsers import expat
- 
-@@ -38,6 +39,9 @@ XML_NS_V1 = 'http://docs.openstack.org/api/openstack-block-storage/1.0/content'
- XML_NS_V2 = 'http://docs.openstack.org/api/openstack-block-storage/2.0/content'
- XML_NS_ATOM = 'http://www.w3.org/2005/Atom'
- 
-+reload(sys)
-+sys.setdefaultencoding('utf-8')
-+
- LOG = logging.getLogger(__name__)
- 
- SUPPORTED_CONTENT_TYPES = (
 diff --git a/cinder/exception.py b/cinder/exception.py
-index 014ab3d6e..fc8d888d9 100644
+index 014ab3d..fc8d888 100644
 --- a/cinder/exception.py
 +++ b/cinder/exception.py
 @@ -497,6 +497,10 @@ class FailedCmdWithDump(VolumeDriverException):
@@ -34,4 +12,29 @@ index 014ab3d6e..fc8d888d9 100644
 +
  class InvalidConnectorException(VolumeDriverException):
      message = _("Connector doesn't have required information: %(missing)s")
+ 
+diff --git a/tox.ini b/tox.ini
+index 3060c8a..c22c037 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -9,10 +9,11 @@ envlist = py27,pep8
+ setenv = VIRTUAL_ENV={envdir}
+          PYTHONHASHSEED=0
+ usedevelop = True
+-install_command = pip install {opts} {packages}
++install_command = pip install -c{toxinidir}/../requirements/upper-constraints.txt {opts} {packages}
+ 
+ deps = -r{toxinidir}/requirements.txt
+        -r{toxinidir}/test-requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands =
+   bash tools/pretty_tox.sh '{posargs}'
+ whitelist_externals = bash
+@@ -28,6 +29,7 @@ commands =
+ 
+ [testenv:pylint]
+ deps = -r{toxinidir}/requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+        pylint==0.26.0
+ commands = bash tools/lintstack.sh
  

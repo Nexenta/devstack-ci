@@ -1,8 +1,14 @@
 diff --git a/files/debs/general b/files/debs/general
-index e824d239..493f11c2 100644
+index e824d23..bfeacc3 100644
 --- a/files/debs/general
 +++ b/files/debs/general
-@@ -16,7 +16,6 @@ iputils-ping
+@@ -10,13 +10,10 @@ graphviz # testonly - docs
+ lsof # useful when debugging
+ openssh-server
+ openssl
+-python-virtualenv
+-python-unittest2
+ iputils-ping
  wget
  curl
  tcpdump
@@ -10,8 +16,131 @@ index e824d239..493f11c2 100644
  tar
  python-cmd2 # dist:precise
  python-dev
+diff --git a/files/debs/glance b/files/debs/glance
+index 8db8145..1a435bc 100644
+--- a/files/debs/glance
++++ b/files/debs/glance
+@@ -3,11 +3,6 @@ libpq-dev           # testonly
+ libssl-dev          # testonly
+ libxml2-dev
+ libxslt1-dev        # testonly
+-python-eventlet
+-python-routes
+-python-greenlet
+-python-sqlalchemy
+-python-pastedeploy
+ python-xattr
+ python-iso8601
+ zlib1g-dev           # testonly
+diff --git a/files/debs/horizon b/files/debs/horizon
+index f9b7d59..ac26413 100644
+--- a/files/debs/horizon
++++ b/files/debs/horizon
+@@ -1,19 +1,10 @@
+ apache2  # NOPRIME
+ libapache2-mod-wsgi  # NOPRIME
+ python-beautifulsoup
+-python-dateutil
+-python-paste
+-python-pastedeploy
+ python-anyjson
+-python-routes
+ python-xattr
+-python-sqlalchemy
+-python-webob
+ pylint
+-python-eventlet
+ python-nose
+ python-mox
+ python-coverage
+-python-cherrypy3 # why?
+-python-migrate
+ libpcre3-dev  # pyScss
+diff --git a/files/debs/keystone b/files/debs/keystone
+index d316a42..3e6c92f 100644
+--- a/files/debs/keystone
++++ b/files/debs/keystone
+@@ -1,15 +1,7 @@
+-python-lxml
+-python-pastescript
+-python-pastedeploy
+-python-paste
+ sqlite3
+ python-pysqlite2
+-python-sqlalchemy
+ python-mysqldb
+ python-mysql.connector
+-python-webob
+-python-greenlet
+-python-routes
+ libldap2-dev
+ libsasl2-dev
+ libkrb5-dev
+diff --git a/files/debs/n-api b/files/debs/n-api
+index b4372d9..0928cd5 100644
+--- a/files/debs/n-api
++++ b/files/debs/n-api
+@@ -1,3 +1 @@
+-python-dateutil
+-msgpack-python
+ fping
+diff --git a/files/debs/n-novnc b/files/debs/n-novnc
+index c8722b9..e69de29 100644
+--- a/files/debs/n-novnc
++++ b/files/debs/n-novnc
+@@ -1 +0,0 @@
+-python-numpy
+diff --git a/files/debs/neutron b/files/debs/neutron
+index 3f4b6d2..72a901a 100644
+--- a/files/debs/neutron
++++ b/files/debs/neutron
+@@ -8,13 +8,7 @@ mysql-server #NOPRIME
+ sudo
+ postgresql-server-dev-all       # testonly
+ python-iso8601
+-python-paste
+-python-routes
+ python-suds
+-python-pastedeploy
+-python-greenlet
+-python-eventlet
+-python-sqlalchemy
+ python-mysqldb
+ python-mysql.connector
+ python-pyudev
+diff --git a/files/debs/nova b/files/debs/nova
+index 66f29c4..2a5d8d4 100644
+--- a/files/debs/nova
++++ b/files/debs/nova
+@@ -9,7 +9,6 @@ mysql-server # NOPRIME
+ python-mysqldb
+ python-mysql.connector
+ python-xattr # needed for glance which is needed for nova --- this shouldn't be here
+-python-lxml # needed for glance which is needed for nova --- this shouldn't be here
+ gawk
+ iptables
+ ebtables
+@@ -28,18 +27,9 @@ rabbitmq-server # NOPRIME
+ qpidd # NOPRIME
+ socat # used by ajaxterm
+ python-mox
+-python-paste
+-python-migrate
+-python-greenlet
+ python-libvirt # NOPRIME
+ python-libxml2
+-python-routes
+-python-numpy # used by websockify for spice console
+-python-pastedeploy
+-python-eventlet
+-python-cheetah
+ python-tempita
+-python-sqlalchemy
+ python-suds
+ python-lockfile
+ python-m2crypto
 diff --git a/functions-common b/functions-common
-index b92fa556..6ebab394 100644
+index b92fa55..6ebab39 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -598,11 +598,11 @@ function git_clone {
@@ -125,23 +254,40 @@ index b92fa556..6ebab394 100644
  
      setup_package $project_dir $flags
 diff --git a/lib/infra b/lib/infra
-index c825b4ee..5be54d37 100644
+index c825b4e..8ade96a 100644
 --- a/lib/infra
 +++ b/lib/infra
-@@ -40,6 +40,8 @@ function install_infra {
+@@ -39,7 +39,9 @@ function install_infra {
+     else
          # Always upgrade pbr to latest version as we may have pulled it
          # in via system packages.
-         pip_install "-U" "pbr"
-+        pip_install "-U" "tox"
-+        pip_install "-U" "parsley"
+-        pip_install "-U" "pbr"
++        pip_install pbr
++        pip_install tox
++        pip_install parsley
      fi
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index 1ae94577..a0a91b2d 100644
+index 1ae9457..122aa17 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -520,6 +520,10 @@ function install_tempest {
+@@ -309,11 +309,14 @@ function configure_tempest {
+     iniset $TEMPEST_CONFIG compute ssh_timeout $BUILD_TIMEOUT
+     iniset $TEMPEST_CONFIG compute image_ref $image_uuid
+     iniset $TEMPEST_CONFIG compute image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute image_ref_alt $image_uuid_alt
+     iniset $TEMPEST_CONFIG compute image_alt_ssh_user ${ALT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_alt_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute flavor_ref $flavor_ref
+     iniset $TEMPEST_CONFIG compute flavor_ref_alt $flavor_ref_alt
+     iniset $TEMPEST_CONFIG compute ssh_connect_method $ssh_connect_method
++    iniset $TEMPEST_CONFIG compute run_ssh "True"
+ 
+     # Compute Features
+     # Run verify_tempest_config -ur to retrieve enabled extensions on API endpoints
+@@ -520,6 +523,10 @@ function install_tempest {
      install_tempest_lib
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
      pip_install tox
@@ -152,8 +298,21 @@ index 1ae94577..a0a91b2d 100644
  }
  
  # init_tempest() - Initialize ec2 images
+diff --git a/stack.sh b/stack.sh
+index eaecea0..40da8b1 100755
+--- a/stack.sh
++++ b/stack.sh
+@@ -660,7 +660,7 @@ TRACK_DEPENDS=${TRACK_DEPENDS:-False}
+ # Install python packages into a virtualenv so that we can track them
+ if [[ $TRACK_DEPENDS = True ]]; then
+     echo_summary "Installing Python packages into a virtualenv $DEST/.venv"
+-    pip_install -U virtualenv
++    pip_install virtualenv
+ 
+     rm -rf $DEST/.venv
+     virtualenv --system-site-packages $DEST/.venv
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index cc5275fe..6c44a246 100755
+index cc5275f..6c44a24 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@
@@ -183,3 +342,32 @@ index cc5275fe..6c44a246 100755
  if is_fedora; then
      # Disable selinux to avoid configuring to allow Apache access
      # to Horizon files (LP#1175444)
+diff --git a/tools/install_pip.sh b/tools/install_pip.sh
+index 73d0947..2f7d2e4 100755
+--- a/tools/install_pip.sh
++++ b/tools/install_pip.sh
+@@ -46,7 +46,7 @@ function install_get_pip {
+         curl --retry 6 --retry-delay 5 -o $LOCAL_PIP $PIP_GET_PIP_URL || \
+             die $LINENO "Download of get-pip.py failed"
+     fi
+-    sudo -H -E python $LOCAL_PIP
++    sudo -H -E python $LOCAL_PIP -c $TOOLS_DIR/cap-pip.txt
+ }
+ 
+ 
+@@ -90,6 +90,6 @@ if [[ -n $PYPI_ALTERNATIVE_URL ]]; then
+     configure_pypi_alternative_url
+ fi
+ 
+-pip_install -U setuptools
++pip_install setuptools
+ 
+ get_versions
+diff --git a/tools/cap-pip.txt b/tools/cap-pip.txt
+new file mode 100644
+index 0000000..375d937
+--- /dev/null
++++ b/tools/cap-pip.txt
+@@ -0,0 +1,2 @@
++pip!=8,<10
++setuptools==30.4.0
