@@ -26,9 +26,14 @@ if grep -q Traceback $_base/$_logs/openstack.log; then
 	exit 1
 fi
 
-if grep -q Uninstalling $_base/$_logs/stack.log; then
+if grep -q 'which is incompatible' $_base/$_logs/stack.log; then
+	echo 'Warning: devstack incompatible packages:'
+	grep 'which is incompatible' $_base/$_logs/stack.log
+fi
+
+if grep -q 'Uninstalling' $_base/$_logs/stack.log; then
 	echo 'Warning: devstack conflicts:'
-	grep Uninstalling $_base/$_logs/stack.log
+	grep 'Uninstalling' $_base/$_logs/stack.log
 fi
 
 cd $_base/cinder
