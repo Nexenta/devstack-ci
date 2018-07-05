@@ -1,5 +1,5 @@
 diff --git a/tempest/api/volume/test_extensions.py b/tempest/api/volume/test_extensions.py
-index 66ea9b7c8..0f6c2d622 100644
+index 66ea9b7..0f6c2d6 100644
 --- a/tempest/api/volume/test_extensions.py
 +++ b/tempest/api/volume/test_extensions.py
 @@ -39,7 +39,7 @@ class ExtensionsV2TestJSON(base.BaseVolumeTest):
@@ -12,7 +12,7 @@ index 66ea9b7c8..0f6c2d622 100644
              raise self.skipException('There are not any extensions configured')
  
 diff --git a/tox.ini b/tox.ini
-index edfee15b3..77191d23f 100644
+index edfee15..77191d2 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -8,19 +8,38 @@ sitepackages = True
@@ -57,7 +57,7 @@ index edfee15b3..77191d23f 100644
  
 diff --git a/.stestr.conf b/.stestr.conf
 new file mode 100644
-index 000000000..818c7436a
+index 0000000..818c743
 --- /dev/null
 +++ b/.stestr.conf
 @@ -0,0 +1,3 @@

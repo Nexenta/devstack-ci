@@ -1,5 +1,178 @@
+diff --git a/files/apts/general b/files/apts/general
+index 2c0d5c0..495024c 100644
+--- a/files/apts/general
++++ b/files/apts/general
+@@ -1,5 +1,4 @@
+ bridge-utils
+-python-setuptools
+ screen
+ unzip
+ wget
+@@ -8,14 +7,11 @@ git
+ lsof # useful when debugging
+ openssh-server
+ openssl
+-python-virtualenv
+ iputils-ping
+ wget
+ curl
+ tcpdump
+-euca2ools # only for testing client
+ tar
+-python-cmd2 # dist:precise
+ python-dev
+ python2.7
+ bc
+diff --git a/files/apts/glance b/files/apts/glance
+index e80f447..3e2029e 100644
+--- a/files/apts/glance
++++ b/files/apts/glance
+@@ -5,10 +5,6 @@ libpq-dev           # testonly
+ libssl-dev          # testonly
+ libxml2-dev
+ libxslt1-dev        # testonly
+-python-eventlet
+-python-routes
+-python-greenlet
+-python-sqlalchemy
+ python-wsgiref
+ python-pastedeploy
+ python-xattr
+diff --git a/files/apts/horizon b/files/apts/horizon
+index eb6651d..102ec27 100644
+--- a/files/apts/horizon
++++ b/files/apts/horizon
+@@ -1,18 +1,12 @@
+ apache2  # NOPRIME
+ libapache2-mod-wsgi  # NOPRIME
+ python-beautifulsoup
+-python-dateutil
+ python-paste
+ python-pastedeploy
+ python-anyjson
+-python-routes
+ python-xattr
+-python-sqlalchemy
+-python-webob
+ python-kombu
+-python-eventlet
+ python-sphinx
+ python-mox
+ python-kombu
+ python-coverage
+-python-cherrypy3 # why?
+diff --git a/files/apts/keystone b/files/apts/keystone
+index 57fde80..9a7198c 100644
+--- a/files/apts/keystone
++++ b/files/apts/keystone
+@@ -1,13 +1,7 @@
+-python-lxml
+-python-pastescript
+ python-pastedeploy
+ python-paste
+ sqlite3
+ python-pysqlite2
+-python-sqlalchemy
+ python-mysqldb
+-python-webob
+-python-greenlet
+-python-routes
+ libldap2-dev
+ libsasl2-dev
+diff --git a/files/apts/n-api b/files/apts/n-api
+index b4372d9..0928cd5 100644
+--- a/files/apts/n-api
++++ b/files/apts/n-api
+@@ -1,3 +1 @@
+-python-dateutil
+-msgpack-python
+ fping
+diff --git a/files/apts/n-novnc b/files/apts/n-novnc
+index c8722b9..e69de29 100644
+--- a/files/apts/n-novnc
++++ b/files/apts/n-novnc
+@@ -1 +0,0 @@
+-python-numpy
+diff --git a/files/apts/neutron b/files/apts/neutron
+index 648716a..daf482a 100644
+--- a/files/apts/neutron
++++ b/files/apts/neutron
+@@ -4,16 +4,10 @@ iputils-ping
+ iputils-arping
+ mysql-server #NOPRIME
+ sudo
+-python-boto
+ python-iso8601
+ python-paste
+-python-routes
+-python-suds
+ python-pastedeploy
+-python-greenlet
+ python-kombu
+-python-eventlet
+-python-sqlalchemy
+ python-mysqldb
+ python-pyudev
+ python-qpid # dist:precise
+diff --git a/files/apts/nova b/files/apts/nova
+index 1048ef1..52a1982 100644
+--- a/files/apts/nova
++++ b/files/apts/nova
+@@ -7,7 +7,6 @@ iputils-arping
+ mysql-server # NOPRIME
+ python-mysqldb
+ python-xattr # needed for glance which is needed for nova --- this shouldn't be here
+-python-lxml # needed for glance which is needed for nova --- this shouldn't be here
+ gawk
+ iptables
+ ebtables
+@@ -26,20 +25,12 @@ qpidd # dist:precise NOPRIME
+ socat # used by ajaxterm
+ python-mox
+ python-paste
+-python-greenlet
+ python-libvirt # NOPRIME
+ python-libxml2
+-python-routes
+-python-numpy # used by websockify for spice console
+ python-pastedeploy
+-python-eventlet
+-python-cheetah
+ python-tempita
+-python-sqlalchemy
+-python-suds
+ python-lockfile
+ python-m2crypto
+-python-boto
+ python-kombu
+ python-feedparser
+ python-iso8601
+diff --git a/files/apts/ryu b/files/apts/ryu
+index 9b85080..db9f745 100644
+--- a/files/apts/ryu
++++ b/files/apts/ryu
+@@ -1,2 +1 @@
+-python-eventlet
+ python-sphinx
+diff --git a/files/apts/swift b/files/apts/swift
+index 122494c..11ab79e 100644
+--- a/files/apts/swift
++++ b/files/apts/swift
+@@ -4,12 +4,9 @@ libffi-dev
+ memcached
+ python-configobj
+ python-coverage
+-python-eventlet
+-python-greenlet
+ python-netifaces
+ python-pastedeploy
+ python-simplejson
+-python-webob
+ python-xattr
+ sqlite3
+ xfsprogs
 diff --git a/functions-common b/functions-common
-index 304eed8f..a7b0d606 100644
+index 304eed8..a7b0d60 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -523,12 +523,18 @@ function git_clone {
@@ -83,7 +256,7 @@ index 304eed8f..a7b0d606 100644
          && $SUDO_PIP rm -rf ${pip_build_tmp}
  }
 diff --git a/lib/cinder b/lib/cinder
-index 8479ca78..f11b9a43 100644
+index 8479ca7..f11b9a4 100644
 --- a/lib/cinder
 +++ b/lib/cinder
 @@ -28,6 +28,7 @@ set +o xtrace
@@ -224,11 +397,58 @@ index 8479ca78..f11b9a43 100644
  
  # Restore xtrace
  $XTRACE
+diff --git a/lib/infra b/lib/infra
+index cdf76c4..cd439e7 100644
+--- a/lib/infra
++++ b/lib/infra
+@@ -10,7 +10,6 @@
+ 
+ # ``stack.sh`` calls the entry points in this order:
+ #
+-# - unfubar_setuptools
+ # - install_infra
+ 
+ # Save trace setting
+@@ -26,19 +25,6 @@ REQUIREMENTS_DIR=$DEST/requirements
+ # Entry Points
+ # ------------
+ 
+-# unfubar_setuptools() - Unbreak the giant mess that is the current state of setuptools
+-function unfubar_setuptools {
+-    # this is a giant game of who's on first, but it does consistently work
+-    # there is hope that upstream python packaging fixes this in the future
+-    echo_summary "Unbreaking setuptools"
+-    pip_install -U "setuptools<8.0"
+-    pip_install -U pip
+-    uninstall_package python-setuptools
+-    pip_install -U "setuptools<8.0"
+-    pip_install -U pip
+-}
+-
+-
+ # install_infra() - Collect source and prepare
+ function install_infra {
+     # bring down global requirements
 diff --git a/lib/tempest b/lib/tempest
-index 1ce4f563..09e745d2 100644
+index 1ce4f56..5969f9f 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -380,7 +380,24 @@ function configure_tempest {
+@@ -293,11 +293,14 @@ function configure_tempest {
+     iniset $TEMPEST_CONFIG compute ssh_timeout $BUILD_TIMEOUT
+     iniset $TEMPEST_CONFIG compute image_ref $image_uuid
+     iniset $TEMPEST_CONFIG compute image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute image_ref_alt $image_uuid_alt
+     iniset $TEMPEST_CONFIG compute image_alt_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_alt_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute flavor_ref $flavor_ref
+     iniset $TEMPEST_CONFIG compute flavor_ref_alt $flavor_ref_alt
+     iniset $TEMPEST_CONFIG compute ssh_connect_method $ssh_connect_method
++    iniset $TEMPEST_CONFIG compute run_ssh "False"
+ 
+     # Compute Features
+     iniset $TEMPEST_CONFIG compute-feature-enabled resize True
+@@ -380,7 +383,24 @@ function configure_tempest {
      if ! is_service_enabled c-bak; then
          iniset $TEMPEST_CONFIG volume-feature-enabled backup False
      fi
@@ -253,7 +473,7 @@ index 1ce4f563..09e745d2 100644
      if [ $CINDER_MULTI_LVM_BACKEND == "True" ]; then
          iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
          iniset $TEMPEST_CONFIG volume backend1_name "LVM_iSCSI"
-@@ -475,7 +492,11 @@ function install_tempest_lib {
+@@ -475,7 +495,11 @@ function install_tempest_lib {
  # install_tempest() - Collect source and prepare
  function install_tempest {
      git_clone $TEMPEST_REPO $TEMPEST_DIR $TEMPEST_BRANCH
@@ -267,7 +487,7 @@ index 1ce4f563..09e745d2 100644
  
  # init_tempest() - Initialize ec2 images
 diff --git a/stack.sh b/stack.sh
-index 7af13aa5..eae4e298 100755
+index 7af13aa..6874ad2 100755
 --- a/stack.sh
 +++ b/stack.sh
 @@ -317,6 +317,10 @@ DSTAT_FILE=${DSTAT_FILE:-"dstat.txt"}
@@ -281,6 +501,15 @@ index 7af13aa5..eae4e298 100755
  # Service startup timeout
  SERVICE_TIMEOUT=${SERVICE_TIMEOUT:-60}
  
+@@ -652,7 +656,7 @@ TRACK_DEPENDS=${TRACK_DEPENDS:-False}
+ # Install python packages into a virtualenv so that we can track them
+ if [[ $TRACK_DEPENDS = True ]]; then
+     echo_summary "Installing Python packages into a virtualenv $DEST/.venv"
+-    pip_install -U virtualenv
++    pip_install virtualenv
+ 
+     rm -rf $DEST/.venv
+     virtualenv --system-site-packages $DEST/.venv
 @@ -1206,6 +1210,7 @@ fi
  if is_service_enabled cinder; then
      echo_summary "Starting Cinder"
@@ -290,10 +519,10 @@ index 7af13aa5..eae4e298 100755
  if is_service_enabled ceilometer; then
      echo_summary "Starting Ceilometer"
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 15ed6e7a..b14b0866 100755
+index 15ed6e7..fd1a919 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -9,9 +9,6 @@
+@@ -9,14 +9,10 @@
  # - prettytable 0.7.2 permissions are 600 in the package and
  #   pip 1.4 doesn't fix it (1.3 did)
  #
@@ -303,7 +532,12 @@ index 15ed6e7a..b14b0866 100755
  # - RHEL6:
  #
  #   - set selinux not enforcing
-@@ -82,16 +79,6 @@ if [[ -d $dir ]]; then
+ #   - (re)start messagebus daemon
+-#   - remove distro packages python-crypto and python-lxml
+ #   - pre-install hgtools to work around a bug in RHEL6 distribute
+ 
+ set -o errexit
+@@ -82,16 +78,6 @@ if [[ -d $dir ]]; then
      sudo chmod +r $dir/*
  fi
  
@@ -320,3 +554,63 @@ index 15ed6e7a..b14b0866 100755
  # Ubuntu 12.04
  # ------------
  
+@@ -127,30 +113,6 @@ if [[ $DISTRO =~ (rhel6) ]]; then
+     # does not exist.
+     sudo service messagebus restart
+ 
+-    # The following workarounds break xenserver
+-    if [ "$VIRT_DRIVER" != 'xenserver' ]; then
+-        # An old version of ``python-crypto`` (2.0.1) may be installed on a
+-        # fresh system via Anaconda and the dependency chain
+-        # ``cas`` -> ``python-paramiko`` -> ``python-crypto``.
+-        # ``pip uninstall pycrypto`` will remove the packaged ``.egg-info``
+-        # file but leave most of the actual library files behind in
+-        # ``/usr/lib64/python2.6/Crypto``. Later ``pip install pycrypto``
+-        # will install over the packaged files resulting
+-        # in a useless mess of old, rpm-packaged files and pip-installed files.
+-        # Remove the package so that ``pip install python-crypto`` installs
+-        # cleanly.
+-        # Note: other RPM packages may require ``python-crypto`` as well.
+-        # For example, RHEL6 does not install ``python-paramiko packages``.
+-        uninstall_package python-crypto
+-
+-        # A similar situation occurs with ``python-lxml``, which is required by
+-        # ``ipa-client``, an auditing package we don't care about.  The
+-        # build-dependencies needed for ``pip install lxml`` (``gcc``,
+-        # ``libxml2-dev`` and ``libxslt-dev``) are present in
+-        # ``files/rpms/general``.
+-        uninstall_package python-lxml
+-    fi
+-
+     # ``setup.py`` contains a ``setup_requires`` package that is supposed
+     # to be transient.  However, RHEL6 distribute has a bug where
+     # ``setup_requires`` registers entry points that are not cleaned
+diff --git a/tools/install_pip.sh b/tools/install_pip.sh
+index d57a687..1fea137 100755
+--- a/tools/install_pip.sh
++++ b/tools/install_pip.sh
+@@ -46,7 +46,7 @@ function install_get_pip {
+         curl -o $LOCAL_PIP $PIP_GET_PIP_URL || \
+             die $LINENO "Download of get-pip.py failed"
+     fi
+-    sudo -H -E python $LOCAL_PIP
++    sudo -H -E python $LOCAL_PIP -c $TOOLS_DIR/cap-pip.txt
+ }
+ 
+ 
+@@ -90,6 +90,6 @@ if [[ -n $PYPI_ALTERNATIVE_URL ]]; then
+     configure_pypi_alternative_url
+ fi
+ 
+-pip_install -U setuptools
++pip_install setuptools
+ 
+ get_versions
+diff --git a/tools/cap-pip.txt b/tools/cap-pip.txt
+new file mode 100644
+index 0000000..375d937
+--- /dev/null
++++ b/tools/cap-pip.txt
+@@ -0,0 +1,2 @@
++pip!=8,<10
++setuptools==30.4.0
