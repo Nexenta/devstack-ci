@@ -91,21 +91,20 @@ index ab32efe..aae4fc5 100644
  }
  
 diff --git a/lib/tempest b/lib/tempest
-index defd452..3b7b7dc 100644
+index defd452..34d6b65 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -357,8 +357,10 @@ function configure_tempest {
-     iniset $TEMPEST_CONFIG compute ssh_timeout $BUILD_TIMEOUT
-     iniset $TEMPEST_CONFIG compute image_ref $image_uuid
-     iniset $TEMPEST_CONFIG compute image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
-+    iniset $TEMPEST_CONFIG compute image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
-     iniset $TEMPEST_CONFIG compute image_ref_alt $image_uuid_alt
-     iniset $TEMPEST_CONFIG compute image_alt_ssh_user ${ALT_INSTANCE_USER:-cirros}
-+    iniset $TEMPEST_CONFIG compute image_alt_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
-     iniset $TEMPEST_CONFIG compute flavor_ref $flavor_ref
-     iniset $TEMPEST_CONFIG compute flavor_ref_alt $flavor_ref_alt
-     iniset $TEMPEST_CONFIG compute ssh_connect_method $ssh_connect_method
-@@ -536,13 +538,16 @@ function configure_tempest {
+@@ -499,6 +499,9 @@ function configure_tempest {
+     iniset $TEMPEST_CONFIG object-storage-feature-enabled discoverable_apis $object_storage_api_extensions
+ 
+     # Validation
++    iniset $TEMPEST_CONFIG validation ip_version_for_ssh 4
++    iniset $TEMPEST_CONFIG validation image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG validation image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG validation run_validation ${TEMPEST_RUN_VALIDATION:-False}
+ 
+     # Volume
+@@ -536,13 +539,16 @@ function configure_tempest {
      # Using ``CINDER_ENABLED_BACKENDS``
      if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
          iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
