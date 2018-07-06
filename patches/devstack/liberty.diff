@@ -68,21 +68,44 @@ index 29429fc..80fa584 100644
      if (( pip_version<6 )); then
          die $LINENO "Currently installed pip version ${pip_version} does not" \
              "meet minimum requirements (>=6)."
+diff --git a/lib/infra b/lib/infra
+index ab32efe..aae4fc5 100644
+--- a/lib/infra
++++ b/lib/infra
+@@ -31,7 +31,7 @@ function install_infra {
+     local PIP_VIRTUAL_ENV="$REQUIREMENTS_DIR/.venv"
+     [ ! -d $PIP_VIRTUAL_ENV ] && virtualenv $PIP_VIRTUAL_ENV
+     # We don't care about testing git pbr in the requirements venv.
+-    PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install -U pbr
++    PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install pbr
+     PIP_VIRTUAL_ENV=$PIP_VIRTUAL_ENV pip_install $REQUIREMENTS_DIR
+ 
+     # Unset the PIP_VIRTUAL_ENV so that PBR does not end up trapped
+@@ -45,7 +45,7 @@ function install_infra {
+     else
+         # Always upgrade pbr to latest version as we may have pulled it
+         # in via system packages.
+-        pip_install "-U" "pbr"
++        pip_install "pbr"
+     fi
+ }
+ 
 diff --git a/lib/tempest b/lib/tempest
-index defd452..34d6b65 100644
+index defd452..3b7b7dc 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -499,6 +499,9 @@ function configure_tempest {
-     iniset $TEMPEST_CONFIG object-storage-feature-enabled discoverable_apis $object_storage_api_extensions
- 
-     # Validation
-+    iniset $TEMPEST_CONFIG validation ip_version_for_ssh 4
-+    iniset $TEMPEST_CONFIG validation image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
-+    iniset $TEMPEST_CONFIG validation image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
-     iniset $TEMPEST_CONFIG validation run_validation ${TEMPEST_RUN_VALIDATION:-False}
- 
-     # Volume
-@@ -536,13 +539,16 @@ function configure_tempest {
+@@ -357,8 +357,10 @@ function configure_tempest {
+     iniset $TEMPEST_CONFIG compute ssh_timeout $BUILD_TIMEOUT
+     iniset $TEMPEST_CONFIG compute image_ref $image_uuid
+     iniset $TEMPEST_CONFIG compute image_ssh_user ${DEFAULT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute image_ref_alt $image_uuid_alt
+     iniset $TEMPEST_CONFIG compute image_alt_ssh_user ${ALT_INSTANCE_USER:-cirros}
++    iniset $TEMPEST_CONFIG compute image_alt_ssh_password ${DEFAULT_INSTANCE_PASSWORD:-cirros}
+     iniset $TEMPEST_CONFIG compute flavor_ref $flavor_ref
+     iniset $TEMPEST_CONFIG compute flavor_ref_alt $flavor_ref_alt
+     iniset $TEMPEST_CONFIG compute ssh_connect_method $ssh_connect_method
+@@ -536,13 +538,16 @@ function configure_tempest {
      # Using ``CINDER_ENABLED_BACKENDS``
      if [[ -n "$CINDER_ENABLED_BACKENDS" ]] && [[ $CINDER_ENABLED_BACKENDS =~ .*,.* ]]; then
          iniset $TEMPEST_CONFIG volume-feature-enabled multi_backend "True"
@@ -99,8 +122,42 @@ index defd452..34d6b65 100644
      fi
  
      if [ $TEMPEST_VOLUME_DRIVER != "default" -o \
+diff --git a/stack.sh b/stack.sh
+index 4e8ab1e..955c609 100755
+--- a/stack.sh
++++ b/stack.sh
+@@ -689,14 +689,14 @@ if [[ "$OFFLINE" != "True" ]]; then
+ fi
+ 
+ # Install subunit for the subunit output stream
+-pip_install -U os-testr
++pip_install os-testr
+ 
+ TRACK_DEPENDS=${TRACK_DEPENDS:-False}
+ 
+ # Install Python packages into a virtualenv so that we can track them
+ if [[ $TRACK_DEPENDS = True ]]; then
+     echo_summary "Installing Python packages into a virtualenv $DEST/.venv"
+-    pip_install -U virtualenv
++    pip_install virtualenv
+ 
+     rm -rf $DEST/.venv
+     virtualenv --system-site-packages $DEST/.venv
+diff --git a/tools/build_venv.sh b/tools/build_venv.sh
+index cfa39a8..10942a6 100755
+--- a/tools/build_venv.sh
++++ b/tools/build_venv.sh
+@@ -41,7 +41,7 @@ fi
+ virtualenv $VENV_DEST
+ 
+ # Install modern pip
+-PIP_VIRTUAL_ENV=$VENV_DEST pip_install -U pip
++PIP_VIRTUAL_ENV=$VENV_DEST pip_install pip
+ 
+ # Install additional packages
+ PIP_VIRTUAL_ENV=$VENV_DEST pip_install ${MORE_PACKAGES}
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index b57d140..709564b 100755
+index b57d140..b044704 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -9,9 +9,6 @@
@@ -130,3 +187,21 @@ index b57d140..709564b 100755
  if is_fedora; then
      # Disable selinux to avoid configuring to allow Apache access
      # to Horizon files (LP#1175444)
+@@ -165,4 +152,4 @@ fi
+ # connection issues under proxy, hence uninstalling python-virtualenv package
+ # and installing the latest version using pip.
+ uninstall_package python-virtualenv
+-pip_install -U virtualenv
++pip_install virtualenv
+diff --git a/tools/install_pip.sh b/tools/install_pip.sh
+index 425d366..af717f4 100755
+--- a/tools/install_pip.sh
++++ b/tools/install_pip.sh
+@@ -102,6 +102,6 @@ if [[ -n $PYPI_ALTERNATIVE_URL ]]; then
+     configure_pypi_alternative_url
+ fi
+ 
+-pip_install -U setuptools
++pip_install setuptools
+ 
+ get_versions
