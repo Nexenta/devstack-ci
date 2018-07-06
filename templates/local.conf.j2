@@ -1,5 +1,5 @@
 [[local|localrc]]
-{% if config.ci.branch == 'mitaka' %}
+{% if config.ci.branch in ['liberty', 'mitaka'] %}
 disable_service n-net
 enable_service q-svc
 enable_service q-agt
