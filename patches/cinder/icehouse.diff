@@ -10,6 +10,18 @@ index 553f06e..bfcd5cd 100644
 +
 +class NexentaException(NotFound):
 +    message = _("Nexenta Cinder Driver exception.")
+diff --git a/etc/cinder/rootwrap.d/volume.filters b/etc/cinder/rootwrap.d/volume.filters
+index 5b57404..caf8755 100644
+--- a/etc/cinder/rootwrap.d/volume.filters
++++ b/etc/cinder/rootwrap.d/volume.filters
+@@ -74,6 +74,7 @@ netapp_nfs_find: RegExpFilter, find, root, find, ^[/]*([^/\0]+(/+)?)*$, -maxdept
+ 
+ # cinder/volume/drivers/glusterfs.py
+ chgrp: CommandFilter, chgrp, root
++umount: CommandFilter, umount, root
+ 
+ # cinder/volumes/drivers/hds/hds.py:
+ hus-cmd: CommandFilter, hus-cmd, root
 diff --git a/requirements.txt b/requirements.txt
 index c5d8e94..26b6222 100644
 --- a/requirements.txt
