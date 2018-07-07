@@ -6,6 +6,10 @@
   tasks:
     - name: Set Configuration Parameters
       block:
+        - name: Print Initial Configuration
+          debug:
+            msg: "{{ config }}"
+
         - name: Set Global Required Parameters
           set_fact:
             {"{{ item }}":"{{ lookup('env', item) }}"}
