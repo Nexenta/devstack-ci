@@ -573,9 +573,9 @@
           delegate_to: "{{ config.vm.name }}"
 
         - name: Tail Latest Log File
-          shell: "tail -50 {{ find.files | sort(attribute='mtime') | reverse | map(attribute='path') | list | first }}"
+          shell: "tail -50 {{ find.files | default({}) | sort(attribute='mtime') | reverse | map(attribute='path') | list | first }}"
           register: tail
-          when: find.files is defined
+          when: find is defined
           delegate_to: "{{ config.vm.name }}"
 
         - name: Display Latest Log File
