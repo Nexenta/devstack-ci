@@ -114,10 +114,10 @@ TEMPEST_STORAGE_PROTOCOL="{{ config.backend.protocol }}"
 {% if 'iscsi' in config.ci.backend %}
 TEMPEST_EXTEND_ATTACHED_VOLUME="True"
 {% endif %}
-
 {% for instance in config.backend.instances %}
 {% set instance_name = config.ci.backend ~ loop.index %}
 {% set prefix = 'NEXENTA_OPTGROUP_' ~ instance_name %}
+
 {{ prefix }}_volume_backend_name="{{ instance_name }}"
 {% for parameter in instance %}
 {{ prefix }}_{{ parameter.name }}="{{ parameter.value }}"
