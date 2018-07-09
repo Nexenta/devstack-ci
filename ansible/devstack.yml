@@ -108,17 +108,17 @@
           set_fact:
             config: "{{ config | combine(matrix, recursive=True) }}"
 
-        - name: Create Inventory for Current Backend
-          add_host:
-            name: "{{ item.host }}"
-            groups: "{{ config.ci.project }}"
-            ansible_host: "{{ item.host }}"
-            ansible_user: "{{ config.backend.ssh.user }}"
-            ansible_connection: "ssh"
-            ansible_ssh_pass: " {{ config.backend.ssh.password }}"
-            ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
-            ansible_ssh_common_args: "{{ config.ci.ssh }}"
-          with_items: "{{ config.backend.instances }}"
+#        - name: Create Inventory for Current Backend
+#          add_host:
+#            name: "{{ item.host }}"
+#            groups: "{{ config.ci.project }}"
+#            ansible_host: "{{ item.host }}"
+#            ansible_user: "{{ config.backend.ssh.user }}"
+#            ansible_connection: "ssh"
+#            ansible_ssh_pass: " {{ config.backend.ssh.password }}"
+#            ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
+#            ansible_ssh_common_args: "{{ config.ci.ssh }}"
+#          with_items: "{{ config.backend.instances }}"
 
         - name: Create Unique BIOS UUID
           bios_uuid:
@@ -346,151 +346,151 @@
                 and config.backup.share is defined and config.backup.share != ""
                 and config.ci.backend is defined and config.ci.backend != ""
 
-        - name: Clean NexentaStor5 LUN Mappings
-          shell: |
-            for mapping in $(lunmapping list -O basic -o volume); do
-              lunmapping destroy -a $mapping
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns5_iscsi"
-
-        - name: Clean NexentaStor4 LUN Mappings and ZFS Volumes
-          shell: |
-            for zvol in $(nmc -c 'show zvol -v' | nawk '/^name/{print $NF}'); do
-              nmc -c "destroy zvol $zvol -R -f -y"
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns4_iscsi"
-
-        - name: Clean NexentaStor5 Host Groups
-          shell: |
-            for hg in $(hostgroup list -O basic | awk '{print $1}'); do
-              hostgroup destroy $hg
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns5_iscsi"
-
-        - name: Clean NexentaStor4 Host Groups
-          shell: |
-            for hg in $(nmc -c 'setup scsi-target initiator-group show' | sed 1d | awk '{print $1}'); do
-              nmc -c "destroy scsi-target initiator-group $hg -y"
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns4_iscsi"
-
-        - name: Clean NexentaStor5 Target Groups
-          shell: |
-            for tg in $(targetgroup list -O basic -o name); do
-              targetgroup destroy $tg
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns5_iscsi"
-
-        - name: Clean NexentaStor4 Target Groups
-          shell: |
-            for tg in $(nmc -c 'setup scsi-target target-group show' | sed 1d | awk '{print $1}'); do
-              nmc -c "destroy scsi-target target-group $tg -y"
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns4_iscsi"
-
-        - name: Clean NexentaStor5 iSCSI Targets
-          shell: |
-            for tgt in $(iscsitarget list -O basic -o name); do
-              iscsitarget destroy $tgt
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns5_iscsi"
-
-        - name: Clean NexentaStor4 iSCSI Targets
-          shell: |
-            for tgt in $(itadm list-target | sed 1d | awk '{print $1}'); do
-              nmc -c "destroy iscsi target $tgt"
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns4_iscsi"
-
-        - name: Clean NexentaStor4 iSCSI Target Portal Groups
-          shell: |
-            for tpg in $(nmc -c 'show iscsi TPG' | sed 1d | awk '{print $1}'); do
-              nmc -c "destroy iscsi TPG $tpg"
-            done
-            {{ hasync }}
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns4_iscsi"
-
-        - name: Clean NexentaStor5 ZFS volumes
-          shell: |
-            vg={{ item.pool }}/{{ item.dataset }}
-            if volume list $vg; then
-              for volume in $(volume list -O basic -o path $vg); do
-                volume destroy -Ry $volume
-              done
-            fi
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns5_iscsi"
-
-        - name: Clean NexentaStor4 ZFS Filesystems
-          shell: |
-            nfs={{ item.pool }}/{{ item.dataset }}
-            for fs in $(nmc -c "show folder $nfs -r" | sed 1,2d | nawk '{print $1}'); do
-              nmc -c "destroy folder $fs -y -R -f"
-            done
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns4_nfs" or config.ci.backend == "ns4_manila"
-
-        - name: Clean NexentaStor5 ZFS Filesystems
-          shell: |
-            nfs={{ item.pool }}/{{ item.dataset }}
-            for fs in $(filesystem list -O basic -o path -r $nfs | sed 1d); do
-              filesystem destroy -Rfy $fs
-            done
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ item.host }}"
-          with_items: "{{ config.backend.instances }}"
-          when: config.ci.backend == "ns5_nfs" or config.ci.backend == "ns5_manila"
+#        - name: Clean NexentaStor5 LUN Mappings
+#          shell: |
+#            for mapping in $(lunmapping list -O basic -o volume); do
+#              lunmapping destroy -a $mapping
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns5_iscsi"
+#
+#        - name: Clean NexentaStor4 LUN Mappings and ZFS Volumes
+#          shell: |
+#            for zvol in $(nmc -c 'show zvol -v' | nawk '/^name/{print $NF}'); do
+#              nmc -c "destroy zvol $zvol -R -f -y"
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns4_iscsi"
+#
+#        - name: Clean NexentaStor5 Host Groups
+#          shell: |
+#            for hg in $(hostgroup list -O basic | awk '{print $1}'); do
+#              hostgroup destroy $hg
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns5_iscsi"
+#
+#        - name: Clean NexentaStor4 Host Groups
+#          shell: |
+#            for hg in $(nmc -c 'setup scsi-target initiator-group show' | sed 1d | awk '{print $1}'); do
+#              nmc -c "destroy scsi-target initiator-group $hg -y"
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns4_iscsi"
+#
+#        - name: Clean NexentaStor5 Target Groups
+#          shell: |
+#            for tg in $(targetgroup list -O basic -o name); do
+#              targetgroup destroy $tg
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns5_iscsi"
+#
+#        - name: Clean NexentaStor4 Target Groups
+#          shell: |
+#            for tg in $(nmc -c 'setup scsi-target target-group show' | sed 1d | awk '{print $1}'); do
+#              nmc -c "destroy scsi-target target-group $tg -y"
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns4_iscsi"
+#
+#        - name: Clean NexentaStor5 iSCSI Targets
+#          shell: |
+#            for tgt in $(iscsitarget list -O basic -o name); do
+#              iscsitarget destroy $tgt
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns5_iscsi"
+#
+#        - name: Clean NexentaStor4 iSCSI Targets
+#          shell: |
+#            for tgt in $(itadm list-target | sed 1d | awk '{print $1}'); do
+#              nmc -c "destroy iscsi target $tgt"
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns4_iscsi"
+#
+#        - name: Clean NexentaStor4 iSCSI Target Portal Groups
+#          shell: |
+#            for tpg in $(nmc -c 'show iscsi TPG' | sed 1d | awk '{print $1}'); do
+#              nmc -c "destroy iscsi TPG $tpg"
+#            done
+#            {{ hasync }}
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns4_iscsi"
+#
+#        - name: Clean NexentaStor5 ZFS volumes
+#          shell: |
+#            vg={{ item.pool }}/{{ item.dataset }}
+#            if volume list $vg; then
+#              for volume in $(volume list -O basic -o path $vg); do
+#                volume destroy -Ry $volume
+#              done
+#            fi
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns5_iscsi"
+#
+#        - name: Clean NexentaStor4 ZFS Filesystems
+#          shell: |
+#            nfs={{ item.pool }}/{{ item.dataset }}
+#            for fs in $(nmc -c "show folder $nfs -r" | sed 1,2d | nawk '{print $1}'); do
+#              nmc -c "destroy folder $fs -y -R -f"
+#            done
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns4_nfs" or config.ci.backend == "ns4_manila"
+#
+#        - name: Clean NexentaStor5 ZFS Filesystems
+#          shell: |
+#            nfs={{ item.pool }}/{{ item.dataset }}
+#            for fs in $(filesystem list -O basic -o path -r $nfs | sed 1d); do
+#              filesystem destroy -Rfy $fs
+#            done
+#          args:
+#            executable: "{{ shell }}"
+#          delegate_to: "{{ item.host }}"
+#          with_items: "{{ config.backend.instances }}"
+#          when: config.ci.backend == "ns5_nfs" or config.ci.backend == "ns5_manila"
 
         - name: Run Test Suite
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
