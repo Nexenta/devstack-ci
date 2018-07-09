@@ -7,37 +7,14 @@ NEXENTA_XTRACE=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ns5_nfs {
-	declare backend=$1
-	declare item share
-	declare -A NEXENTA_SHARE
-	declare -A opt
+	local backend=$1
+	local prefix="NEXENTA_OPTGROUP_${backend}_"
 
-	if [[ -n "${NEXENTA_POOL[$backend]:-}" &&
-	      -n "${NEXENTA_DATASET[$backend]:-}" ]]; then
-		NEXENTA_SHARE[$backend]="${NEXENTA_POOL[$backend]}"
-        NEXENTA_SHARE[$backend]+="/"
-        NEXENTA_SHARE[$backend]+="${NEXENTA_DATASET[$backend]}"
-	fi
-
-	opt[volume_driver]=NEXENTA_DRIVER
-	opt[nas_host]=NEXENTA_HOST
-	opt[nas_share_path]=NEXENTA_SHARE
-	opt[nas_mount_options]=NEXENTA_OPTIONS
-	opt[nexenta_sparsed_volumes]=NEXENTA_SPARSED
-	opt[nexenta_user]=NEXENTA_REST_USER
-	opt[nexenta_password]=NEXENTA_REST_PASSWORD
-	opt[nexenta_rest_address]=NEXENTA_REST_HOST
-	opt[nexenta_rest_port]=NEXENTA_REST_PORT
-	opt[nexenta_rest_protocol]=NEXENTA_REST_PROTO
-
-	iniset $CINDER_CONF $backend volume_backend_name $backend
-
-	for item in "${!opt[@]}"; do
-		declare -n var="${opt[$item]}[$backend]"
-
-		if [[ -n "${var:-}" ]]; then
-			iniset $CINDER_CONF $backend $item $var
-		fi
+	for env in $(set | grep "^$prefix"); do
+		opt=${env#$prefix}
+		name=${opt%%=*}
+		value=${opt##*=}
+		iniset $CINDER_CONF $backend $name $value
 	done
 }
 
