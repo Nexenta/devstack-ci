@@ -13,6 +13,7 @@ function configure_cinder_backend_ns4_nfs {
 		local opt=${env#$prefix}
 		local name=${opt%%=*}
 		local value=${opt##*=}
+		local options=''
 		local nexenta_host='host'
 		local nexenta_dataset='dataset'
 		local nexenta_rest_protocol='http'
@@ -43,11 +44,18 @@ function configure_cinder_backend_ns4_nfs {
 		nexenta_volume_root)
 			nexenta_volume_root="$value"
 			;;
+		nas_mount_options|nfs_mount_options)
+			options="$value"
 		*)
 			iniset $CINDER_CONF $backend $name $value
 			;;
 		esac
 	done
+
+	if [[ -n "$options" ]]; then
+		iniset $CINDER_CONF $backend nas_mount_options $options
+		iniset $CINDER_CONF $backend nfs_mount_options $options
+	fi
 
 	iniset $CINDER_CONF $backend nexenta_shares_config \
 		$CINDER_CONF_DIR/$backend.conf

@@ -9,13 +9,27 @@ set +o xtrace
 function configure_cinder_backend_ns5_nfs {
 	local backend=$1
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
+	local options=''
 
 	for env in $(set | grep "^$prefix"); do
 		opt=${env#$prefix}
 		name=${opt%%=*}
 		value=${opt##*=}
-		iniset $CINDER_CONF $backend $name $value
+
+		case "$name" in
+		nas_mount_options|nfs_mount_options)
+			options="$value"
+			;;
+		*)
+			iniset $CINDER_CONF $backend $name $value
+			;;
+		esac
 	done
+
+	if [[ -n "$options" ]]; then
+		iniset $CINDER_CONF $backend nas_mount_options $options
+		iniset $CINDER_CONF $backend nfs_mount_options $options
+	fi
 }
 
 function cleanup_cinder_backend_ns5_nfs {
