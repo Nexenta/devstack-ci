@@ -7,14 +7,15 @@ NEXENTA_XTRACE=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ns5_iscsi {
-	local backend=$1
+	local backend="$1"
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
 
 	for env in $(set | grep "^$prefix"); do
-		opt=${env#$prefix}
-		name=${opt%%=*}
-		value=${opt##*=}
-		iniset $CINDER_CONF $backend $name $value
+		local opt="${env#$prefix}"
+		local name="${opt%%=*}"
+		local value="${opt#*=}"
+
+		iniset "$CINDER_CONF" "$backend" "$name" "$value"
 	done
 }
 

@@ -7,12 +7,12 @@ NEXENTA_XTRACE=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ns4_nfs {
-	local backend=$1
+	local backend="$1"
 
 	for env in $(set | grep "^$prefix"); do
-		local opt=${env#$prefix}
-		local name=${opt%%=*}
-		local value=${opt##*=}
+		local opt="${env#$prefix}"
+		local name="${opt%%=*}"
+		local value="${opt#*=}"
 		local options=''
 		local nexenta_host='host'
 		local nexenta_dataset='dataset'
@@ -47,23 +47,23 @@ function configure_cinder_backend_ns4_nfs {
 		nas_mount_options|nfs_mount_options)
 			options="$value"
 		*)
-			iniset $CINDER_CONF $backend $name $value
+			iniset "$CINDER_CONF" "$backend" "$name" "$value"
 			;;
 		esac
 	done
 
 	if [[ -n "$options" ]]; then
-		iniset $CINDER_CONF $backend nas_mount_options $options
-		iniset $CINDER_CONF $backend nfs_mount_options $options
+		iniset "$CINDER_CONF" "$backend" 'nas_mount_options' "$options"
+		iniset "$CINDER_CONF" "$backend" 'nfs_mount_options' "$options"
 	fi
 
-	iniset $CINDER_CONF $backend nexenta_shares_config \
-		$CINDER_CONF_DIR/$backend.conf
+	iniset "$CINDER_CONF" "$backend" 'nexenta_shares_config' \
+		"${CINDER_CONF_DIR}/${backend}.conf"
 
 	printf "%s:/%s/%s\t%s://%s:%s@%s:%d\n" \
-		$nexenta_host $nexenta_volume_root $nexenta_dataset \
-		$nexenta_rest_protocol $nexenta_user $nexenta_password \
-		$nexenta_host $nexenta_rest_port | tee $CINDER_CONF_DIR/$backend.conf
+		"$nexenta_host" "$nexenta_volume_root" "$nexenta_dataset" \
+		"$nexenta_rest_protocol" "$nexenta_user" "$nexenta_password" \
+		"$nexenta_host" "$nexenta_rest_port" | tee "${CINDER_CONF_DIR}/${backend}.conf"
 }
 
 function cleanup_cinder_backend_ns4_nfs {
