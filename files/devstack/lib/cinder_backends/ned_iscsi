@@ -7,8 +7,24 @@ NEXENTA_XTRACE=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ned_iscsi {
+	set -x
+	echo ' ====> DEBUG configure_cinder_backend_ned_iscsi'
 	local backend="$1"
+	local space=${backend//_/-}
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
+	local env item
+
+	sudo $CIDIR/scripts/nedge-k8.sh "$space"
+
+	for item in .kube .minikube; do
+		if [[ -d "$item" ]]; then
+			sudo chown -R $(id -un):$(id -gn) "$item"
+		fi
+	done
+
+	local "${prefix}nexenta_iscsi_service"="$space"
+	local "${prefix}nexenta_rest_address"="$(ci_cip "$space" "${space}-mgmt")"
+	local "${prefix}nexenta_client_address"="$(ci_cip "$space" "${space}-svc-iscsi-${space}")"
 
 	for env in $(set | grep "^$prefix"); do
 		local opt="${env#$prefix}"

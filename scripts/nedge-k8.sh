@@ -21,18 +21,18 @@ else
 fi
 
 if (( $# != 1 )); then
-	echo "$0 <[1-9] | clean>"
+	echo "$0 <name|clean>"
 	exit 1
 fi
 
-typeset _index="$1"
+typeset _name="$1"
 typeset _mkbin='/usr/local/bin/minikube'
 typeset _mkurl='https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64'
 typeset _nedir='/var/lib/nedge'
 typeset _neurl='https://raw.githubusercontent.com/Nexenta/edge-kubernetes/master/nedge-cluster-lfs-solo.yaml'
 typeset _kcurl='https://packages.cloud.google.com/apt/doc/apt-key.gpg'
 
-if [[ "$_index" == "clean" ]]; then
+if [[ "$_name" == "clean" ]]; then
 	set +e
 
 	if which minikube; then
@@ -50,16 +50,9 @@ if [[ "$_index" == "clean" ]]; then
 	exit 0
 fi
 
-if [[ "$_index" =~ ^[1-9]$ ]]; then
-	echo "Create namespace #$_index"
-else
-	echo "$0 <[1-9] | clean>"
-	exit 1
-fi
-
-typeset _nodeports=''
-typeset _namespace="nedge${_index}"
+typeset _ports=''
 typeset -i _base=30000
+typeset -i _index=$(( RANDOM % 100 ))
 typeset -A _port
 
 _port[30080]=$(( _base + _index * 10 + 1 ))
@@ -68,9 +61,8 @@ _port[31080]=$(( _base + _index * 10 + 3 ))
 _port[31443]=$(( _base + _index * 10 + 4 ))
 _port[31444]=$(( _base + _index * 10 + 5 ))
 
-for i in "${!_port[@]}"; do
-	r="s|\<$i\>|${_port[$i]}|g"
-	nodeports="${_nodeports:+$_nodeports} -e $r"
+for _item in "${!_port[@]}"; do
+	_ports+=" -e s|\<$_item\>|${_port[$_item]}|g"
 done
 
 apt install -y docker.io apt-transport-https expect-lite
@@ -98,10 +90,10 @@ fi
 
 typeset _yaml="$(mktemp)"
 curl -Ls "$_neurl" | sed \
-	-e 's|/mnt/nedge|'$_nedir'/'$_namespace'|g' \
-	-e '/\//! s|nedge|'$_namespace'|g' \
-	-e 's|\(local-storage\)|'$_namespace'-\1|g' \
-	$_nodeports >"$_yaml"
+	-e 's|/mnt/nedge|'$_nedir'/'$_name'|g' \
+	-e '/\//! s|nedge|'$_name'|g' \
+	-e 's|\(local-storage\)|'$_name'-\1|g' \
+	$_ports >"$_yaml"
 	
 kubectl create -f "$_yaml"
 rm -fv "$_yaml"
@@ -121,7 +113,7 @@ while true; do
 		if [[ "$_status" == "Running" && "$_ready" == "$_total" ]]; then
 			(( _pods++ ))
 		fi
-	done < <(kubectl get pods -n $_namespace --no-headers | awk -F '[ /]+' '{print $1,$2,$3,$4}')
+	done < <(kubectl get pods -n $_name --no-headers | awk -F '[ /]+' '{print $1,$2,$3,$4}')
 
 	if (( _pods == 2 )); then
 		break
@@ -132,14 +124,15 @@ while true; do
 done
 set -ex
 
-kubectl get pods -n $_namespace
-typeset _mgmt=$(kubectl get pods -n $_namespace --no-headers | awk '/^'$_namespace'-mgmt/{print $1}')
-typeset _neenv="kubectl exec -it -n $_namespace $_mgmt -c rest --"
+kubectl get pods -n $_name -o wide
+
+typeset _mgmt=$(kubectl get pods -n $_name --no-headers | awk '/^'$_name'-mgmt/{print $1}')
+typeset _neenv="kubectl exec -it -n $_name $_mgmt -c rest --"
 typeset _neadm="$_neenv neadm"
 
 $_neenv sed -i \
 	-e 's|/mnt|'$_nedir'|g' \
-	-e '/\//! s|nedge|'$_namespace'|g' \
+	-e '/\//! s|nedge|'$_name'|g' \
 	nmf/etc/kubernetes/nedge-svc-{iscsi,nfs,s3,s3s,swift}.yaml.tmpl
 
 typeset _expect="$(mktemp)"
@@ -171,10 +164,10 @@ rm -f "$_expect"
 $_neadm system status
 
 typeset _sid=$($_neadm system status | awk '/ONLINE/{print $2}')
-typeset _cluster="cluster${_index}"
-typeset _tenant="${_cluster}/tenant${_index}"
-typeset _bucket="${_tenant}/bucket${_index}"
-typeset _service="iscsi${_index}"
+typeset _cluster="cluster"
+typeset _tenant="${_cluster}/tenant"
+typeset _bucket="${_tenant}/bucket"
+typeset _service="$_name"
 
 $_neadm cluster create $_cluster
 $_neadm tenant create $_tenant
@@ -184,3 +177,6 @@ $_neadm service add $_service $_sid
 $_neadm service serve $_service $_cluster
 $_neadm service enable $_service
 $_neadm service show $_service
+
+minikube service list -n $_name
+kubectl get pods -o wide -n $_name

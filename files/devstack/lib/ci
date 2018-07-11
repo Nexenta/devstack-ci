@@ -135,3 +135,12 @@ function ci_clean {
 function ci_unstack {
 	ci_clean
 }
+
+function ci_cip {
+	local space=$1
+	local name=$2
+	local format='custom-columns=NAME:.metadata.name,IP:.status.podIP'
+
+	kubectl get pods --no-headers --namespace="$space" --output="$format" | \
+		awk '/^'$name'/{print $2}'
+}
