@@ -7,8 +7,6 @@ NEXENTA_XTRACE=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ned_iscsi {
-	set -x
-	echo ' ====> DEBUG configure_cinder_backend_ned_iscsi'
 	local backend="$1"
 	local space=${backend//_/-}
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
@@ -37,6 +35,7 @@ function configure_cinder_backend_ned_iscsi {
 
 function cleanup_cinder_backend_ned_iscsi {
 	ci_clean
+	sudo $CIDIR/scripts/nedge-k8.sh clean
 }
 
 $NEXENTA_XTRACE
