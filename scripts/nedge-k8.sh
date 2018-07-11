@@ -174,7 +174,6 @@ $_neadm tenant create $_tenant
 $_neadm bucket create $_bucket
 $_neadm service create iscsi $_service
 $_neadm service add $_service $_sid
-$_neadm service serve $_service $_cluster
 $_neadm service enable $_service
 $_neadm service show $_service
 
