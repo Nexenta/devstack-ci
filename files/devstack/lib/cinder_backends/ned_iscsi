@@ -15,8 +15,8 @@ function configure_cinder_backend_ned_iscsi {
 	sudo $CIDIR/scripts/nedge-k8.sh "$space"
 
 	for item in .kube .minikube; do
-		if [[ -d "$item" ]]; then
-			sudo chown -R $(id -un):$(id -gn) "$item"
+		if [[ -d "$HOME/$item" ]]; then
+			sudo chown -R $(id -un):$(id -gn) "$HOME/$item"
 		fi
 	done
 
