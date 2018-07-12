@@ -129,6 +129,12 @@ kubectl get pods -n $_name -o wide
 typeset _mgmt=$(kubectl get pods -n $_name --no-headers | awk '/^'$_name'-mgmt/{print $1}')
 typeset _neenv="kubectl exec -it -n $_name $_mgmt -c rest --"
 typeset _neadm="$_neenv neadm"
+typeset _nelog='/opt/nedge/var/log/nef.log'
+typeset _nemsg='ccow-auditd  now running'
+
+while ! $_neenv grep "$_nemsg" $_nelog 2>/dev/null; do
+	sleep 5
+done
 
 $_neenv sed -i \
 	-e 's|/mnt|'$_nedir'|g' \
