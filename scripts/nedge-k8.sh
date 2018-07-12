@@ -99,6 +99,7 @@ kubectl create -f "$_yaml"
 rm -fv "$_yaml"
 
 set +ex
+typeset -i _delay=30
 typeset -i _retries=50
 while true; do
 	if (( --_retries == 0 )); then
@@ -119,7 +120,7 @@ while true; do
 		break
 	fi
 
-	sleep 10
+	sleep $_delay
 	echo
 done
 set -ex
@@ -133,7 +134,7 @@ typeset _nelog='/opt/nedge/var/log/nef.log'
 typeset _nemsg='ccow-auditd  now running'
 
 while ! $_neenv grep "$_nemsg" $_nelog 2>/dev/null; do
-	sleep 5
+	sleep $_delay
 done
 
 $_neenv sed -i \
