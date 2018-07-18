@@ -22,29 +22,31 @@ index 8e20833..6c55fc1 100644
  python-cmd2 # dist:precise
  python-dev
 diff --git a/files/apts/glance b/files/apts/glance
-index 15e09aa..0e5ff89 100644
+index 15e09aa..9bbe2e7 100644
 --- a/files/apts/glance
 +++ b/files/apts/glance
-@@ -3,8 +3,6 @@ libpq-dev           # testonly
+@@ -3,10 +3,7 @@ libpq-dev           # testonly
  libssl-dev          # testonly
  libxml2-dev
  libxslt1-dev        # testonly
 -python-eventlet
 -python-routes
  python-greenlet
- python-sqlalchemy
+-python-sqlalchemy
  python-wsgiref
+ python-pastedeploy
+ python-xattr
 diff --git a/files/apts/horizon b/files/apts/horizon
-index f79f435..c28e1d1 100644
+index f79f435..1c936dd 100644
 --- a/files/apts/horizon
 +++ b/files/apts/horizon
-@@ -5,13 +5,9 @@ python-dateutil
+@@ -5,13 +5,8 @@ python-dateutil
  python-paste
  python-pastedeploy
  python-anyjson
 -python-routes
  python-xattr
- python-sqlalchemy
+-python-sqlalchemy
  python-webob
 -python-eventlet
  python-sphinx
@@ -53,16 +55,18 @@ index f79f435..c28e1d1 100644
 -python-cherrypy3 # why?
 -python-migrate
 diff --git a/files/apts/keystone b/files/apts/keystone
-index d316a42..71897ba 100644
+index d316a42..aebb1e3 100644
 --- a/files/apts/keystone
 +++ b/files/apts/keystone
-@@ -1,5 +1,4 @@
+@@ -1,15 +1,12 @@
  python-lxml
 -python-pastescript
  python-pastedeploy
  python-paste
  sqlite3
-@@ -9,7 +8,6 @@ python-mysqldb
+ python-pysqlite2
+-python-sqlalchemy
+ python-mysqldb
  python-mysql.connector
  python-webob
  python-greenlet
@@ -71,10 +75,10 @@ index d316a42..71897ba 100644
  libsasl2-dev
  libkrb5-dev
 diff --git a/files/apts/neutron b/files/apts/neutron
-index a48a800..b90869b 100644
+index a48a800..bf75a53 100644
 --- a/files/apts/neutron
 +++ b/files/apts/neutron
-@@ -7,11 +7,8 @@ mysql-server #NOPRIME
+@@ -7,12 +7,8 @@ mysql-server #NOPRIME
  sudo
  python-iso8601
  python-paste
@@ -83,14 +87,15 @@ index a48a800..b90869b 100644
  python-pastedeploy
  python-greenlet
 -python-eventlet
- python-sqlalchemy
+-python-sqlalchemy
  python-mysqldb
  python-mysql.connector
+ python-pyudev
 diff --git a/files/apts/nova b/files/apts/nova
-index 66f29c4..426269a 100644
+index 66f29c4..57140b4 100644
 --- a/files/apts/nova
 +++ b/files/apts/nova
-@@ -29,18 +29,14 @@ qpidd # NOPRIME
+@@ -29,18 +29,13 @@ qpidd # NOPRIME
  socat # used by ajaxterm
  python-mox
  python-paste
@@ -104,7 +109,7 @@ index 66f29c4..426269a 100644
 -python-eventlet
  python-cheetah
  python-tempita
- python-sqlalchemy
+-python-sqlalchemy
 -python-suds
  python-lockfile
  python-m2crypto
