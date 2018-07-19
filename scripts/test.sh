@@ -20,9 +20,15 @@ else
 	exec > >(tee -a $_base/$_logs/$_ident.log | logger -t $_ident) 2>&1
 fi
 
-openstack --help --debug >$_base/$_logs/openstack.log 2>&1
+if ! openstack --help --debug >$_base/$_logs/openstack.log 2>&1; then
+	echo 'Error: openstack command failed:'
+	cat $_base/$_logs/openstack.log
+	exit 1
+fi
 
-if grep -q Traceback $_base/$_logs/openstack.log; then
+if grep -q 'Traceback' $_base/$_logs/openstack.log; then
+	echo 'Error: openstack command failed:'
+	grep 'Traceback' $_base/$_logs/openstack.log
 	exit 1
 fi
 
