@@ -10,22 +10,33 @@ function configure_cinder_backend_ned_iscsi {
 	local backend="$1"
 	local space=${backend//_/-}
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
-	local env item
+	local -i count=0
+	local item
 
-	sudo $CIDIR/scripts/nedge-k8.sh "$space"
+	for item in nexenta_iscsi_service nexenta_rest_address nexenta_client_address; do
+		local -n ref="$prefix$item"
 
-	for item in .kube .minikube; do
-		if [[ -d "$HOME/$item" ]]; then
-			sudo chown -R $(id -un):$(id -gn) "$HOME/$item"
+		if [[ -n "$ref" ]]; then
+			(( count++ ))
 		fi
 	done
 
-	local "${prefix}nexenta_iscsi_service"="$space"
-	local "${prefix}nexenta_rest_address"="$(ci_cip "$space" "${space}-mgmt")"
-	local "${prefix}nexenta_client_address"="$(ci_cip "$space" "${space}-svc-iscsi-${space}")"
+	if (( count != 3 )); then
+		sudo $CIDIR/scripts/nedge-k8.sh "$space"
 
-	for env in $(set | grep "^$prefix"); do
-		local opt="${env#$prefix}"
+		for item in .kube .minikube; do
+			if [[ -d "$HOME/$item" ]]; then
+				sudo chown -R $(id -un):$(id -gn) "$HOME/$item"
+			fi
+		done
+
+		local "${prefix}nexenta_iscsi_service"="$space"
+		local "${prefix}nexenta_rest_address"="$(ci_cip "$space" "${space}-mgmt")"
+		local "${prefix}nexenta_client_address"="$(ci_cip "$space" "${space}-svc-iscsi-${space}")"
+	fi
+
+	for item in $(set | grep "^$prefix"); do
+		local opt="${item#$prefix}"
 		local name="${opt%%=*}"
 		local value="${opt#*=}"
 

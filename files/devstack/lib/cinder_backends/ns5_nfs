@@ -10,9 +10,10 @@ function configure_cinder_backend_ns5_nfs {
 	local backend="$1"
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
 	local options=''
+	local item
 
-	for env in $(set | grep "^$prefix"); do
-		local opt="${env#$prefix}"
+	for item in $(set | grep "^$prefix"); do
+		local opt="${item#$prefix}"
 		local name="${opt%%=*}"
 		local value="${opt#*=}"
 

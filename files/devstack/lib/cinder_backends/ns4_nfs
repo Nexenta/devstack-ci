@@ -8,9 +8,10 @@ set +o xtrace
 
 function configure_cinder_backend_ns4_nfs {
 	local backend="$1"
+	local item
 
-	for env in $(set | grep "^$prefix"); do
-		local opt="${env#$prefix}"
+	for item in $(set | grep "^$prefix"); do
+		local opt="${item#$prefix}"
 		local name="${opt%%=*}"
 		local value="${opt#*=}"
 		local options=''
