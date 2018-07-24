@@ -8,20 +8,22 @@ set +o xtrace
 
 function configure_cinder_backend_ned_iscsi {
 	local backend="$1"
-	local space=${backend//_/-}
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
-	local -i count=0
+	local deploy="True"
 	local item
 
 	for item in nexenta_iscsi_service nexenta_rest_address nexenta_client_address; do
-		local -n ref="$prefix$item"
+		local env="$(set | awk '/^'$prefix$item'=/')"
 
-		if [[ -n "$ref" ]]; then
-			(( count++ ))
+		if [[ -z "$env" ]]; then
+			deploy="False"
+			break
 		fi
 	done
 
-	if (( count != 3 )); then
+	if [[ "$deploy" == "True" ]]; then
+		local space=${backend//_/-}
+
 		sudo $CIDIR/scripts/nedge-k8.sh "$space"
 
 		for item in .kube .minikube; do
