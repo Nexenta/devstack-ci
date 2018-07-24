@@ -9,14 +9,14 @@ set +o xtrace
 function configure_cinder_backend_ned_iscsi {
 	local backend="$1"
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
-	local deploy="True"
+	local deploy="False"
 	local item
 
 	for item in nexenta_iscsi_service nexenta_rest_address nexenta_client_address; do
 		local env="$(set | awk '/^'$prefix$item'=/')"
 
 		if [[ -z "$env" ]]; then
-			deploy="False"
+			deploy="True"
 			break
 		fi
 	done
