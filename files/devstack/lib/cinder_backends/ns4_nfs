@@ -9,20 +9,20 @@ set +o xtrace
 function configure_cinder_backend_ns4_nfs {
 	local backend="$1"
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
+	local nexenta_host='host'
+	local nexenta_dataset='dataset'
+	local nexenta_rest_protocol='http'
+	local nexenta_rest_port='80'
+	local nexenta_user='user'
+	local nexenta_password='password'
+	local nexenta_volume_root='/'
+	local options=''
 	local item
 
 	for item in $(set | grep "^$prefix"); do
 		local opt="${item#$prefix}"
 		local name="${opt%%=*}"
 		local value="${opt#*=}"
-		local options=''
-		local nexenta_host='host'
-		local nexenta_dataset='dataset'
-		local nexenta_rest_protocol='http'
-		local nexenta_rest_port='80'
-		local nexenta_user='user'
-		local nexenta_password='password'
-		local nexenta_volume_root='/'
 
 		case "$name" in
 		nexenta_host)
