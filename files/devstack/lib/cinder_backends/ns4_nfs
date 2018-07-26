@@ -63,7 +63,7 @@ function configure_cinder_backend_ns4_nfs {
 	iniset "$CINDER_CONF" "$backend" 'nexenta_shares_config' \
 		"${CINDER_CONF_DIR}/${backend}.conf"
 
-	printf "%s:/%s/%s\t%s://%s:%s@%s:%d\n" \
+	printf "%s:%s/%s\t%s://%s:%s@%s:%d\n" \
 		"$nexenta_host" "$nexenta_volume_root" "$nexenta_dataset" \
 		"$nexenta_rest_protocol" "$nexenta_user" "$nexenta_password" \
 		"$nexenta_host" "$nexenta_rest_port" | tee "${CINDER_CONF_DIR}/${backend}.conf"
