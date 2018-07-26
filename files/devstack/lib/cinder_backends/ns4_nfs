@@ -47,6 +47,7 @@ function configure_cinder_backend_ns4_nfs {
 			;;
 		nas_mount_options|nfs_mount_options)
 			options="$value"
+			;;
 		*)
 			iniset "$CINDER_CONF" "$backend" "$name" "$value"
 			;;
