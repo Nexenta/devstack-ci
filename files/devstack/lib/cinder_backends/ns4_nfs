@@ -8,6 +8,7 @@ set +o xtrace
 
 function configure_cinder_backend_ns4_nfs {
 	local backend="$1"
+	local prefix="NEXENTA_OPTGROUP_${backend}_"
 	local item
 
 	for item in $(set | grep "^$prefix"); do
