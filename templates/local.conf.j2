@@ -30,7 +30,6 @@ GIT_DEPTH="1"
 ROOTSLEEP="0"
 SERVICE_TIMEOUT="600"
 IP_VERSION="4"
-USE_SCREEN="True"
 API_RATE_LIMIT="False"
 INSTALL_TEMPEST="True"
 TEMPEST_RUN_VALIDATION="True"
@@ -40,8 +39,15 @@ CINDER_IMG_CACHE_ENABLED="False"
 CINDER_COORDINATION_URL="mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${SERVICE_LOCAL_HOST}/cinder?charset=utf8"
 LOG_COLOR="False"
 SYSLOG="False"
+{% if config.devstack.startup == 'systemd' %}
+USE_SCREEN="False"
+USE_SYSTEMD="True"
+USE_JOURNAL="True"
+{% else %}
+USE_SCREEN="True"
 USE_SYSTEMD="False"
 USE_JOURNAL="False"
+{% endif %}
 
 NEXENTA_BACKEND_NAME="{{ config.ci.backend }}"
 NEXENTA_REPOSITORY="{{ config.nexenta.repository }}"
