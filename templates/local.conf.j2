@@ -39,7 +39,7 @@ CINDER_IMG_CACHE_ENABLED="False"
 CINDER_COORDINATION_URL="mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${SERVICE_LOCAL_HOST}/cinder?charset=utf8"
 LOG_COLOR="False"
 SYSLOG="False"
-{% if config.devstack.startup == 'systemd' %}
+{% if (config.ci.branch == 'pike' and config.devstack.startup == 'systemd') or config.ci.branch in ['queens', 'master'] %}
 USE_SCREEN="False"
 USE_SYSTEMD="True"
 USE_JOURNAL="True"
