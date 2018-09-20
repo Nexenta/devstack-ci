@@ -13,6 +13,7 @@ enable_service tempest
 enable_service c-bak
 {% endif %}
 
+FORCE="yes"
 DATABASE_USER="root"
 SERVICE_LOCAL_HOST="127.0.0.1"
 ADMIN_PASSWORD="{{ config.devstack.password }}"
