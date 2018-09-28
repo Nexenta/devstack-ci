@@ -140,7 +140,6 @@ TEMPEST_EXTEND_ATTACHED_VOLUME="True"
 [[post-config|$CINDER_CONF]]
 
 [DEFAULT]
-use_json = True
 driver_ssl_cert_verify = False
 {% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
 backup_file_size = "134217728"

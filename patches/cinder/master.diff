@@ -1,3 +1,24 @@
+diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
+index 4f5e2a9..81706d0 100644
+--- a/cinder/api/openstack/wsgi.py
++++ b/cinder/api/openstack/wsgi.py
+@@ -18,6 +18,7 @@ import collections
+ import functools
+ import inspect
+ import math
++import sys
+ import time
+ 
+ from oslo_log import log as logging
+@@ -41,6 +42,8 @@ from cinder.i18n import _
+ from cinder import utils
+ from cinder.wsgi import common as wsgi
+ 
++reload(sys)
++sys.setdefaultencoding('utf-8')
+ 
+ LOG = logging.getLogger(__name__)
+ 
 diff --git a/test-requirements.txt b/test-requirements.txt
 index 28ee878..2add5aa 100644
 --- a/test-requirements.txt
