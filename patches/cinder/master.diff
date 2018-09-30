@@ -1,5 +1,5 @@
 diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index 4f5e2a9..81706d0 100644
+index 4f5e2a95e..81706d0f1 100644
 --- a/cinder/api/openstack/wsgi.py
 +++ b/cinder/api/openstack/wsgi.py
 @@ -18,6 +18,7 @@ import collections
@@ -20,7 +20,7 @@ index 4f5e2a9..81706d0 100644
  LOG = logging.getLogger(__name__)
  
 diff --git a/test-requirements.txt b/test-requirements.txt
-index 28ee878..2add5aa 100644
+index 28ee878f0..2add5aab6 100644
 --- a/test-requirements.txt
 +++ b/test-requirements.txt
 @@ -17,6 +17,5 @@ testtools>=2.2.0 # MIT
@@ -30,3 +30,25 @@ index 28ee878..2add5aa 100644
 -tempest>=17.1.0 # Apache-2.0
  bandit>=1.1.0 # Apache-2.0
  reno>=2.5.0 # Apache-2.0
+diff --git a/tox.ini b/tox.ini
+index 57ebbc357..786f6733d 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -68,7 +68,7 @@ setenv =
+   OS_TEST_PATH = ./cinder/tests/compliance
+ 
+ [testenv:pep8]
+-basepython = python3
++basepython = python2
+ commands =
+   python setup.py check --restructuredtext --strict
+   flake8 {posargs} .
+@@ -114,7 +114,7 @@ basepython = python3
+ commands = oslopolicy-sample-generator --config-file=tools/config/cinder-policy-generator.conf
+ 
+ [testenv:genopts]
+-basepython = python3
++basepython = python2
+ sitepackages = False
+ envdir = {toxworkdir}/pep8
+ commands = python tools/config/generate_cinder_opts.py
