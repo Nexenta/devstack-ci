@@ -1,5 +1,26 @@
+diff --git a/cinder_tempest_plugin/api/volume/base.py b/cinder_tempest_plugin/api/volume/base.py
+index b3765e0..b5e7749 100644
+--- a/cinder_tempest_plugin/api/volume/base.py
++++ b/cinder_tempest_plugin/api/volume/base.py
+@@ -31,7 +31,7 @@ class BaseVolumeTest(api_version_utils.BaseMicroversionTest,
+     """Base test case class for all Cinder API tests."""
+ 
+     _api_version = 2
+-    credentials = ['primary']
++    credentials = ['primary', 'admin']
+ 
+     @classmethod
+     def skip_checks(cls):
+@@ -67,6 +67,7 @@ class BaseVolumeTest(api_version_utils.BaseMicroversionTest,
+             cls.volumes_client = cls.os_primary.volumes_v2_client
+ 
+         cls.snapshots_client = cls.os_primary.snapshots_v2_client
++        cls.admin_volume_types_client = cls.os_adm.volume_types_v2_client
+ 
+     @classmethod
+     def setup_credentials(cls):
 diff --git a/cinder_tempest_plugin/services/volume_revert_client.py b/cinder_tempest_plugin/services/volume_revert_client.py
-index 0d54701..285494a 100644
+index fc9b6ad..c1c0637 100644
 --- a/cinder_tempest_plugin/services/volume_revert_client.py
 +++ b/cinder_tempest_plugin/services/volume_revert_client.py
 @@ -15,7 +15,7 @@
