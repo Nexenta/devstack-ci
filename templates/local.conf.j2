@@ -92,7 +92,6 @@ enable_plugin manila-tempest-plugin git://git.openstack.org/openstack/manila-tem
 
 MANILA_UI_ENABLED="True"
 ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
-SHARE_DRIVER="{{ config.backend.driver }}"
 MANILA_SERVICE_VM_FLAVOR_RAM="512"
 MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="snapshot_support=True create_share_from_snapshot_support=True revert_to_snapshot_support=True mount_snapshot_support=True"
 MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
@@ -101,8 +100,10 @@ MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 {% set prefix = 'MANILA_OPTGROUP_' ~ instance_name %}
 MANILA_BACKEND{{ loop.index }}_CONFIG_GROUP_NAME="{{ instance_name }}"
 MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ instance_name }}"
-{{ prefix }}_driver_handles_share_servers="False"
 {% for parameter in instance %}
+{% if parameter.name == 'share_driver' %}
+SHARE_DRIVER="{{ parameter.value }}"
+{% endif %}
 {{ prefix }}_{{ parameter.name }}="{{ parameter.value }}"
 {% endfor %}
 {% endfor %}
