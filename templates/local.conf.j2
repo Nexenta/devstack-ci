@@ -102,18 +102,9 @@ MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 MANILA_BACKEND{{ loop.index }}_CONFIG_GROUP_NAME="{{ instance_name }}"
 MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ instance_name }}"
 {{ prefix }}_driver_handles_share_servers="False"
-{{ prefix }}_nexenta_host="{{ instance.host }}"
-{% if config.ci.backend == 'ns5_manila' %}
-{{ prefix }}_nexenta_pool="{{ instance.pool }}"
-{% else %}
-{{ prefix }}_nexenta_volume="{{ instance.pool }}"
-{% endif %}
-{{ prefix }}_nexenta_nfs_share="{{ instance.dataset }}"
-{{ prefix }}_nexenta_thin_provisioning="{{ instance.sparsed }}"
-{{ prefix }}_nexenta_user="{{ config.backend.rest.user }}"
-{{ prefix }}_nexenta_password="{{ config.backend.rest.password }}"
-{{ prefix }}_nexenta_rest_port="{{ config.backend.rest.port }}"
-{{ prefix }}_nexenta_rest_protocol="{{ config.backend.rest.protocol }}"
+{% for parameter in instance %}
+{{ prefix }}_{{ parameter.name }}="{{ parameter.value }}"
+{% endfor %}
 {% endfor %}
 {% else %}
 {% if config.ci.branch in ['master', 'queens'] %}
