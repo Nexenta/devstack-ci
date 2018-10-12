@@ -2,15 +2,28 @@
 
 function ci_install {
 	if is_service_enabled cinder; then
-		git_clone $NEXENTA_REPOSITORY $NEXENTA_DESTINATION $NEXENTA_BRANCH
+		git_clone $NEXENTA_CINDER_REPOSITORY $NEXENTA_CINDER_DESTINATION $NEXENTA_BRANCH
 		pushd $CINDER_DIR/cinder/volume/drivers
 
 		if [[ -d "nexenta" ]]; then
 			rm -rf nexenta
 		fi
 
-		ln -s $NEXENTA_DESTINATION/cinder/volume/drivers/nexenta
+		ln -s $NEXENTA_CINDER_DESTINATION/cinder/volume/drivers/nexenta
 		popd
+	fi
+
+	if is_service_enabled manila; then
+		git_clone $NEXENTA_MANILA_REPOSITORY $NEXENTA_MANILA_DESTINATION $NEXENTA_BRANCH
+		pushd $MANILA_DIR/manila/share/drivers
+
+		if [[ -d "nexenta" ]]; then
+			rm -rf nexenta
+		fi
+
+		ln -s $NEXENTA_MANILA_DESTINATION/manila/share/drivers/nexenta
+		popd
+
 	fi
 }
 
