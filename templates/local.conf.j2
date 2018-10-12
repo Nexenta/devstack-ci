@@ -54,6 +54,8 @@ ENABLE_VOLUME_MULTIATTACH="True"
 {% endif %}
 
 NEXENTA_BACKEND_NAME="{{ config.ci.backend }}"
+NEXENTA_CINDER_REPOSITORY="{{ config.nexenta.cinder.repository }}"
+NEXENTA_CINDER_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}/{{ config.nexenta.cinder.destination }}"
 
 CI_BRANCH="{{ config.ci.branch }}"
 {% for project in config.matrix.project %}
@@ -114,8 +116,6 @@ MANILA_SHARE_BACKEND{{ loop.index }}_NAME="{{ instance_name }}"
 {{ prefix }}_nexenta_rest_protocol="{{ config.backend.rest.protocol }}"
 {% endfor %}
 {% else %}
-NEXENTA_CINDER_REPOSITORY="{{ config.nexenta.cinder.repository }}"
-NEXENTA_CINDER_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.destination }}/{{ config.nexenta.cinder.destination }}"
 {% if config.ci.branch in ['master', 'queens'] %}
 enable_plugin cinder-tempest-plugin git://git.openstack.org/openstack/cinder-tempest-plugin $CINDER_TEMPEST_PLUGIN_BRANCH
 {% endif %}
