@@ -84,7 +84,7 @@ index 44dd451..a177004 100644
 -        else
 -            LIBVIRT_GROUP=libvirtd
 -        fi
-+        LIBVIRT_GROUP=$(awk -F '"' '/^unix_sock_group/{print $(NF-1)}' /etc/libvirt/libvirtd.conf)
++        LIBVIRT_GROUP=libvirt
          ;;
      lxd)
          LXD_GROUP=${LXD_GROUP:-"lxd"}
