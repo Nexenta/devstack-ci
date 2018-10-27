@@ -167,6 +167,17 @@
           pause:
             seconds: "{{ config.ci.delay | random }}"
 
+        - name: Create Current Build Folder
+          vcenter_folder:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            datacenter: "{{ config.vsphere.datacenter }}"
+            folder_name: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
+            folder_type: "vm"
+            state: "present"
+
         - name: Destroy Virtual Machine
           vmware_guest:
             validate_certs: False
