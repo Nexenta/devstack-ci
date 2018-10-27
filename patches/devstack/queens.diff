@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index df295a33..5693134d 100644
+index df295a3..5693134 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -494,11 +494,11 @@ function git_clone {
@@ -62,3 +62,29 @@ index df295a33..5693134d 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/stackrc b/stackrc
+index 44dd451..a177004 100644
+--- a/stackrc
++++ b/stackrc
+@@ -625,20 +625,7 @@ VIRT_DRIVER=${VIRT_DRIVER:-$DEFAULT_VIRT_DRIVER}
+ case "$VIRT_DRIVER" in
+     ironic|libvirt)
+         LIBVIRT_TYPE=${LIBVIRT_TYPE:-kvm}
+-        # If ENABLE_VOLUME_MULTIATTACH is True, the Ubuntu Cloud Archive can't
+-        # be used until it provides libvirt>=3.10, and with older versions of
+-        # Ubuntu the group is "libvirtd".
+-        # TODO(mriedem): Remove the ENABLE_VOLUME_MULTIATTACH check when
+-        # UCA has libvirt>=3.10.
+-        if [[ "$os_VENDOR" =~ (Debian|Ubuntu) && "${ENABLE_VOLUME_MULTIATTACH}" == "False" ]]; then
+-            # The groups change with newer libvirt. Older Ubuntu used
+-            # 'libvirtd', but now uses libvirt like Debian. Do a quick check
+-            # to see if libvirtd group already exists to handle grenade's case.
+-            LIBVIRT_GROUP=$(cut -d ':' -f 1 /etc/group | grep 'libvirtd$' || true)
+-            LIBVIRT_GROUP=${LIBVIRT_GROUP:-libvirt}
+-        else
+-            LIBVIRT_GROUP=libvirtd
+-        fi
++        LIBVIRT_GROUP=$(awk -F '"' '/^unix_sock_group/{print $(NF-1)}' /etc/libvirt/libvirtd.conf)
+         ;;
+     lxd)
+         LXD_GROUP=${LXD_GROUP:-"lxd"}
