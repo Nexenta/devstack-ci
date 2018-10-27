@@ -174,8 +174,8 @@
             username: "{{ config.vsphere.user }}"
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
-            folder_name: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
-            folder_type: "vm"
+            parent_folder: "{{ config.vsphere.folder }}"
+            folder_name: "Build_{{ config.ci.build }}"
             state: "present"
 
         - name: Destroy Virtual Machine
