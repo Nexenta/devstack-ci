@@ -175,7 +175,7 @@
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
             cluster: "{{ config.vsphere.cluster }}"
-            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
             name: "{{ config.vm.name }}"
             state: "absent"
             force: yes
@@ -188,7 +188,7 @@
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
             cluster: "{{ config.vsphere.cluster }}"
-            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
             uuid: "{{ config.vm.uuid }}"
             name: "{{ config.vm.name }}"
             guest_id: "{{ config.vm.guest }}"
@@ -597,7 +597,7 @@
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
             cluster: "{{ config.vsphere.cluster }}"
-            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
             name: "{{ config.vm.name }}"
             state: absent
             force: yes
