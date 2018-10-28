@@ -9,7 +9,7 @@ index e33f2079d..277e9835e 100644
 -flake8-import-order==0.11 # LGPLv3
 +flake8-import-order==0.12 # LGPLv3
 diff --git a/tox.ini b/tox.ini
-index 5644641fd..59a328bef 100644
+index befa991b0..a0f1748f5 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -9,8 +9,8 @@ setenv =
@@ -23,7 +23,7 @@ index 5644641fd..59a328bef 100644
  [testenv]
  setenv =
 @@ -22,16 +22,33 @@ setenv =
-     PYTHONWARNINGS=default::DeprecationWarning
+     PYTHONWARNINGS=default::DeprecationWarning,ignore::DeprecationWarning:distutils,ignore::DeprecationWarning:site
  passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST
  usedevelop = True
 -install_command = pip install {opts} {packages}
@@ -58,7 +58,7 @@ index 5644641fd..59a328bef 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
-@@ -127,7 +144,7 @@ commands =
+@@ -147,7 +164,7 @@ commands =
  
  [testenv:venv]
  deps =
@@ -67,7 +67,7 @@ index 5644641fd..59a328bef 100644
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
  commands = {posargs}
-@@ -141,7 +158,7 @@ commands = {posargs}
+@@ -161,7 +178,7 @@ commands = {posargs}
  
  [testenv:docs]
  deps =
@@ -76,7 +76,7 @@ index 5644641fd..59a328bef 100644
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
  commands =
-@@ -174,7 +191,7 @@ import-order-style = pep8
+@@ -194,7 +211,7 @@ import-order-style = pep8
  
  [testenv:releasenotes]
  deps =
@@ -85,7 +85,7 @@ index 5644641fd..59a328bef 100644
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
  commands =
-@@ -190,6 +207,7 @@ whitelist_externals = rm
+@@ -210,6 +227,7 @@ whitelist_externals = rm
  # of the requirements.txt files
  deps = pip_check_reqs
         -r{toxinidir}/requirements.txt
