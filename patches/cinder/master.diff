@@ -36,6 +36,18 @@ index b2e51e9..0986a33 100644
          try:
              msg = 'Reverting volume %(v_id)s to snapshot %(s_id)s.'
              LOG.info(msg, {'v_id': volume.id,
+diff --git a/etc/cinder/rootwrap.d/volume.filters b/etc/cinder/rootwrap.d/volume.filters
+index a6f284c..0630c5c 100644
+--- a/etc/cinder/rootwrap.d/volume.filters
++++ b/etc/cinder/rootwrap.d/volume.filters
+@@ -104,6 +104,7 @@ qemu-img_convert: CommandFilter, qemu-img, root
+ 
+ # cinder/volume/nfs.py
+ stat: CommandFilter, stat, root
++mount: CommandFilter, mount, root
+ df: CommandFilter, df, root
+ du: CommandFilter, du, root
+ truncate: CommandFilter, truncate, root
 diff --git a/test-requirements.txt b/test-requirements.txt
 index 28ee878..2add5aa 100644
 --- a/test-requirements.txt
