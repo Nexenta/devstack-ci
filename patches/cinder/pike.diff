@@ -19,6 +19,52 @@ index eeb9df1..cfe06d4 100644
  
  LOG = logging.getLogger(__name__)
  
+diff --git a/cinder/tests/tempest/api/volume/test_consistencygroups.py b/cinder/tests/tempest/api/volume/test_consistencygroups.py
+index c524e9a..b7bcc54 100644
+--- a/cinder/tests/tempest/api/volume/test_consistencygroups.py
++++ b/cinder/tests/tempest/api/volume/test_consistencygroups.py
+@@ -14,25 +14,25 @@
+ #    License for the specific language governing permissions and limitations
+ #    under the License.
+ 
++from tempest.api.volume import base
+ from tempest.common import waiters
+ from tempest import config
+ from tempest.lib.common.utils import data_utils
+ from tempest.lib import decorators
+ 
+-from cinder.tests.tempest.api.volume import base
+ from cinder.tests.tempest import cinder_clients
+ 
+ CONF = config.CONF
+ 
+ 
+-class ConsistencyGroupsV2Test(base.BaseVolumeTest):
++class ConsistencyGroupsV2Test(base.BaseVolumeAdminTest):
+     @classmethod
+     def setup_clients(cls):
+         cls._api_version = 2
+         super(ConsistencyGroupsV2Test, cls).setup_clients()
+         cls.admin_volume_client = cls.os_admin.volumes_v2_client
+ 
+-        manager = cinder_clients.Manager(cls.os_adm)
++        manager = cinder_clients.Manager(cls.os_admin)
+         cls.consistencygroups_adm_client = manager.consistencygroups_adm_client
+ 
+     @classmethod
+diff --git a/cinder/tests/tempest/services/volume_revert_client.py b/cinder/tests/tempest/services/volume_revert_client.py
+index 285494a..0d54701 100644
+--- a/cinder/tests/tempest/services/volume_revert_client.py
++++ b/cinder/tests/tempest/services/volume_revert_client.py
+@@ -15,7 +15,7 @@
+ 
+ from oslo_serialization import jsonutils as json
+ from tempest.lib.common import rest_client
+-from tempest.lib.services.volume.v3 import base_client
++from tempest.lib.services.volume import base_client
+ 
+ 
+ class VolumeRevertClient(base_client.BaseClient):
 diff --git a/test-requirements.txt b/test-requirements.txt
 index 8f25d59..764a865 100644
 --- a/test-requirements.txt
