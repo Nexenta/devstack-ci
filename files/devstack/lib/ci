@@ -89,6 +89,7 @@ function ci_extra {
 function ci_test_config {
 	if is_service_enabled tempest; then
 		if is_service_enabled cinder; then
+			iniset $TEMPEST_CONFIG volume catalog_type volumev2
 			iniset $TEMPEST_CONFIG volume-feature-enabled consistency_group True
 			case "$CI_BRANCH" in
 			pike|queens|master)
