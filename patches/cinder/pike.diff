@@ -65,6 +65,37 @@ index 285494a..0d54701 100644
  
  
  class VolumeRevertClient(base_client.BaseClient):
+diff --git a/etc/cinder/policy.json b/etc/cinder/policy.json
+index c51f564..5f6553b 100644
+--- a/etc/cinder/policy.json
++++ b/etc/cinder/policy.json
+@@ -114,16 +114,16 @@
+     "snapshot_extension:snapshot_unmanage": "rule:admin_api",
+     "snapshot_extension:list_manageable": "rule:admin_api",
+ 
+-    "consistencygroup:create" : "group:nobody",
+-    "consistencygroup:delete": "group:nobody",
+-    "consistencygroup:update": "group:nobody",
+-    "consistencygroup:get": "group:nobody",
+-    "consistencygroup:get_all": "group:nobody",
+-
+-    "consistencygroup:create_cgsnapshot" : "group:nobody",
+-    "consistencygroup:delete_cgsnapshot": "group:nobody",
+-    "consistencygroup:get_cgsnapshot": "group:nobody",
+-    "consistencygroup:get_all_cgsnapshots": "group:nobody",
++    "consistencygroup:create" : "",
++    "consistencygroup:delete": "",
++    "consistencygroup:update": "",
++    "consistencygroup:get": "",
++    "consistencygroup:get_all": "",
++
++    "consistencygroup:create_cgsnapshot" : "",
++    "consistencygroup:delete_cgsnapshot": "",
++    "consistencygroup:get_cgsnapshot": "",
++    "consistencygroup:get_all_cgsnapshots": "",
+ 
+     "group:group_types_manage": "rule:admin_api",
+     "group:group_types_specs": "rule:admin_api",
 diff --git a/test-requirements.txt b/test-requirements.txt
 index 8f25d59..764a865 100644
 --- a/test-requirements.txt
