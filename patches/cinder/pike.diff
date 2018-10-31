@@ -52,19 +52,6 @@ index c524e9a..b7bcc54 100644
          cls.consistencygroups_adm_client = manager.consistencygroups_adm_client
  
      @classmethod
-diff --git a/cinder/tests/tempest/services/volume_revert_client.py b/cinder/tests/tempest/services/volume_revert_client.py
-index 285494a..0d54701 100644
---- a/cinder/tests/tempest/services/volume_revert_client.py
-+++ b/cinder/tests/tempest/services/volume_revert_client.py
-@@ -15,7 +15,7 @@
- 
- from oslo_serialization import jsonutils as json
- from tempest.lib.common import rest_client
--from tempest.lib.services.volume.v3 import base_client
-+from tempest.lib.services.volume import base_client
- 
- 
- class VolumeRevertClient(base_client.BaseClient):
 diff --git a/etc/cinder/policy.json b/etc/cinder/policy.json
 index c51f564..5f6553b 100644
 --- a/etc/cinder/policy.json
