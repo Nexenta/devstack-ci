@@ -52,6 +52,28 @@ index c524e9a..b7bcc54 100644
          cls.consistencygroups_adm_client = manager.consistencygroups_adm_client
  
      @classmethod
+diff --git a/cinder/volume/manager.py b/cinder/volume/manager.py
+index 6b0cc79..8b83f2d 100644
+--- a/cinder/volume/manager.py
++++ b/cinder/volume/manager.py
+@@ -37,6 +37,7 @@ intact.
+ 
+ 
+ import requests
++import sys
+ import time
+ 
+ from oslo_config import cfg
+@@ -84,6 +85,9 @@ from cinder.volume import rpcapi as volume_rpcapi
+ from cinder.volume import utils as vol_utils
+ from cinder.volume import volume_types
+ 
++reload(sys)
++sys.setdefaultencoding('utf-8')
++
+ LOG = logging.getLogger(__name__)
+ 
+ QUOTAS = quota.QUOTAS
 diff --git a/etc/cinder/policy.json b/etc/cinder/policy.json
 index c51f564..5f6553b 100644
 --- a/etc/cinder/policy.json
