@@ -1,11 +1,12 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
 new file mode 100644
-index 0000000..a6a58f0
+index 0000000..651fcaa
 --- /dev/null
 +++ b/upper-constraints.txt
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,20 @@
 +cliff===1.10.1
 +cmd2===0.6.8
++django-compressor===1.6
 +eventlet===0.15.2
 +httplib2===0.9
 +ipaddress===1.0.22
