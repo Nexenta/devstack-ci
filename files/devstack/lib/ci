@@ -112,7 +112,7 @@ function ci_test_config {
 			iniset $TEMPEST_CONFIG share enable_protocols nfs
 			iniset $TEMPEST_CONFIG share enable_ip_rules_for_protocols nfs
 			iniset $TEMPEST_CONFIG share enable_ro_access_level_for_protocols nfs
-			iniset $TEMPEST_CONFIG share run_mount_snapshot_tests True
+			iniset $TEMPEST_CONFIG share run_mount_snapshot_tests False
 			iniset $TEMPEST_CONFIG share run_quota_tests True
 			iniset $TEMPEST_CONFIG share run_extend_tests True
 			iniset $TEMPEST_CONFIG share run_revert_to_snapshot_tests True
