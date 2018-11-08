@@ -92,7 +92,7 @@ function ci_test_config {
 			iniset $TEMPEST_CONFIG volume catalog_type volumev3
 			iniset $TEMPEST_CONFIG volume-feature-enabled consistency_group True
 			case "$CI_BRANCH" in
-			pike|queens|master)
+			pike|queens|rocky|master)
 				iniset $TEMPEST_CONFIG volume-feature-enabled volume_revert True
 				;;
 			*)
