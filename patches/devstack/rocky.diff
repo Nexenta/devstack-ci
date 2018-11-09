@@ -69,6 +69,21 @@ index fae936a..39a734d 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index 2efa003..adb1adb 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -576,9 +576,7 @@ function configure_tempest {
+         tox -revenv-tempest --notest
+     fi
+ 
+-    # The requirements might be on a different branch, while tempest needs master requirements.
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
+-    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
++    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
+ 
+     # Auth:
+     iniset $TEMPEST_CONFIG auth tempest_roles "Member"
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
 index 9147932..df6c188 100755
 --- a/tools/fixup_stuff.sh
