@@ -1,0 +1,12 @@
+diff --git a/nova/virt/libvirt/volume/mount.py b/nova/virt/libvirt/volume/mount.py
+index a02fe46..2002e6d 100644
+--- a/nova/virt/libvirt/volume/mount.py
++++ b/nova/virt/libvirt/volume/mount.py
+@@ -192,6 +192,7 @@ class _HostMountState(object):
+             self.attachments.remove((vol_name, instance_uuid))
+ 
+         def in_use(self):
++            return False
+             return len(self.attachments) > 0
+ 
+     def __init__(self, host, generation):
