@@ -57,6 +57,7 @@ NEXENTA_BACKEND_NAME="{{ config.ci.backend }}"
 NEXENTA_CINDER_REPOSITORY="{{ config.nexenta.cinder.repository }}"
 NEXENTA_CINDER_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
 
+CI_BACKEND="{{ config.ci.backend }}"
 CI_BRANCH="{{ config.ci.branch }}"
 {% for project in config.matrix.project %}
 {% set value = namespace(found=none) %}
