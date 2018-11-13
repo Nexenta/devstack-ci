@@ -87,9 +87,6 @@ NEXENTA_MANILA_REPOSITORY="{{ config.nexenta.manila.repository }}"
 NEXENTA_MANILA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.manila.destination }}"
 enable_plugin manila git://git.openstack.org/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui git://git.openstack.org/openstack/manila-ui $MANILA_UI_BRANCH
-{% if config.ci.branch in ['ocata', 'pike'] %}
-enable_plugin manila-tempest-plugin git://git.openstack.org/openstack/manila-tempest-plugin $MANILA_TEMPEST_PLUGIN_BRANCH
-{% endif %}
 
 MANILA_UI_ENABLED="True"
 ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
