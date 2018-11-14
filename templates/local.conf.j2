@@ -39,7 +39,7 @@ TEMPEST_RUN_VALIDATION="True"
 DEFAULT_INSTANCE_USER="cirros"
 DEFAULT_INSTANCE_PASSWORD="cubswin:)"
 CINDER_IMG_CACHE_ENABLED="False"
-CINDER_COORDINATION_URL="pgsql://${DATABASE_USER}:${DATABASE_PASSWORD}@${SERVICE_LOCAL_HOST}/cinder?charset=utf8"
+CINDER_COORDINATION_URL="postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@${SERVICE_LOCAL_HOST}/cinder?charset=utf8"
 LOG_COLOR="False"
 SYSLOG="False"
 {% if (config.ci.branch == 'pike' and config.devstack.startup == 'systemd') or config.ci.branch in ['queens', 'rocky', 'master'] %}
