@@ -89,7 +89,14 @@ function ci_extra {
 function ci_test_config {
 	if is_service_enabled tempest; then
 		if is_service_enabled cinder; then
-			iniset $TEMPEST_CONFIG volume catalog_type volumev3
+			case "$CI_BRANCH" in
+			ocata)
+				iniset $TEMPEST_CONFIG volume catalog_type volumev3
+				;;
+			*)
+				;;
+			esac
+
 			case "$CI_BACKEND" in
 			ns5_iscsi|ns5_nfs)
 				iniset $TEMPEST_CONFIG volume-feature-enabled consistency_group True
@@ -97,6 +104,7 @@ function ci_test_config {
 			*)
 				;;
 			esac
+
 			case "$CI_BRANCH" in
 			pike|queens|rocky|master)
 				iniset $TEMPEST_CONFIG volume-feature-enabled volume_revert True
