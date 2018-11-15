@@ -137,6 +137,14 @@ function ci_test_config {
 			iniset $TEMPEST_CONFIG share run_migration_tests False
 			iniset $TEMPEST_CONFIG share run_manage_unmanage_tests False
 			iniset $TEMPEST_CONFIG share run_manage_unmanage_snapshot_tests False
+
+			case "$CI_BRANCH" in
+			queens)
+				iniset $TEMPEST_CONFIG share max_api_microversion 2.42
+				;;
+			*)
+				;;
+			esac
 	
 			case "$NEXENTA_BACKEND_NAME" in
 			ns4_manila)
