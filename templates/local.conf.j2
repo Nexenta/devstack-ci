@@ -93,7 +93,7 @@ enable_plugin manila-ui git://git.openstack.org/openstack/manila-ui $MANILA_UI_B
 MANILA_UI_ENABLED="True"
 ENABLED_SHARE_PROTOCOLS="{{ config.backend.protocol }}"
 MANILA_SERVICE_VM_FLAVOR_RAM="512"
-MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="snapshot_support=True create_share_from_snapshot_support=True revert_to_snapshot_support=True mount_snapshot_support=True"
+MANILA_DEFAULT_SHARE_TYPE_EXTRA_SPECS="snapshot_support=True create_share_from_snapshot_support=True revert_to_snapshot_support=True mount_snapshot_support=False"
 MANILA_ENABLED_BACKENDS="{{ value.list|join(',') }}"
 {% for instance in config.backend.instances %}
 {% set instance_name = config.ci.backend ~ loop.index %}
