@@ -1,0 +1,13 @@
+diff --git a/manila_tempest_tests/tests/api/base.py b/manila_tempest_tests/tests/api/base.py
+index b68d7b5..c80239c 100644
+--- a/manila_tempest_tests/tests/api/base.py
++++ b/manila_tempest_tests/tests/api/base.py
+@@ -23,7 +23,7 @@ from oslo_log import log
+ import six
+ from tempest import clients
+ from tempest.common import credentials_factory as common_creds
+-from tempest.common import dynamic_creds
++from tempest.lib.common import dynamic_creds
+ from tempest import config
+ from tempest.lib.common.utils import data_utils
+ from tempest.lib import exceptions
