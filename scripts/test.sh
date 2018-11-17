@@ -42,7 +42,18 @@ if grep -q 'Uninstalling' $_base/$_logs/stack.log; then
 	grep 'Uninstalling' $_base/$_logs/stack.log
 fi
 
-cd $_base/cinder
+case "$_backend" in 
+ns4_manila|ns5_manila)
+	cd $_base/manila
+	;;
+ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs)
+	cd $_base/cinder
+	;;
+*)
+	echo "Unknown CI backend: $_backend"
+	exit 1
+	;;
+esac
 
 if grep -q genopts tox.ini; then
 	tox -e genopts

@@ -1,0 +1,13 @@
+diff --git a/manila_tempest_tests/utils.py b/manila_tempest_tests/utils.py
+index a494b5d..e240769 100644
+--- a/manila_tempest_tests/utils.py
++++ b/manila_tempest_tests/utils.py
+@@ -101,7 +101,7 @@ def rand_ip(network=False):
+     test_net_3 = '203.0.113.'
+     address = test_net_3 + six.text_type(random.randint(0, 255))
+     if network:
+-        mask_length = six.text_type(random.randint(24, 32))
++        mask_length = six.text_type(random.randint(24, 30))
+         address = '/'.join((address, mask_length))
+         ip_network = ip.IPNetwork(address)
+         return '/'.join((six.text_type(ip_network.network), mask_length))
