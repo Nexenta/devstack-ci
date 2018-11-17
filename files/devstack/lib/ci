@@ -90,7 +90,7 @@ function ci_test_config {
 	if is_service_enabled tempest; then
 		if is_service_enabled cinder; then
 			case "$CI_BRANCH" in
-			ocata)
+			ocata|pike)
 				iniset $TEMPEST_CONFIG volume catalog_type volumev3
 				;;
 			*)
