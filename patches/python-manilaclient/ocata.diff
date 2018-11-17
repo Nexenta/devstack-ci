@@ -1,0 +1,12 @@
+diff --git a/test-requirements.txt b/test-requirements.txt
+index 2fa4cbd..43f2cf7 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -12,7 +12,6 @@ mock>=2.0 # BSD
+ oslosphinx>=4.7.0 # Apache-2.0
+ oslotest>=1.10.0 # Apache-2.0
+ sphinx!=1.3b1,<1.4,>=1.2.1 # BSD
+-tempest>=12.1.0 # Apache-2.0
+ testrepository>=0.0.18 # Apache-2.0/BSD
+ testtools>=1.4.0 # MIT
+ python-openstackclient>=3.3.0 # Apache-2.0
