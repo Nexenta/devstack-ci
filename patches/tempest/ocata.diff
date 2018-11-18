@@ -1,18 +1,17 @@
-diff --git a/test-requirements.txt b/test-requirements.txt
-index 37644d0..5093748 100644
---- a/test-requirements.txt
-+++ b/test-requirements.txt
-@@ -1,7 +1,7 @@
- # The order of packages is significant, because pip processes them in the order
- # of appearance. Changing the order has an impact on the overall integration
- # process, which may cause wedges in the gate later.
--hacking!=0.13.0,<0.14,>=0.12.0 # Apache-2.0
-+hacking<0.11,>=0.10.0
- # needed for doc build
- sphinx>=1.6.2 # BSD
- openstackdocstheme>=1.17.0 # Apache-2.0
+diff --git a/requirements.txt b/requirements.txt
+index 259a4cf..61589a0 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -20,6 +20,6 @@ python-subunit>=0.0.18 # Apache-2.0/BSD
+ stevedore>=1.20.0 # Apache-2.0
+ PrettyTable<0.8,>=0.7.1 # BSD
+ os-testr>=0.8.0 # Apache-2.0
+-urllib3>=1.21.1 # MIT
++urllib3>=1.20 # MIT
+ debtcollector>=1.2.0 # Apache-2.0
+ unittest2 # BSD
 diff --git a/tox.ini b/tox.ini
-index 21696eb..10c4583 100644
+index 892f834..3061f56 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -12,6 +12,7 @@ setenv =
@@ -24,7 +23,7 @@ index 21696eb..10c4583 100644
  [testenv]
  setenv =
 @@ -23,15 +24,33 @@ setenv =
- passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH OS_TEST_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION
  usedevelop = True
  install_command =
 -    {toxinidir}/tools/tox_install.sh {env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt} {opts} {packages}
@@ -36,7 +35,7 @@ index 21696eb..10c4583 100644
 +    -c{toxinidir}/../requirements/upper-constraints.txt
  commands =
      find . -type f -name "*.pyc" -delete
-     stestr --test-path ./tempest/tests run {posargs}
+     ostestr {posargs}
  
 +[testenv:ci]
 +setenv = {[tempestenv]setenv}
@@ -58,7 +57,7 @@ index 21696eb..10c4583 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
-@@ -176,6 +195,7 @@ commands =
+@@ -173,6 +192,7 @@ commands = sphinx-build -a -E -W -d releasenotes/build/doctrees -b html releasen
  # of the requirements.txt files
  deps = pip_check_reqs
         -r{toxinidir}/requirements.txt

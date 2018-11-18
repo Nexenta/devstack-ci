@@ -1,3 +1,29 @@
+diff --git a/devstack/plugin.sh b/devstack/plugin.sh
+index c89f84c..3631bcc 100755
+--- a/devstack/plugin.sh
++++ b/devstack/plugin.sh
+@@ -181,8 +181,7 @@ function configure_manila {
+     iniset $MANILA_CONF DEFAULT osapi_share_extension manila.api.contrib.standard_extensions
+     iniset $MANILA_CONF DEFAULT state_path $MANILA_STATE_PATH
+     iniset $MANILA_CONF DEFAULT default_share_type $MANILA_DEFAULT_SHARE_TYPE
+-    # TODO(vponomaryov): revert following back in Pike
+-    # iniset $MANILA_CONF DEFAULT default_share_group_type $MANILA_DEFAULT_SHARE_GROUP_TYPE
++    iniset $MANILA_CONF DEFAULT default_share_group_type $MANILA_DEFAULT_SHARE_GROUP_TYPE
+ 
+     if ! [[ -z $MANILA_SHARE_MIGRATION_PERIOD_TASK_INTERVAL ]]; then
+         iniset $MANILA_CONF DEFAULT migration_driver_continue_update_interval $MANILA_SHARE_MIGRATION_PERIOD_TASK_INTERVAL
+@@ -926,9 +925,8 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
+     echo_summary "Creating Manila default share type"
+     create_default_share_type
+ 
+-    # TODO(vponomaryov): revert following back in Pike
+-    # echo_summary "Creating Manila default share group type"
+-    # create_default_share_group_type
++    echo_summary "Creating Manila default share group type"
++    create_default_share_group_type
+ 
+     echo_summary "Creating Manila custom share types"
+     create_custom_share_types
 diff --git a/etc/manila/policy.json b/etc/manila/policy.json
 index 0b98432..dc91ebf 100644
 --- a/etc/manila/policy.json
@@ -91,17 +117,3 @@ index 0b98432..dc91ebf 100644
 +    "message:get": "rule:default",
 +    "message:get_all": "rule:default"
  }
-diff --git a/manila_tempest_tests/tests/api/base.py b/manila_tempest_tests/tests/api/base.py
-index b68d7b5..bccd7ed 100644
---- a/manila_tempest_tests/tests/api/base.py
-+++ b/manila_tempest_tests/tests/api/base.py
-@@ -23,8 +23,8 @@ from oslo_log import log
- import six
- from tempest import clients
- from tempest.common import credentials_factory as common_creds
--from tempest.common import dynamic_creds
- from tempest import config
-+from tempest.lib.common import dynamic_creds
- from tempest.lib.common.utils import data_utils
- from tempest.lib import exceptions
- from tempest import test
