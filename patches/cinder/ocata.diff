@@ -60,10 +60,18 @@ index 717c3b3..9e8ea4e 100644
          self.create_backup(volume_id=volume['id'])
          # Create a server
 diff --git a/cinder/tests/tempest/api/volume/test_volume_unicode.py b/cinder/tests/tempest/api/volume/test_volume_unicode.py
-index db280d3..6356783 100644
+index db280d3..1ab7c10 100644
 --- a/cinder/tests/tempest/api/volume/test_volume_unicode.py
 +++ b/cinder/tests/tempest/api/volume/test_volume_unicode.py
-@@ -44,11 +44,6 @@ class CinderUnicodeTest(base.BaseVolumeTest):
+@@ -17,7 +17,6 @@
+ from tempest.common import waiters
+ from tempest import config
+ from tempest.lib.common.utils import data_utils
+-from tempest.lib.common.utils import test_utils
+ 
+ from cinder.tests.tempest.api.volume import base
+ 
+@@ -44,11 +43,6 @@ class CinderUnicodeTest(base.BaseVolumeTest):
          kwargs['size'] = CONF.volume.volume_size
  
          volume = cls.volumes_client.create_volume(**kwargs)['volume']
@@ -75,7 +83,7 @@ index db280d3..6356783 100644
          waiters.wait_for_volume_resource_status(cls.volumes_client,
                                                  volume['id'],
                                                  'available')
-@@ -62,3 +57,4 @@ class CinderUnicodeTest(base.BaseVolumeTest):
+@@ -62,3 +56,4 @@ class CinderUnicodeTest(base.BaseVolumeTest):
          fetched_volume = result['volume']
          self.assertEqual(fetched_volume['name'],
                           self.volume_name)
