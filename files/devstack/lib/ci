@@ -146,12 +146,14 @@ function ci_test_config {
 				;;
 			esac
 	
-			case "$NEXENTA_BACKEND_NAME" in
+			case "$CI_BACKEND" in
 			ns4_manila)
 				iniset $TEMPEST_CONFIG share run_shrink_tests False
 				;;
 			ns5_manila)
 				iniset $TEMPEST_CONFIG share run_shrink_tests True
+				;;
+			*)
 				;;
 			esac
 		fi
@@ -171,13 +173,4 @@ function ci_clean {
 
 function ci_unstack {
 	ci_clean
-}
-
-function ci_cip {
-	local space=$1
-	local name=$2
-	local format='custom-columns=NAME:.metadata.name,IP:.status.podIP'
-
-	kubectl get pods --no-headers --namespace="$space" --output="$format" | \
-		awk '/^'$name'/{print $2}'
 }
