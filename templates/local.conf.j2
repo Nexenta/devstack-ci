@@ -49,7 +49,7 @@ USE_SCREEN="True"
 USE_SYSTEMD="False"
 USE_JOURNAL="False"
 {% endif %}
-{% if config.ci.branch in ['queens', 'rocky', 'master'] %}
+{% if 'ns5' in config.ci.backend and config.ci.branch in ['queens', 'rocky', 'master'] %}
 ENABLE_VOLUME_MULTIATTACH="True"
 {% endif %}
 
