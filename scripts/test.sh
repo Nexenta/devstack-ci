@@ -46,7 +46,7 @@ case "$_backend" in
 ns4_manila|ns5_manila)
 	cd $_base/manila
 	;;
-ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs|ned-iscsi)
+ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs|ned_iscsi)
 	cd $_base/cinder
 	;;
 *)
