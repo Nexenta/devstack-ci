@@ -44,13 +44,13 @@
 
         - name: Set Common SSH Options
           set_fact:
-            ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
+            ssh: "{{ ssh | default('-q') }} -o {{ item.key }}={{ item.value }}"
           with_items: "{{ config.ssh }}"
 
-        - name: Set VM Extra Options
-          set_fact:
-            extra: "{{ extra | default([]) + [{ item.name: item.value}] }}"
-          with_items: "{{ config.vm.extra_config }}"
+#        - name: Set VM Extra Options
+#          set_fact:
+#            extra: "{{ extra | default([]) + [{ item.name: item.value}] }}"
+#          with_items: "{{ config.vm.extra_config }}"
 
         - name: Set Global Parameters
           set_fact:
@@ -211,7 +211,7 @@
             disk: "{{ config.vm.disks }}"
             networks: "{{ config.vm.install_networks }}"
             hardware: "{{ config.vm.hardware }}"
-            vm_extra_config: "{{ extra }}"
+            customvalues: "{{ config.vm.customvalues }}"
             wait_for_ip_address: True
             state: "poweredon"
 
