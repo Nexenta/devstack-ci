@@ -206,7 +206,7 @@
             disk: "{{ config.vm.disks }}"
             networks: "{{ config.vm.install_networks }}"
             hardware: "{{ config.vm.hardware }}"
-			vm_extra_config: "{{ config.vm.extra_config }}"
+            vm_extra_config: "{{ config.vm.extra_config }}"
             wait_for_ip_address: True
             state: "poweredon"
 
