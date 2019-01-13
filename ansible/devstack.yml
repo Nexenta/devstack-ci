@@ -47,6 +47,11 @@
             ssh: "{{ ssh | default('-q') }} -o {{ item.option }}={{ item.value }}"
           with_items: "{{ config.ssh }}"
 
+        - name: Set VM Extra Options
+          set_fact:
+            extra: {{ extra + [{ item.name: item.value}] }}
+          with_items: "{{ config.vm.extra_config }}"
+
         - name: Set Global Parameters
           set_fact:
             matrix:
@@ -206,7 +211,7 @@
             disk: "{{ config.vm.disks }}"
             networks: "{{ config.vm.install_networks }}"
             hardware: "{{ config.vm.hardware }}"
-            vm_extra_config: "{{ config.vm.extra_config }}"
+            vm_extra_config: "{{ extra }}"
             wait_for_ip_address: True
             state: "poweredon"
 
