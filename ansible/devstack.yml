@@ -49,7 +49,7 @@
 
         - name: Set VM Extra Options
           set_fact:
-            extra: "{{ extra + [{ item.name: item.value}] }}"
+            extra: "{{ extra | default([]) + [{ item.name: item.value}] }}"
           with_items: "{{ config.vm.extra_config }}"
 
         - name: Set Global Parameters
