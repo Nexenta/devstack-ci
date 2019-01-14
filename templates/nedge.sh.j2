@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -o nounset
+set -o xtrace
+set -o errexit
+set -o pipefail
+set -o noglob
+
+_base="{{ config.ci.base }}"
+_logs="{{ config.ci.logs }}"
+_nodename="{{ config.nedge.hostname }}"
+_ip="{{ config.nedge.ip }}"
+_version="{{ config.nedge.version }}"
+_build="{{ config.nedge.build }}"
+_url="{{ config.nedge.url }}"
+_license="{{ config.nedge.license }}"
+_cluster="{{ config.nedge.cluster }}"
+_tenant="{{ config.nedge.tenant }}"
+_bucket="{{ config.nedge.bucket }}"
+_service="{{ config.nedge.service }}"
+
+mkdir -p $_base/$_logs
+exec > >(tee -a $_base/$_logs/deploy.log) 2>&1
+
+rm -rf .cache .wgetrc
+
+wget -O - "${_url}/nedeploy/${_build}/nedeploy-linux_${_version}-${_build}_x64.tar.gz" | tar zxf -
+wget -O - "${_url}/neadm/${_build}/neadm-linux_${_version}-${_build}_x64.tar.gz" | tar zxf -
+
+cat >>.bashrc<<-'EOF'
+
+export PATH=$PATH:$HOME/nedeploy:$HOME/neadm
+
+EOF
+
+ln .bashrc .bash_profile
+. .bashrc
+
+nedeploy precheck $_ip root:root -i ens224
+nedeploy deploy solo $_ip root:root -m -i ens224 -t capacity -f --baremetal
+
+while ! neadm system status; do
+	sleep 30
+done
+
+neadm system init -s
+neadm system license set online $_license
+
+neadm cluster create $_cluster
+neadm tenant create $_cluster/$_tenant
+neadm bucket create $_cluster/$_tenant/$_bucket
+neadm service create iscsi $_service
+neadm system status
+neadm service add $_service $_nodename
+neadm service serve $_service $_cluster/$_tenant
+neadm service enable $_service
+neadm service list

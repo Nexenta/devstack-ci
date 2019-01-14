@@ -1,5 +1,5 @@
 ---
-- name: OpenStack Continuous Integration
+- name: Install Nexenta Edge CI Environment
   hosts: local
   vars_files:
     - global.yml
@@ -134,7 +134,7 @@
             matrix:
               vm:
                 uuid: "{{ bios.uuid }}"
-                name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
+#                name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
 
         - name: Combine Dependent Parameters
           set_fact:
@@ -167,17 +167,6 @@
           pause:
             seconds: "{{ config.ci.delay | random }}"
 
-        - name: Create Current Build Folder
-          vcenter_folder:
-            validate_certs: False
-            hostname: "{{ config.vsphere.host }}"
-            username: "{{ config.vsphere.user }}"
-            password: "{{ config.vsphere.password }}"
-            datacenter: "{{ config.vsphere.datacenter }}"
-            parent_folder: "{{ config.vsphere.folder }}"
-            folder_name: "Build_{{ config.ci.build }}"
-            state: "present"
-
         - name: Destroy Virtual Machine
           vmware_guest:
             validate_certs: False
@@ -185,8 +174,9 @@
             username: "{{ config.vsphere.user }}"
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
-            cluster: "{{ config.vsphere.cluster }}"
-            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
+#            cluster: "{{ config.vsphere.cluster }}"
+            esxi_hostname: "{{ config.vsphere.esxi }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
             name: "{{ config.vm.name }}"
             state: "absent"
             force: yes
@@ -198,40 +188,89 @@
             username: "{{ config.vsphere.user }}"
             password: "{{ config.vsphere.password }}"
             datacenter: "{{ config.vsphere.datacenter }}"
-            cluster: "{{ config.vsphere.cluster }}"
-            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
+#            cluster: "{{ config.vsphere.cluster }}"
+            esxi_hostname: "{{ config.vsphere.esxi }}"
+            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}"
             uuid: "{{ config.vm.uuid }}"
             name: "{{ config.vm.name }}"
             guest_id: "{{ config.vm.guest }}"
             disk: "{{ config.vm.disks }}"
-            networks: "{{ config.vm.install_networks }}"
+            networks: "{{ config.vm.networks }}"
             hardware: "{{ config.vm.hardware }}"
             customvalues: "{{ config.vm.customvalues }}"
             wait_for_ip_address: True
             state: "poweredon"
 
-        - name: Shutdown Virtual Machine
-          vmware_guest:
+        - name: Identify Virtual Machine
+          vmware_guest_facts:
             validate_certs: False
             hostname: "{{ config.vsphere.host }}"
             username: "{{ config.vsphere.user }}"
             password: "{{ config.vsphere.password }}"
+            datacenter: "{{ config.vsphere.datacenter }}"
             uuid: "{{ config.vm.uuid }}"
             name: "{{ config.vm.name }}"
-            state_change_timeout: "{{ config.vm.timeout }}"
-            state: "shutdownguest"
+          register: vm0
 
-        - name: Change Virtual Machine Network
-          vmware_guest:
-            validate_certs: False
-            hostname: "{{ config.vsphere.host }}"
-            username: "{{ config.vsphere.user }}"
-            password: "{{ config.vsphere.password }}"
-            uuid: "{{ config.vm.uuid }}"
-            name: "{{ config.vm.name }}"
-            networks: "{{ config.vm.tempest_networks }}"
+        - name: Print Virtual Machine Parameters
+          debug:
+            var: vm0
 
-        - name: Poweron Virtual Machine
+        - name: Check Virtual Machine IP Address
+          fail:
+            msg: "Virtual Machine IP address is not defined"
+          when: (vm0.instance.ipv4 is not defined) or (vm0.instance.ipv4 == "")
+
+        - name: Wait for SSH Port to Become Open and Contain "OpenSSH"
+          wait_for:
+            port: 22
+            host: "{{ vm0.instance.ipv4 }}"
+            search_regex: "OpenSSH"
+
+        - name: Create Inventory for Virtual Machine IP address
+          add_host:
+            name: "{{ config.vm.name }}0"
+            groups: "{{ config.ci.project }}"
+            ansible_host: "{{ vm0.instance.ipv4 }}"
+            ansible_user: "{{ config.devstack.user }}"
+            ansible_connection: "ssh"
+            ansible_ssh_pass: " {{ config.devstack.password }}"
+            ansible_ssh_private_key_file: "{{ ansible_env.HOME }}/.ssh/id_rsa"
+            ansible_ssh_common_args: "{{ config.ci.ssh }}"
+
+        - name: Install Required Packages
+          apt:
+            name: "{{ config.nedge.packages }}"
+            state: "present"
+            update_cache: "yes"
+#          vars:
+#            packages: "{{ config.nedge.packages }}"
+
+        - name: Change Host OS Hostname
+          template:
+            src: "{{ config.ci.source }}/templates/etc-hostname.j2"
+            dest: "/etc/hostname"
+            mode: 0644
+          become: yes
+          delegate_to: "{{ config.vm.name }}0"
+
+        - name: Change Host OS Hosts
+          template:
+            src: "{{ config.ci.source }}/templates/etc-hosts.j2"
+            dest: "/etc/hosts"
+            mode: 0644
+          become: yes
+          delegate_to: "{{ config.vm.name }}0"
+
+        - name: Change Host OS Network Settings
+          template:
+            src: "{{ config.ci.source }}/templates/etc-network-interfaces.j2"
+            dest: "/etc/network/interfaces"
+            mode: 0644
+          become: yes
+          delegate_to: "{{ config.vm.name }}0"
+
+        - name: Reboot Virtual Machine
           vmware_guest:
             validate_certs: False
             hostname: "{{ config.vsphere.host }}"
@@ -241,7 +280,7 @@
             name: "{{ config.vm.name }}"
             wait_for_ip_address: True
             state_change_timeout: "{{ config.vm.timeout }}"
-            state: "poweredon"
+            state: "rebootguest"
 
         - name: Identify Virtual Machine
           vmware_guest_facts:
@@ -306,213 +345,21 @@
             depth: 1
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Checkout DevStack Repository
-          git:
-            repo: "{{ config.devstack.repository }}"
-            dest: "{{ config.ci.base }}/{{ config.devstack.destination }}"
-            version: "{{ config.devstack.branch }}"
-            depth: 1
-          delegate_to: "{{ config.vm.name }}"
-
-        - name: Copy DevStack Profile
+        - name: Copy Nedge Install Script
           template:
-            src: "{{ config.ci.source }}/templates/local.conf.j2"
-            dest: "{{ config.ci.base }}/{{ config.devstack.destination }}/local.conf"
-            mode: 0644
-          delegate_to: "{{ config.vm.name }}"
-
-        - name: Copy CI Profile
-          template:
-            src: "{{ config.ci.source }}/templates/env.sh.j2"
-            dest: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/env.sh"
+            src: "{{ config.ci.source }}/templates/nedge.sh.j2"
+            dest: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/nedge.sh"
             mode: 0755
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Patch DevStack Source Code
-          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/patch.sh"
-          args:
-            chdir: "{{ config.ci.base }}/{{ config.devstack.destination }}"
-          delegate_to: "{{ config.vm.name }}"
-
         - name: Install DevStack Environment
-          shell: "{{ config.ci.base }}/{{ config.devstack.destination }}/stack.sh"
+          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/nedge.sh"
           delegate_to: "{{ config.vm.name }}"
-
-        - name: Acquire Backend Lock
-          flock:
-            name: "{{ config.ci.project }}-{{ config.ci.backend }}"
-            action: "acquire"
-          register: lock
-
-        - name: Clean Backup Share
-          shell: |
-            backup=/net/{{ config.backup.host }}/{{ config.backup.share }}/{{ config.ci.backend }}
-            if [[ -d $backup ]]; then
-              for item in $(find $backup -mindepth 1 -maxdepth 1); do
-                rm -rf $item
-              done
-            fi
-          args:
-            executable: "{{ shell }}"
-          when: config.backup.host is defined and config.backup.host != ""
-                and config.backup.share is defined and config.backup.share != ""
-                and config.ci.backend is defined and config.ci.backend != ""
-
-#        - name: Clean NexentaStor5 LUN Mappings
-#          shell: |
-#            for mapping in $(lunmapping list -O basic -o volume); do
-#              lunmapping destroy -a $mapping
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns5_iscsi"
-#
-#        - name: Clean NexentaStor4 LUN Mappings and ZFS Volumes
-#          shell: |
-#            for zvol in $(nmc -c 'show zvol -v' | nawk '/^name/{print $NF}'); do
-#              nmc -c "destroy zvol $zvol -R -f -y"
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns4_iscsi"
-#
-#        - name: Clean NexentaStor5 Host Groups
-#          shell: |
-#            for hg in $(hostgroup list -O basic | awk '{print $1}'); do
-#              hostgroup destroy $hg
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns5_iscsi"
-#
-#        - name: Clean NexentaStor4 Host Groups
-#          shell: |
-#            for hg in $(nmc -c 'setup scsi-target initiator-group show' | sed 1d | awk '{print $1}'); do
-#              nmc -c "destroy scsi-target initiator-group $hg -y"
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns4_iscsi"
-#
-#        - name: Clean NexentaStor5 Target Groups
-#          shell: |
-#            for tg in $(targetgroup list -O basic -o name); do
-#              targetgroup destroy $tg
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns5_iscsi"
-#
-#        - name: Clean NexentaStor4 Target Groups
-#          shell: |
-#            for tg in $(nmc -c 'setup scsi-target target-group show' | sed 1d | awk '{print $1}'); do
-#              nmc -c "destroy scsi-target target-group $tg -y"
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns4_iscsi"
-#
-#        - name: Clean NexentaStor5 iSCSI Targets
-#          shell: |
-#            for tgt in $(iscsitarget list -O basic -o name); do
-#              iscsitarget destroy $tgt
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns5_iscsi"
-#
-#        - name: Clean NexentaStor4 iSCSI Targets
-#          shell: |
-#            for tgt in $(itadm list-target | sed 1d | awk '{print $1}'); do
-#              nmc -c "destroy iscsi target $tgt"
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns4_iscsi"
-#
-#        - name: Clean NexentaStor4 iSCSI Target Portal Groups
-#          shell: |
-#            for tpg in $(nmc -c 'show iscsi TPG' | sed 1d | awk '{print $1}'); do
-#              nmc -c "destroy iscsi TPG $tpg"
-#            done
-#            {{ hasync }}
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns4_iscsi"
-#
-#        - name: Clean NexentaStor5 ZFS volumes
-#          shell: |
-#            vg={{ item.pool }}/{{ item.dataset }}
-#            if volume list $vg; then
-#              for volume in $(volume list -O basic -o path $vg); do
-#                volume destroy -Ry $volume
-#              done
-#            fi
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns5_iscsi"
-#
-#        - name: Clean NexentaStor4 ZFS Filesystems
-#          shell: |
-#            nfs={{ item.pool }}/{{ item.dataset }}
-#            for fs in $(nmc -c "show folder $nfs -r" | sed 1,2d | nawk '{print $1}'); do
-#              nmc -c "destroy folder $fs -y -R -f"
-#            done
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns4_nfs" or config.ci.backend == "ns4_manila"
-#
-#        - name: Clean NexentaStor5 ZFS Filesystems
-#          shell: |
-#            nfs={{ item.pool }}/{{ item.dataset }}
-#            for fs in $(filesystem list -O basic -o path -r $nfs | sed 1d); do
-#              filesystem destroy -Rfy $fs
-#            done
-#          args:
-#            executable: "{{ shell }}"
-#          delegate_to: "{{ item.host }}"
-#          with_items: "{{ config.backend.instances }}"
-#          when: config.ci.backend == "ns5_nfs" or config.ci.backend == "ns5_manila"
-
-        - name: Run Test Suite
-          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/test.sh"
-          delegate_to: "{{ config.vm.name }}"
-          when: config.ci.tests == "yes"
 
       rescue:
         - name: Set Error Flag
           set_fact:
-            error: "Compound devstack task failed"
+            error: "Compound DevStack Task Failed"
 
         - name: Stop Current Job
           fail:
@@ -525,24 +372,6 @@
           changed_when: True
           when: error is defined
           notify: failure
-
-        - name: Release Backend Lock
-          flock:
-            name: "{{ config.ci.project }}-{{ config.ci.backend }}"
-            action: "release"
-          when: lock is defined
-
-        - name: Collect Journal Logs
-          shell: |
-            if systemctl --version; then
-              for unit in $(systemctl --no-legend --no-pager list-unit-files devstack@* | awk '{print $1}'); do
-                log="{{ config.ci.base }}/{{ config.ci.logs }}/$unit.log"
-                journalctl --all --merge --no-pager --output=cat --unit=$unit >$log
-              done
-            fi
-          args:
-            executable: "{{ shell }}"
-          delegate_to: "{{ config.vm.name }}"
 
         - name: Find Results Files
           find:
@@ -600,21 +429,6 @@
             path: "{{ config.ci.source }}/{{ config.result.base }}/latest"
             src: "{{ config.ci.source }}/{{ config.result.base }}/{{ config.ci.build }}"
             state: "link"
-
-        - name: Destroy Virtual Machine
-          vmware_guest:
-            validate_certs: False
-            hostname: "{{ config.vsphere.host }}"
-            username: "{{ config.vsphere.user }}"
-            password: "{{ config.vsphere.password }}"
-            datacenter: "{{ config.vsphere.datacenter }}"
-            cluster: "{{ config.vsphere.cluster }}"
-            folder: "{{ config.vsphere.datacenter }}/vm/{{ config.vsphere.folder }}/Build_{{ config.ci.build }}"
-            name: "{{ config.vm.name }}"
-            state: absent
-            force: yes
-          when: (config.vm.policy == "no") or
-                (config.vm.policy == "onerror" and error is undefined)
 
   handlers:
     - name: Failure Handler
