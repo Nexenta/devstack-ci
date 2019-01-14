@@ -1,12 +1,27 @@
 ---
 - name: Install Nexenta Edge CI Environment
   hosts: local
+  vars:
+    required:
+      - config
   tasks:
     - name: Set Configuration Parameters
       block:
+        - name: Set Global Required Parameters
+          set_fact:
+            {"{{ item }}":"{{ lookup('env', item) }}"}
+          when: hostvars['localhost'][item] is undefined
+          with_items: "{{ required }}"
+
         - name: Print Initial Configuration
           debug:
             msg: "{{ config }}"
+
+        - name: Check Required Parameters
+          fail:
+            msg: "Required parameter {{ item }} is not defined"
+          when: hostvars['localhost'][item] == ""
+          with_items: "{{ required }}"
 
         - name: Set Current Workspace via Jenkins Environment
           set_fact:
