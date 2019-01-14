@@ -54,8 +54,6 @@
               ci:
                 build: "{{ build }}"
                 source: "{{ workspace }}"
-                branch: "{{ branch }}"
-                backend: "{{ backend }}"
                 ssh: "{{ ssh }}"
 
         - name: Combine Global Parameters
