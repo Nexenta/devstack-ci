@@ -210,7 +210,18 @@
           become: yes
           delegate_to: "{{ config.vm.name }}0"
 
-        - name: Reboot Virtual Machine
+        - name: Shutdown Virtual Machine
+          vmware_guest:
+            validate_certs: False
+            hostname: "{{ config.vsphere.host }}"
+            username: "{{ config.vsphere.user }}"
+            password: "{{ config.vsphere.password }}"
+            uuid: "{{ config.vm.uuid }}"
+            name: "{{ config.vm.name }}"
+            state_change_timeout: "{{ config.vm.timeout }}"
+            state: "shutdownguest"
+
+        - name: Poweron Virtual Machine
           vmware_guest:
             validate_certs: False
             hostname: "{{ config.vsphere.host }}"
@@ -220,7 +231,7 @@
             name: "{{ config.vm.name }}"
             wait_for_ip_address: True
             state_change_timeout: "{{ config.vm.timeout }}"
-            state: "rebootguest"
+            state: "poweredon"
 
         - name: Identify Virtual Machine
           vmware_guest_facts:
