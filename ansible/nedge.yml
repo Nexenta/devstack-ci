@@ -1,6 +1,8 @@
 ---
 - name: Install Nexenta Edge CI Environment
   hosts: local
+  vars_files:
+    - license.yml
   vars:
     required:
       - config
@@ -48,6 +50,16 @@
             ssh: "{{ ssh | default('-q') }} -o {{ item.key }}={{ item.value }}"
           with_items: "{{ config.ssh }}"
 
+        - name: Set Nedge License
+          set_fact:
+            matrix:
+              nedge:
+                license: "{{ license }}"
+
+        - name: Combine Global Parameters
+          set_fact:
+            config: "{{ config | combine(matrix, recursive=True) }}"
+
         - name: Set Global Parameters
           set_fact:
             matrix:
@@ -74,7 +86,6 @@
             matrix:
               vm:
                 uuid: "{{ bios.uuid }}"
-#                name: "{{ config.ci.project }}-{{ branch }}-{{ backend | replace('_', '-') }}-{{ bios.uuid }}"
 
         - name: Combine Dependent Parameters
           set_fact:
@@ -183,8 +194,6 @@
             update_cache: "yes"
           become: yes
           delegate_to: "{{ config.vm.name }}0"
-#          vars:
-#            packages: "{{ config.nedge.packages }}"
 
         - name: Change Host OS Hostname
           template:
