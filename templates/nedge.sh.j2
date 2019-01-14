@@ -27,14 +27,11 @@ rm -rf .cache .wgetrc
 wget -O - "${_url}/nedeploy/${_build}/nedeploy-linux_${_version}-${_build}_x64.tar.gz" | tar zxf -
 wget -O - "${_url}/neadm/${_build}/neadm-linux_${_version}-${_build}_x64.tar.gz" | tar zxf -
 
-cat >>.bashrc<<-'EOF'
-
+cat >>.bash_profile<<-'EOF'
 export PATH=$PATH:$HOME/nedeploy:$HOME/neadm
-
 EOF
 
-ln .bashrc .bash_profile
-. .bashrc
+. .bash_profile
 
 nedeploy precheck $_ip root:root -i ens224
 nedeploy deploy solo $_ip root:root -m -i ens224 -t capacity -f --baremetal

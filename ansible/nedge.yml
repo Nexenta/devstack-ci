@@ -303,7 +303,7 @@
             mode: 0755
           delegate_to: "{{ config.vm.name }}"
 
-        - name: Install DevStack Environment
+        - name: Install Nedge Environment
           shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/nedge.sh"
           delegate_to: "{{ config.vm.name }}"
 
