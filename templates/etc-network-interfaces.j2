@@ -1,0 +1,20 @@
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+auto ens192
+iface ens192 inet static
+    address {{ config.nedge.ip }}
+    netmask {{ config.nedge.netmask }}
+    gateway {{ config.nedge.gateway }}
+    dns-nameservers {{ config.nedge.dns }}
+    dns-domain {{ config.nedge.domain }}
+    dns-search {{ config.nedge.domain }}
+
+auto ens224
+iface ens224 inet static
+    address 0.0.0.0
+    netmask 255.255.255.0
+    mtu 9000
+
