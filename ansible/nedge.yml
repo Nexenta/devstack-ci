@@ -181,6 +181,7 @@
             name: "{{ config.nedge.packages }}"
             state: "present"
             update_cache: "yes"
+          delegate_to: "{{ config.vm.name }}0"
 #          vars:
 #            packages: "{{ config.nedge.packages }}"
 
