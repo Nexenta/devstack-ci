@@ -52,6 +52,10 @@ USE_JOURNAL="False"
 {% if 'ns5' in config.ci.backend and config.ci.branch in ['queens', 'rocky', 'master'] %}
 ENABLE_VOLUME_MULTIATTACH="True"
 {% endif %}
+{% if 'ns5' in config.ci.backend and config.ci.branch in ['master'] %}
+TEMPEST_VOLUME_MANAGE_VOLUME="True"
+TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
+{% endif %}
 
 NEXENTA_CINDER_REPOSITORY="{{ config.nexenta.cinder.repository }}"
 NEXENTA_CINDER_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
