@@ -118,7 +118,7 @@ function ci_test_config {
 				case "$CI_BACKEND" in
 				ns5_iscsi|ns5_nfs)
 					iniset $TEMPEST_CONFIG volume manage_volume_ref "source-name, volume-%s"
-					iniset $TEMPEST_CONFIG volume manage_volume_ref "source-name, snapshot-%s"
+					iniset $TEMPEST_CONFIG volume manage_snapshot_ref "source-name, snapshot-%s"
 					;;
 				*)
 					;;
