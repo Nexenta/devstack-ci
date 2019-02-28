@@ -1,25 +1,29 @@
 #!/usr/bin/env bash
 
 function ci_install {
+	local cinder_drivers_path='cinder/volume/drivers/nexenta'
+	local cinder_unit_tests_path='cinder/tests/unit/volume/drivers/nexenta'
+	local manila_drivers_path='manila/share/drivers/nexenta'
+
 	if is_service_enabled cinder; then
-		git_clone $NEXENTA_CINDER_REPOSITORY $NEXENTA_CINDER_DESTINATION $NEXENTA_BRANCH
-		pushd $CINDER_DIR/cinder/volume/drivers
-		rm -rf nexenta
-		cp -prv $NEXENTA_CINDER_DESTINATION/cinder/volume/drivers/nexenta nexenta
-		popd
-		pushd $CINDER_DIR/cinder/tests/unit/volume/drivers
-		rm -rf nexenta
-		cp -prv $NEXENTA_CINDER_DESTINATION/cinder/tests/unit/volume/drivers/nexenta nexenta
-		popd
+		git_clone $NEXENTA_CINDER_REPOSITORY \
+		          $NEXENTA_CINDER_DESTINATION \
+		          $NEXENTA_BRANCH
+		rm -rf $CINDER_DIR/$cinder_drivers_path
+		cp -prv $NEXENTA_CINDER_DESTINATION/$cinder_drivers_path \
+		        $CINDER_DIR/$cinder_drivers_path
+		rm -rf $CINDER_DIR/$cinder_unit_tests_path
+		cp -prv $NEXENTA_CINDER_DESTINATION/$cinder_unit_tests_path \
+		        $CINDER_DIR/$cinder_unit_tests_path
 	fi
 
 	if is_service_enabled manila; then
-		git_clone $NEXENTA_MANILA_REPOSITORY $NEXENTA_MANILA_DESTINATION $NEXENTA_BRANCH
-		pushd $MANILA_DIR/manila/share/drivers
-		rm -rf nexenta
-		cp -prv $NEXENTA_MANILA_DESTINATION/manila/share/drivers/nexenta nexenta
-		popd
-
+		git_clone $NEXENTA_MANILA_REPOSITORY \
+		          $NEXENTA_MANILA_DESTINATION \
+		          $NEXENTA_BRANCH
+		rm -rf $MANILA_DIR/$manila_drivers_path
+		cp -prv $NEXENTA_MANILA_DESTINATION/$manila_drivers_path \
+		        $MANILA_DIR/$manila_drivers_path
 	fi
 }
 

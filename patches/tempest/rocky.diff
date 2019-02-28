@@ -49,7 +49,7 @@ index befa991b0..a0f1748f5 100644
 +    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
 +    find {toxinidir} -type f -name '*.pyc' -delete
 +    bash -cexu 'find {toxinidir}/.. -mindepth 1 -maxdepth 1 -type d -name *-tempest-plugin | xargs -L1 -rt pip install'
-+    ostestr --no-slowest --serial --regex '{posargs}'
++    ostestr --no-slowest --parallel --regex '{posargs}'
 +    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
 +    bash -cexu 'testr last --subunit >report.sub'
 +    bash -cexu 'cat report.sub | subunit-trace >report.txt'
