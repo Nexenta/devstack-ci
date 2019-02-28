@@ -63,11 +63,37 @@ tox -e pep8
 
 case "$_backend" in
 ns5_iscsi|ns5_nfs)
-	if [[ "$_branch" == 'master' ]]; then
+	typeset -a _versions
+	case "$_branch" in
+	master)
+		_versions=(py27 py35 py36)
 		tox -e cover -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
-	fi
+		;;
+	rocky)
+		_versions=(py27 py35 py36)
+		;;
+	ocata|pike|queens)
+		_versions=(py27 py35)
+		;;
+	newton)
+		_versions=(py27 py34)
+		;;
+	kilo|liberty|mitaka)
+		_versions=(py27)
+		;;
+	juno)
+		_versions=(py26 py27)
+		;;
+	icehouse)
+		_versions=(py26 py27 py33)
+		;;
+	*)
+		echo "Unknown CI branch: $_branch"
+		exit 1
+		;;
+	esac
 
-	for _version in py27 py35 py36; do
+	for _version in "${_versions[@]}"; do
 		tox -e $_version -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
 	done
 	;;
