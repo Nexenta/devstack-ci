@@ -1,21 +1,15 @@
 diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index eeb9df1..cfe06d4 100644
+index eeb9df1..96cda05 100644
 --- a/cinder/api/openstack/wsgi.py
 +++ b/cinder/api/openstack/wsgi.py
-@@ -17,6 +17,7 @@
- import functools
- import inspect
- import math
-+import sys
- import time
- 
- from oslo_log import log as logging
-@@ -41,6 +42,8 @@ from cinder import policy
+@@ -41,6 +41,10 @@ from cinder import policy
  from cinder import utils
  from cinder.wsgi import common as wsgi
  
-+reload(sys)
-+sys.setdefaultencoding('utf-8')
++if not six.PY3:
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
  
  LOG = logging.getLogger(__name__)
  
@@ -53,23 +47,17 @@ index c524e9a..b7bcc54 100644
  
      @classmethod
 diff --git a/cinder/volume/manager.py b/cinder/volume/manager.py
-index 6b0cc79..8b83f2d 100644
+index 6b0cc79..ccc43d4 100644
 --- a/cinder/volume/manager.py
 +++ b/cinder/volume/manager.py
-@@ -37,6 +37,7 @@ intact.
- 
- 
- import requests
-+import sys
- import time
- 
- from oslo_config import cfg
-@@ -84,6 +85,9 @@ from cinder.volume import rpcapi as volume_rpcapi
+@@ -84,6 +84,11 @@ from cinder.volume import rpcapi as volume_rpcapi
  from cinder.volume import utils as vol_utils
  from cinder.volume import volume_types
  
-+reload(sys)
-+sys.setdefaultencoding('utf-8')
++if not six.PY3:
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
 +
  LOG = logging.getLogger(__name__)
  
@@ -118,7 +106,7 @@ index 8f25d59..764a865 100644
  reno!=2.3.1,>=1.8.0 # Apache-2.0
  doc8 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index bc6122f..d023acf 100644
+index bc6122f..2d22961 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -10,7 +10,7 @@ setenv = VIRTUAL_ENV={envdir}
@@ -130,3 +118,12 @@ index bc6122f..d023acf 100644
  
  deps = -r{toxinidir}/test-requirements.txt
  
+@@ -20,7 +20,7 @@ deps = -r{toxinidir}/test-requirements.txt
+ # call ie: 'tox -epy27 -- --concurrency=4'
+ commands =
+   find . -type f -name "*.pyc" -delete
+-  ostestr {posargs}
++  ostestr --no-slowest --serial --regex '{posargs}'
+ 
+ whitelist_externals =
+   bash
