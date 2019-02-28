@@ -5,11 +5,11 @@ function ci_install {
 		git_clone $NEXENTA_CINDER_REPOSITORY $NEXENTA_CINDER_DESTINATION $NEXENTA_BRANCH
 		pushd $CINDER_DIR/cinder/volume/drivers
 		rm -rf nexenta
-		ln -s $NEXENTA_CINDER_DESTINATION/cinder/volume/drivers/nexenta
+		cp -prv $NEXENTA_CINDER_DESTINATION/cinder/volume/drivers/nexenta nexenta
 		popd
 		pushd $CINDER_DIR/cinder/tests/unit/volume/drivers
 		rm -rf nexenta
-		ln -s $NEXENTA_CINDER_DESTINATION/cinder/tests/unit/volume/drivers/nexenta
+		cp -prv $NEXENTA_CINDER_DESTINATION/cinder/tests/unit/volume/drivers/nexenta nexenta
 		popd
 	fi
 
@@ -17,7 +17,7 @@ function ci_install {
 		git_clone $NEXENTA_MANILA_REPOSITORY $NEXENTA_MANILA_DESTINATION $NEXENTA_BRANCH
 		pushd $MANILA_DIR/manila/share/drivers
 		rm -rf nexenta
-		ln -s $NEXENTA_MANILA_DESTINATION/manila/share/drivers/nexenta
+		cp -prv $NEXENTA_MANILA_DESTINATION/manila/share/drivers/nexenta nexenta
 		popd
 
 	fi
