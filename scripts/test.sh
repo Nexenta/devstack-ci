@@ -63,7 +63,10 @@ tox -e pep8
 
 case "$_backend" in
 ns5_iscsi|ns5_nfs)
-	tox -e cover -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
+	if [[ "$_branch" == 'master' ]]; then
+		tox -e cover -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
+	fi
+
 	for _version in py27 py35 py36; do
 		tox -e $_version -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
 	done
