@@ -57,8 +57,8 @@ TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
 
-NEXENTA_CINDER_REPOSITORY="{{ config.nexenta.cinder.repository }}"
-NEXENTA_CINDER_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
+NEXENTA_CINDER_REPO="{{ config.nexenta.cinder.repository }}"
+NEXENTA_CINDER_DIR="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
 
 CI_BACKEND="{{ config.ci.backend }}"
 CI_BRANCH="{{ config.ci.branch }}"
@@ -86,8 +86,8 @@ CI_BRANCH="{{ config.ci.branch }}"
 {% endfor %}
 
 {% if 'manila' in config.ci.backend %}
-NEXENTA_MANILA_REPOSITORY="{{ config.nexenta.manila.repository }}"
-NEXENTA_MANILA_DESTINATION="{{ config.ci.base }}/{{ config.nexenta.manila.destination }}"
+NEXENTA_MANILA_REPO="{{ config.nexenta.manila.repository }}"
+NEXENTA_MANILA_DIR="{{ config.ci.base }}/{{ config.nexenta.manila.destination }}"
 enable_plugin manila git://git.openstack.org/openstack/manila $MANILA_BRANCH
 enable_plugin manila-ui git://git.openstack.org/openstack/manila-ui $MANILA_UI_BRANCH
 

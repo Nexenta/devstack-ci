@@ -53,6 +53,7 @@ kubernetes_backends = {
 }
 
 openstack_ostypes = {
+    'nexentastor':      0xa1,
     'linux':            0xa2
 }
 
@@ -67,7 +68,11 @@ kubernetes_ostypes = {
 openstack_osversions = {
     'ubuntu14':         0x14,
     'ubuntu16':         0x16,
-    'ubuntu18':         0x18
+    'ubuntu18':         0x18,
+    'nexentastor50':    0x50,
+    'nexentastor51':    0x51,
+    'nexentastor52':    0x52,
+    'nexentastor53':    0x53
 }
 
 docker_osversions = {
