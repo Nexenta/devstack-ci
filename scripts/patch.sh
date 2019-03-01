@@ -31,6 +31,15 @@ if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
 	patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
 fi
 
+for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-constraints.txt; do
+	if [[ -f "$_file" ]]; then
+		sed -i '/^tempest/d' $_file
+		if [[ "$_project" != 'cinder' && "$_project" != 'manila' ]]; then
+			sed -i -e '/^flake8/d' -e '/^hacking/d' $_file
+		fi
+	fi
+done
+
 if [[ -d $_base/$_ci/files/$_project ]]; then
 	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
