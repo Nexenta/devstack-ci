@@ -62,6 +62,14 @@ NEXENTA_CINDER_DIR="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}
 
 CI_BACKEND="{{ config.ci.backend }}"
 CI_BRANCH="{{ config.ci.branch }}"
+{% for item in config.matrix.python %}
+{% if item.branch == config.ci.branch %}
+{% if item.version == '3' %}
+USE_PYTHON3="True"
+{% endif %}
+{% break %}
+{% endif %}
+{% endfor %}
 {% for project in config.matrix.project %}
 {% set value = namespace(found=none) %}
 {% for branch in config.matrix.branch %}
