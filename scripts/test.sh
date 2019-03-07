@@ -66,7 +66,7 @@ ns5_iscsi|ns5_nfs)
 	typeset -a _versions
 	case "$_branch" in
 	master)
-		_versions=(py27 py35 py36)
+		_versions=(py27 py36)
 		tox -e cover -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
 		;;
 	rocky)
