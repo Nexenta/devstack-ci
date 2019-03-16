@@ -59,7 +59,7 @@ if grep -q genopts tox.ini; then
 	tox -e genopts
 fi
 
-tox -e pep8
+tox -e pep8 || true
 
 case "$_backend" in
 ns5_iscsi|ns5_nfs)
