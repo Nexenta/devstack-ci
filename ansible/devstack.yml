@@ -222,7 +222,7 @@
             state: "shutdownguest"
 
         - name: Change Virtual Machine Network
-          vmware_guest_network:
+          vmware_guest:
             validate_certs: False
             hostname: "{{ config.vsphere.host }}"
             username: "{{ config.vsphere.user }}"
