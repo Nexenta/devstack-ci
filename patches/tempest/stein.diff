@@ -1,0 +1,85 @@
+diff --git a/tox.ini b/tox.ini
+index 433f168..efade23 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -9,8 +9,8 @@ setenv =
+     VIRTUAL_ENV={envdir}
+     OS_TEST_PATH=./tempest/test_discover
+ deps =
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
+     -r{toxinidir}/requirements.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
+ 
+ [testenv]
+ setenv =
+@@ -22,16 +22,33 @@ setenv =
+     PYTHONWARNINGS=default::DeprecationWarning,ignore::DeprecationWarning:distutils,ignore::DeprecationWarning:site
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST GABBI_TEMPEST_PATH
+ usedevelop = True
+-install_command = pip install {opts} {packages}
++install_command = pip install {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
+ whitelist_externals = *
+ deps =
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
+     -r{toxinidir}/requirements.txt
+     -r{toxinidir}/test-requirements.txt
++    -c{toxinidir}/../requirements/upper-constraints.txt
+ commands =
+     find . -type f -name "*.pyc" -delete
+     stestr --test-path ./tempest/tests run {posargs}
+ 
++[testenv:ci]
++setenv = {[tempestenv]setenv}
++deps = {[tempestenv]deps}
++ignore_errors = True
++sitepackages = True
++recreate = True
++envdir = .tox/ci
++commands =
++    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
++    find {toxinidir} -type f -name '*.pyc' -delete
++    bash -cexu 'find {toxinidir}/.. -mindepth 1 -maxdepth 1 -type d -name *-tempest-plugin | xargs -L1 -rt pip install'
++    ostestr --no-slowest --serial --regex '{posargs}'
++    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
++    bash -cexu 'testr last --subunit >report.sub'
++    bash -cexu 'cat report.sub | subunit-trace >report.txt'
++    subunit2html report.sub report.html
++
+ [testenv:genconfig]
+ commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
+ 
+@@ -173,7 +190,7 @@ commands =
+ 
+ [testenv:venv]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands = {posargs}
+@@ -188,7 +205,7 @@ commands = {posargs}
+ [testenv:docs]
+ basepython = python3
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+@@ -234,7 +251,7 @@ import-order-style = pep8
+ [testenv:releasenotes]
+ basepython = python3
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+@@ -250,6 +267,7 @@ whitelist_externals = rm
+ # of the requirements.txt files
+ deps = pip_check_reqs
+        -r{toxinidir}/requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands=
+     pip-extra-reqs -d --ignore-file=tempest/tests/* tempest
+     pip-missing-reqs -d --ignore-file=tempest/tests/* tempest
