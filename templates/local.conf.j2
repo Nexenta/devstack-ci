@@ -147,7 +147,7 @@ driver_ssl_cert_verify = False
 {% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
 backup_file_size = "134217728"
 backup_sha_block_size_bytes = "32768"
-{% if config.ci.branch in ['master'] %}
+{% if config.ci.branch in ['stein', 'master'] %}
 backup_driver = "cinder.backup.drivers.nfs.NFSBackupDriver"
 {% else %}
 backup_driver = "cinder.backup.drivers.nfs"
