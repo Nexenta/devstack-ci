@@ -111,7 +111,7 @@ function ci_test_config {
 			esac
 
 			case "$CI_BRANCH" in
-			pike|queens|rocky|master)
+			pike|queens|rocky|stein|master)
 				iniset $TEMPEST_CONFIG volume-feature-enabled volume_revert True
 				;;
 			*)
@@ -119,7 +119,7 @@ function ci_test_config {
 			esac
 
 			case "$CI_BRANCH" in
-			pike|queens|rocky|master)
+			pike|queens|rocky|stein|master)
 				case "$CI_BACKEND" in
 				ns5_iscsi|ns5_nfs)
 					iniset $TEMPEST_CONFIG volume manage_volume_ref "source-name, volume-%s"
