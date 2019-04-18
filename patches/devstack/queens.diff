@@ -62,8 +62,23 @@ index df295a3..5693134 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index ff62e4f..253e544 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -559,9 +559,7 @@ function configure_tempest {
+         tox -revenv-tempest --notest
+     fi
+ 
+-    # The requirements might be on a different branch, while tempest needs master requirements.
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
+-    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
++    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
+ 
+     # Auth:
+     iniset $TEMPEST_CONFIG auth tempest_roles "Member"
 diff --git a/stackrc b/stackrc
-index 44dd451..a177004 100644
+index ff85146..6f3b196 100644
 --- a/stackrc
 +++ b/stackrc
 @@ -625,20 +625,7 @@ VIRT_DRIVER=${VIRT_DRIVER:-$DEFAULT_VIRT_DRIVER}
