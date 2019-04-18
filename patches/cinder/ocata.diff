@@ -143,3 +143,24 @@ index 3657f88..b17bfd3 100644
  
  deps = -r{toxinidir}/test-requirements.txt
  
+diff --git a/cinder/tests/unit/image/fake.py b/cinder/tests/unit/image/fake.py
+index f721726..7026858 100644
+--- a/cinder/tests/unit/image/fake.py
++++ b/cinder/tests/unit/image/fake.py
+@@ -23,6 +23,7 @@ import uuid
+ 
+ from cinder import exception
+ import cinder.image.glance
++from cinder.tests.unit import fake_constants
+ 
+ 
+ class _FakeImageService(object):
+@@ -34,7 +35,7 @@ class _FakeImageService(object):
+         # So, make sure we've got one..
+         timestamp = datetime.datetime(2011, 1, 1, 1, 2, 3)
+ 
+-        image1 = {'id': '155d900f-4e14-4e4c-a73d-069cbf4541e6',
++        image1 = {'id': fake_constants.IMAGE_ID,
+                   'name': 'fakeimage123456',
+                   'created_at': timestamp,
+                   'updated_at': timestamp,
