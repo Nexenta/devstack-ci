@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index 660df795..e02baa38 100644
+index 660df79..e02baa3 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -498,11 +498,11 @@ function git_clone {
@@ -62,3 +62,18 @@ index 660df795..e02baa38 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index d27ebca..b57de55 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -543,9 +543,7 @@ function configure_tempest {
+         tox -revenv-tempest --notest
+     fi
+ 
+-    # The requirements might be on a different branch, while tempest needs master requirements.
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
+-    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
++    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
+ 
+     # Auth:
+     iniset $TEMPEST_CONFIG auth tempest_roles "Member"
