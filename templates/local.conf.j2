@@ -52,7 +52,7 @@ USE_JOURNAL="False"
 {% if 'ns5' in config.ci.backend and config.ci.branch in ['queens', 'rocky', 'stein', 'master'] %}
 ENABLE_VOLUME_MULTIATTACH="True"
 {% endif %}
-{% if 'ns5' in config.ci.backend and config.ci.branch in ['newton', 'ocata', 'pike', 'queens', 'rocky', 'stein', 'master'] %}
+{% if 'ns5' in config.ci.backend and config.ci.branch in ['mitaka', 'newton', 'ocata', 'pike', 'queens', 'rocky', 'stein', 'master'] %}
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
