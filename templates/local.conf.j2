@@ -50,7 +50,7 @@ USE_SCREEN="True"
 USE_SYSTEMD="False"
 USE_JOURNAL="False"
 {% endif %}
-{% if 'ns5' in config.ci.backend and config.ci.branch in ['queens', 'rocky', 'stein', 'master'] %}
+{% if config.ci.branch in ['queens', 'rocky', 'stein', 'master'] %}
 ENABLE_VOLUME_MULTIATTACH="True"
 {% endif %}
 {% if 'ns5' in config.ci.backend and config.ci.branch in ['mitaka', 'newton', 'ocata', 'pike', 'queens', 'rocky', 'stein', 'master'] %}
