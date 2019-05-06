@@ -6,10 +6,10 @@ index 0d9da44..2b643b8 100644
  dstat
 -python-psutil
 diff --git a/functions-common b/functions-common
-index fae936a..39a734d 100644
+index bace9e0..f8817f9 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -497,11 +497,11 @@ function git_clone {
+@@ -526,11 +526,11 @@ function git_clone {
      local git_ref=$3
      local orig_dir
      orig_dir=$(pwd)
@@ -24,7 +24,7 @@ index fae936a..39a734d 100644
      fi
  
      if [[ "$OFFLINE" = "True" ]]; then
-@@ -509,6 +509,7 @@ function git_clone {
+@@ -538,6 +538,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
          git show --oneline | head -1
@@ -32,7 +32,7 @@ index fae936a..39a734d 100644
          cd $orig_dir
          return
      fi
-@@ -533,8 +534,7 @@ function git_clone {
+@@ -562,8 +563,7 @@ function git_clone {
                  echo "the project to the \$PROJECTS variable in the job definition."
                  die $LINENO "Cloning not allowed in this configuration"
              fi
@@ -42,7 +42,7 @@ index fae936a..39a734d 100644
          elif [[ "$RECLONE" = "True" ]]; then
              # if it does exist then simulate what clone does if asked to RECLONE
              cd $git_dest
-@@ -563,6 +563,7 @@ function git_clone {
+@@ -592,6 +592,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -50,7 +50,7 @@ index fae936a..39a734d 100644
      cd $orig_dir
  }
  
-@@ -1051,7 +1052,8 @@ function apt_get_update {
+@@ -1080,7 +1081,8 @@ function apt_get_update {
      time_start "apt-get-update"
  
      local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
@@ -60,7 +60,7 @@ index fae936a..39a734d 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
-@@ -1684,7 +1686,7 @@ function run_phase {
+@@ -1742,7 +1744,7 @@ function run_phase {
              # white listed elements in tree. We want these to move out
              # over time as well, but they are in tree, so we need to
              # manage that.
@@ -69,12 +69,27 @@ index fae936a..39a734d 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index 8c6fa01..6d284c9 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -592,9 +592,7 @@ function configure_tempest {
+         tox -revenv-tempest --notest
+     fi
+ 
+-    # The requirements might be on a different branch, while tempest needs master requirements.
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
+-    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
++    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
+ 
+     # Auth:
+     iniset $TEMPEST_CONFIG auth tempest_roles "member"
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 9147932..df6c188 100755
+index 7482239..2605e67 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -205,33 +205,8 @@ function fixup_fedora {
-     fi
+@@ -238,33 +238,8 @@ function fixup_suse {
+     sudo rm -rf /usr/lib/python3.6/site-packages/ply-*.egg-info
  }
  
 -# The version of pip(1.5.4) supported by python-virtualenv(1.11.4) has
