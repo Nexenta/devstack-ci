@@ -9,13 +9,6 @@ set +o xtrace
 function configure_cinder_backend_ns4_nfs {
 	local backend="$1"
 	local prefix="NEXENTA_OPTGROUP_${backend}_"
-	local nexenta_host='host'
-	local nexenta_dataset='dataset'
-	local nexenta_rest_protocol='http'
-	local nexenta_rest_port='80'
-	local nexenta_user='user'
-	local nexenta_password='password'
-	local nexenta_volume_root='/'
 	local options=''
 	local item
 
@@ -25,27 +18,6 @@ function configure_cinder_backend_ns4_nfs {
 		local value="${opt#*=}"
 
 		case "$name" in
-		nexenta_host)
-			nexenta_host="$value"
-			;;
-		nexenta_dataset)
-			nexenta_dataset="$value"
-			;;
-		nexenta_rest_protocol)
-			nexenta_rest_protocol="$value"
-			;;
-		nexenta_rest_port)
-			nexenta_rest_port="$value"
-			;;
-		nexenta_user)
-			nexenta_user="$value"
-			;;
-		nexenta_password)
-			nexenta_password="$value"
-			;;
-		nexenta_volume_root)
-			nexenta_volume_root="$value"
-			;;
 		nas_mount_options|nfs_mount_options)
 			options="$value"
 			;;
@@ -59,14 +31,6 @@ function configure_cinder_backend_ns4_nfs {
 		iniset "$CINDER_CONF" "$backend" 'nas_mount_options' "$options"
 		iniset "$CINDER_CONF" "$backend" 'nfs_mount_options' "$options"
 	fi
-
-	iniset "$CINDER_CONF" "$backend" 'nexenta_shares_config' \
-		"${CINDER_CONF_DIR}/${backend}.conf"
-
-	printf "%s:%s/%s\t%s://%s:%s@%s:%d\n" \
-		"$nexenta_host" "$nexenta_volume_root" "$nexenta_dataset" \
-		"$nexenta_rest_protocol" "$nexenta_user" "$nexenta_password" \
-		"$nexenta_host" "$nexenta_rest_port" | tee "${CINDER_CONF_DIR}/${backend}.conf"
 }
 
 function cleanup_cinder_backend_ns4_nfs {
