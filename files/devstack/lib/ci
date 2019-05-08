@@ -23,7 +23,7 @@ function ci_install {
 		case "$CI_BACKEND" in
 		ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs)
 			rm -rfv $CINDER_DIR/$cinder_drivers_path/*edge*
-			rm -rf $NEXENTA_CINDER_DIR/$cinder_unit_tests_path/*edge*
+			rm -rfv $CINDER_DIR/$cinder_unit_tests_path/*edge*
 			;;
 		*)
 			;;
