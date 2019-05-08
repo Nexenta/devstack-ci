@@ -40,10 +40,6 @@ for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-
 	fi
 done
 
-if [[ -f test-requirements.txt && "$_project" == 'cinder' ]]; then
-	echo future >> test-requirements.txt
-fi
-
 if [[ -d $_base/$_ci/files/$_project ]]; then
 	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
