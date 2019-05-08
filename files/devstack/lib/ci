@@ -19,6 +19,16 @@ function ci_install {
 			cp -prv $NEXENTA_CINDER_DIR/$cinder_unit_tests_path \
 			        $CINDER_DIR/$cinder_unit_tests_path
 		fi
+
+		case "$CI_BACKEND" in
+		ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs)
+			if [[ -d "$CINDER_DIR/$cinder_drivers_path/nexentaedge" ]]; then
+				rm -rfv $CINDER_DIR/$cinder_drivers_path/nexentaedge
+			fi
+			;;
+		*)
+			;;
+		esac
 	fi
 
 	if is_service_enabled manila; then
