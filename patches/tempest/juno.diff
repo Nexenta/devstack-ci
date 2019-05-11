@@ -1,3 +1,16 @@
+diff --git a/tempest/common/utils/linux/remote_client.py b/tempest/common/utils/linux/remote_client.py
+index 6a238d0..fc2bbff 100644
+--- a/tempest/common/utils/linux/remote_client.py
++++ b/tempest/common/utils/linux/remote_client.py
+@@ -70,7 +70,7 @@ class RemoteClient():
+ 
+     def get_partitions(self):
+         # Return the contents of /proc/partitions
+-        command = 'cat /proc/partitions'
++        command = 'lsblk -n -i -o name'
+         output = self.exec_command(command)
+         return output
+ 
 diff --git a/tempest/api/volume/test_extensions.py b/tempest/api/volume/test_extensions.py
 index 66ea9b7c8..0f6c2d622 100644
 --- a/tempest/api/volume/test_extensions.py
