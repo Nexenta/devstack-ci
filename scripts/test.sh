@@ -69,26 +69,15 @@ ns5_iscsi|ns5_nfs)
 		_versions=(py27 py36)
 		tox -e cover -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
 		;;
-	stein)
+	stein|rocky)
 		_versions=(py27 py36)
 		;;
-	rocky)
-		_versions=(py27 py35 py36)
-		;;
-	ocata|pike|queens)
-		_versions=(py27 py35)
-		;;
-	newton)
-		_versions=(py27 py34)
-		;;
-	kilo|liberty|mitaka)
+	queens|pike|ocata|newton)
+		_versions=(py27)
 		_versions=(py27)
 		;;
-	juno)
-		_versions=(py26 py27)
-		;;
-	icehouse)
-		_versions=(py26 py27 py33)
+	mitaka|liberty|kilo|juno|icehouse)
+		_versions=()
 		;;
 	*)
 		echo "Unknown CI branch: $_branch"
