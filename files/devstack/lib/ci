@@ -169,6 +169,9 @@ function ci_test_config {
 			queens)
 				iniset $TEMPEST_CONFIG share max_api_microversion 2.42
 				;;
+			rocky)
+				iniset $TEMPEST_CONFIG share max_api_microversion 2.49
+				;;
 			*)
 				;;
 			esac
