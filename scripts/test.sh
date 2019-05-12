@@ -11,6 +11,8 @@ typeset _project=$(basename $_pwd)
 typeset _script=$(readlink -f $0)
 typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
+typeset _unit
+typeset -a _versions
 
 source $_source/env.sh
 
@@ -61,37 +63,46 @@ fi
 
 tox -e pep8 || true
 
-case "$_backend" in
-ns5_iscsi|ns5_nfs)
-	typeset -a _versions
-	case "$_branch" in
-	master)
-		_versions=(py27 py36)
-		tox -e cover -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
-		;;
-	stein|rocky)
-		_versions=(py27 py36)
-		;;
-	queens|pike|ocata|newton)
-		_versions=(py27)
-		_versions=(py27)
-		;;
-	mitaka|liberty|kilo|juno|icehouse)
-		_versions=()
-		;;
-	*)
-		echo "Unknown CI branch: $_branch"
-		exit 1
-		;;
-	esac
-
-	for _version in "${_versions[@]}"; do
-		tox -e $_version -- cinder.tests.unit.volume.drivers.nexenta.test_nexenta5 || true
-	done
+case "$_branch" in
+master|stein|rocky)
+	_versions=(py27 py36)
+	tox -e cover -- nexenta5 || true
+	;;
+stein|rocky)
+	_versions=(py27 py36)
+	;;
+queens|pike|ocata|newton)
+	_versions=(py27)
 	;;
 *)
+	_versions=()
 	;;
 esac
+
+case "$_backend" in
+ns5_iscsi|ns5_nfs)
+	_unit='nexenta5'
+	;;
+ns4_iscsi|ns4_nfs)
+	_unit='nexenta4'
+	;;
+ns5_manila)
+	_unit='nexenta.ns5'
+	;;
+ns4_manila)
+	_unit='nexenta.ns4'
+	;;
+*)
+	_unit=''
+	;;
+esac
+
+if [[ -n "$_unit" ]]; then
+	tox -e cover -- $_unit || true
+	for _version in "${_versions[@]}"; do
+		tox -e $_version -- $_unit || true
+	done
+fi
 
 cd $_base/tempest
 
