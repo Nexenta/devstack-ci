@@ -38,21 +38,19 @@ index b2e51e9..0986a33 100644
              msg = 'Reverting volume %(v_id)s to snapshot %(s_id)s.'
              LOG.info(msg, {'v_id': volume.id,
 diff --git a/tox.ini b/tox.ini
-index 40830e7..a82d87b 100644
+index 15b4808..ce82716 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -14,8 +14,8 @@ setenv = VIRTUAL_ENV={envdir}
+@@ -14,7 +14,7 @@ setenv = VIRTUAL_ENV={envdir}
  usedevelop = True
  install_command = pip install {opts} {packages}
  
 -deps = -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/stein}
--        -r{toxinidir}/test-requirements.txt
 +deps = -c{toxinidir}/../requirements/upper-constraints.txt
-+       -r{toxinidir}/test-requirements.txt
+         -r{toxinidir}/test-requirements.txt
+         -r{toxinidir}/requirements.txt
  
- # By default stestr will set concurrency
- # to ncpu, to specify something else use
-@@ -35,7 +35,7 @@ passenv = *_proxy *_PROXY
+@@ -36,7 +36,7 @@ passenv = *_proxy *_PROXY
  basepython = python3
  whitelist_externals = rm
  deps =
@@ -61,7 +59,7 @@ index 40830e7..a82d87b 100644
      -r{toxinidir}/doc/requirements.txt
  commands =
    rm -rf api-ref/build
-@@ -44,7 +44,7 @@ commands =
+@@ -45,7 +45,7 @@ commands =
  [testenv:releasenotes]
  basepython = python3
  deps =
@@ -70,7 +68,7 @@ index 40830e7..a82d87b 100644
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
  commands = sphinx-build -a -E -W -d releasenotes/build/doctrees -b html releasenotes/source releasenotes/build/html
-@@ -73,7 +73,7 @@ setenv =
+@@ -74,7 +74,7 @@ setenv =
    OS_TEST_PATH = ./cinder/tests/compliance
  
  [testenv:pep8]
@@ -79,7 +77,15 @@ index 40830e7..a82d87b 100644
  commands =
    flake8 {posargs} .
    {toxinidir}/tools/config/check_uptodate.sh
-@@ -120,7 +120,7 @@ basepython = python3
+@@ -92,6 +92,7 @@ passenv = FAST8_NUM_COMMITS
+ basepython = python3
+ deps = -r{toxinidir}/requirements.txt
+        -r{toxinidir}/test-requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+        pylint==2.1.1
+ commands =
+   bash ./tools/coding-checks.sh --pylint {posargs}
+@@ -121,7 +122,7 @@ basepython = python3
  commands = oslopolicy-sample-generator --config-file=tools/config/cinder-policy-generator.conf
  
  [testenv:genopts]
@@ -88,7 +94,7 @@ index 40830e7..a82d87b 100644
  sitepackages = False
  envdir = {toxworkdir}/pep8
  commands = python tools/config/generate_cinder_opts.py
-@@ -132,7 +132,7 @@ commands = {posargs}
+@@ -133,7 +134,7 @@ commands = {posargs}
  [testenv:docs]
  basepython = python3
  deps =
@@ -97,3 +103,11 @@ index 40830e7..a82d87b 100644
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
  commands =
+@@ -153,6 +154,7 @@ commands = python {toxinidir}/tools/generate_driver_list.py
+ [testenv:bandit]
+ basepython = python3
+ deps = -r{toxinidir}/test-requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands = bandit -r cinder -n5 -x tests -ll
+ 
+ [testenv:bandit-baseline]
