@@ -99,9 +99,11 @@ esac
 
 if [[ -n "$_unit" ]]; then
 	tox -e cover -- $_unit || true
-	for _version in "${_versions[@]}"; do
-		tox -e $_version -- $_unit || true
-	done
+	if (( ${#_versions[@]} > 0 )); then
+		for _version in "${_versions[@]}"; do
+			tox -e $_version -- $_unit || true
+		done
+	fi
 fi
 
 cd $_base/tempest
