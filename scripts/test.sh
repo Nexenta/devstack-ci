@@ -11,7 +11,7 @@ typeset _project=$(basename $_pwd)
 typeset _script=$(readlink -f $0)
 typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
-typeset _unit
+typeset _unit _index
 typeset -a _versions
 
 source $_source/env.sh
@@ -99,11 +99,10 @@ esac
 
 if [[ -n "$_unit" ]]; then
 	tox -e cover -- $_unit || true
-	if (( ${#_versions[@]} > 0 )); then
-		for _version in "${_versions[@]}"; do
-			tox -e $_version -- $_unit || true
-		done
-	fi
+	for _index in "${!_versions[@]}"; do
+		_version=${_versions[$_index]}
+		tox -e $_version -- $_unit || true
+	done
 fi
 
 cd $_base/tempest
