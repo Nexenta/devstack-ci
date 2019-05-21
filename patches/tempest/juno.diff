@@ -1,3 +1,19 @@
+diff --git a/tempest/common/waiters.py b/tempest/common/waiters.py
+index 52568cb..d8daea8 100644
+--- a/tempest/common/waiters.py
++++ b/tempest/common/waiters.py
+@@ -42,11 +42,6 @@ def wait_for_server_status(client, server_id, status, ready_wait=True,
+     start_time = int(time.time())
+     timeout = client.build_timeout + extra_timeout
+     while True:
+-        # NOTE(afazekas): Now the BUILD status only reached
+-        # between the UNKNOWN->ACTIVE transition.
+-        # TODO(afazekas): enumerate and validate the stable status set
+-        if status == 'BUILD' and server_status != 'UNKNOWN':
+-            return
+         if server_status == status:
+             if ready_wait:
+                 if status == 'BUILD':
 diff --git a/tempest/common/utils/linux/remote_client.py b/tempest/common/utils/linux/remote_client.py
 index 6a238d0..fc2bbff 100644
 --- a/tempest/common/utils/linux/remote_client.py
