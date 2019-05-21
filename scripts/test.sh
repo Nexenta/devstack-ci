@@ -63,22 +63,6 @@ fi
 
 tox -e pep8 || true
 
-case "$_branch" in
-master|stein|rocky)
-	_versions=(py27 py36)
-	tox -e cover -- nexenta5 || true
-	;;
-stein|rocky)
-	_versions=(py27 py36)
-	;;
-queens|pike|ocata|newton)
-	_versions=(py27)
-	;;
-*)
-	_versions=()
-	;;
-esac
-
 case "$_backend" in
 ns5_iscsi|ns5_nfs)
 	_unit='nexenta5'
@@ -96,6 +80,22 @@ ns4_manila)
 	_unit=''
 	;;
 esac
+
+case "$_branch" in
+master|stein|rocky)
+	_versions=(py27 py36)
+	;;
+stein|rocky)
+	_versions=(py27 py36)
+	;;
+queens|pike|ocata|newton)
+	_versions=(py27)
+	;;
+*)
+	_versions=()
+	;;
+esac
+
 
 if [[ -n "$_unit" ]]; then
 	tox -e cover -- $_unit || true
