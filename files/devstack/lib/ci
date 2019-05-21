@@ -45,6 +45,8 @@ function ci_extra {
 	local key_type key_file
 	local tnt pid gid
 
+	echo "KeepAlive Off" | sudo tee $APACHE_CONF_DIR/99-ci.conf
+
 	if is_service_enabled nova; then
 		case "$VIRT_DRIVER" in
 		libvirt)
