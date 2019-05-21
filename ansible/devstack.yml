@@ -537,7 +537,7 @@
             if systemctl --version; then
               for unit in $(systemctl --no-legend --no-pager list-unit-files devstack@* | awk '{print $1}'); do
                 log="{{ config.ci.base }}/{{ config.ci.logs }}/$unit.log"
-                journalctl --all --merge --no-pager --output=cat --unit=$unit >$log
+                journalctl --all --merge --no-pager --no-hostname --unit=$unit >$log
               done
             fi
           args:
