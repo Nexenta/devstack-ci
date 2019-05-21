@@ -1,3 +1,16 @@
+diff --git a/cinder/hacking/checks.py b/cinder/hacking/checks.py
+index 804b54c..d830b27 100644
+--- a/cinder/hacking/checks.py
++++ b/cinder/hacking/checks.py
+@@ -372,6 +372,8 @@ def validate_log_translations(logical_line, filename):
+     # misuse of the form LOG.info('Message').
+     if "cinder/tests" in filename:
+         return
++    if "nexenta" in filename:
++        return
+     msg = "N328: LOG.info messages require translations `_LI()`!"
+     if log_translation_LI.match(logical_line):
+         yield (0, msg)
 diff --git a/cinder/tests/tempest/api/volume/base.py b/cinder/tests/tempest/api/volume/base.py
 index 50ee60a..01f0e16 100644
 --- a/cinder/tests/tempest/api/volume/base.py
@@ -88,6 +101,27 @@ index db280d3..1ab7c10 100644
          self.assertEqual(fetched_volume['name'],
                           self.volume_name)
 +        self.volumes_client.delete_volume(self.volume['id'])
+diff --git a/cinder/tests/unit/image/fake.py b/cinder/tests/unit/image/fake.py
+index f721726..7026858 100644
+--- a/cinder/tests/unit/image/fake.py
++++ b/cinder/tests/unit/image/fake.py
+@@ -23,6 +23,7 @@ import uuid
+ 
+ from cinder import exception
+ import cinder.image.glance
++from cinder.tests.unit import fake_constants
+ 
+ 
+ class _FakeImageService(object):
+@@ -34,7 +35,7 @@ class _FakeImageService(object):
+         # So, make sure we've got one..
+         timestamp = datetime.datetime(2011, 1, 1, 1, 2, 3)
+ 
+-        image1 = {'id': '155d900f-4e14-4e4c-a73d-069cbf4541e6',
++        image1 = {'id': fake_constants.IMAGE_ID,
+                   'name': 'fakeimage123456',
+                   'created_at': timestamp,
+                   'updated_at': timestamp,
 diff --git a/etc/cinder/policy.json b/etc/cinder/policy.json
 index 6a65122..3b32cb3 100644
 --- a/etc/cinder/policy.json
@@ -131,10 +165,10 @@ index 45b50a6..61dafbb 100644
  bandit>=1.1.0 # Apache-2.0
  reno>=1.8.0 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index 3657f88..b17bfd3 100644
+index 3657f88..eedc88c 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -10,7 +10,7 @@ setenv = VIRTUAL_ENV={envdir}
+@@ -10,9 +10,10 @@ setenv = VIRTUAL_ENV={envdir}
           PYTHONHASHSEED=0
           PYTHONWARNINGS=default::DeprecationWarning
  usedevelop = True
@@ -142,25 +176,31 @@ index 3657f88..b17bfd3 100644
 +install_command = pip install -c{toxinidir}/../requirements/upper-constraints.txt {opts} {packages}
  
  deps = -r{toxinidir}/test-requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
  
-diff --git a/cinder/tests/unit/image/fake.py b/cinder/tests/unit/image/fake.py
-index f721726..7026858 100644
---- a/cinder/tests/unit/image/fake.py
-+++ b/cinder/tests/unit/image/fake.py
-@@ -23,6 +23,7 @@ import uuid
+ # By default ostestr will set concurrency
+ # to ncpu, to specify something else use
+@@ -32,6 +33,7 @@ passenv = *_proxy *_PROXY
+ # the API Ref to developer.openstack.org.
+ whitelist_externals = rm
+ deps = -r{toxinidir}/test-requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands =
+   rm -rf api-ref/build
+   sphinx-build -W -b html -d api-ref/build/doctrees api-ref/source api-ref/build/html/
+@@ -69,6 +71,7 @@ commands =
  
- from cinder import exception
- import cinder.image.glance
-+from cinder.tests.unit import fake_constants
+ [testenv:pylint]
+ deps = -r{toxinidir}/requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+        pylint==0.26.0
+ commands = bash tools/lintstack.sh
  
+@@ -107,6 +110,7 @@ commands = python {toxinidir}/tools/generate_driver_list.py
  
- class _FakeImageService(object):
-@@ -34,7 +35,7 @@ class _FakeImageService(object):
-         # So, make sure we've got one..
-         timestamp = datetime.datetime(2011, 1, 1, 1, 2, 3)
+ [testenv:bandit]
+ deps = -r{toxinidir}/test-requirements.txt
++       -c{toxinidir}/../requirements/upper-constraints.txt
+ commands = bandit -r cinder -n5 -x tests -ll
  
--        image1 = {'id': '155d900f-4e14-4e4c-a73d-069cbf4541e6',
-+        image1 = {'id': fake_constants.IMAGE_ID,
-                   'name': 'fakeimage123456',
-                   'created_at': timestamp,
-                   'updated_at': timestamp,
+ [flake8]
