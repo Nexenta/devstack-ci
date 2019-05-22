@@ -102,6 +102,10 @@ function ci_extra {
 
 function ci_test_config {
 	if is_service_enabled tempest; then
+		if is_service_enabled nova; then
+			iniset $TEMPEST_CONFIG compute build_interval 5
+		fi
+
 		if is_service_enabled cinder; then
 			case "$CI_BRANCH" in
 			ocata|pike)
