@@ -14,12 +14,12 @@ stack)
 		ci_install
 		;;
 	post-config)
+		ci_test_config
 		;;
 	extra)
 		ci_extra
 		;;
 	test-config)
-		ci_test_config
 		;;
 	esac
 	;;
