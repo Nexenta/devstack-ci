@@ -14,10 +14,10 @@ stack)
 		ci_install
 		;;
 	post-config)
-		ci_test_config
 		;;
 	extra)
 		ci_extra
+		ci_test_config
 		;;
 	test-config)
 		;;
