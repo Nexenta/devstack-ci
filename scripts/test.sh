@@ -68,7 +68,7 @@ ns5_iscsi|ns5_nfs)
 	_unit='nexenta5'
 	;;
 ns4_iscsi|ns4_nfs)
-	_unit='nexenta4'
+	_unit=''
 	;;
 ns5_manila)
 	_unit='nexenta.ns5'
