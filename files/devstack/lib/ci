@@ -45,6 +45,14 @@ function ci_extra {
 	local key_type key_file
 	local tnt pid gid
 
+	case "$CI_BRANCH" in
+	icehouse|juno|kilo|liberty|mitaka|newton)
+		ci_test_config
+		;;
+	*)
+		;;
+	esac
+
 	if is_service_enabled nova; then
 		case "$VIRT_DRIVER" in
 		libvirt)

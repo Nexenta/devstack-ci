@@ -17,9 +17,9 @@ stack)
 		;;
 	extra)
 		ci_extra
-		ci_test_config
 		;;
 	test-config)
+		ci_test_config
 		;;
 	esac
 	;;
