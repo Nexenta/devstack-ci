@@ -27,6 +27,8 @@ fi
 
 exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
 
+git reset --hard
+
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
 	patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
 fi
