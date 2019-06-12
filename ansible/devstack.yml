@@ -299,19 +299,6 @@
 
     - name: Compound DevStack Task
       block:
-        - name: Install Python Packages
-          apt:
-            name: "{{ packages }}"
-            state: "present"
-            update_cache: "yes"
-          become: yes
-          delegate_to: "{{ config.vm.name }}"
-          vars:
-            packages:
-            - python2.7-minimal
-            - python3.6-minimal
-            - python3.7-minimal
-
         - name: Checkout CI Repository
           git:
             repo: "{{ config.ci.repository }}"
