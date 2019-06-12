@@ -83,7 +83,7 @@ esac
 
 case "$_branch" in
 master|stein|rocky)
-	_versions=(py27 py36)
+	_versions=(py27 py36 py37)
 	;;
 stein|rocky)
 	_versions=(py27 py36)

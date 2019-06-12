@@ -66,8 +66,11 @@ CI_BACKEND="{{ config.ci.backend }}"
 CI_BRANCH="{{ config.ci.branch }}"
 {% for item in config.matrix.python %}
 {% if item.branch == config.ci.branch %}
-{% if item.version == '3' %}
+{% if item.version.startswith('3') %}
 USE_PYTHON3="True"
+PYTHON3_VERSION="{{ item.version }}"
+{% elif item.version.startswith('2') %}
+PYTHON2_VERSION="{{ item.version }}"
 {% endif %}
 {% break %}
 {% endif %}
