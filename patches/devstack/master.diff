@@ -6,7 +6,7 @@ index 0d9da44..2b643b8 100644
  dstat
 -python-psutil
 diff --git a/functions-common b/functions-common
-index bace9e0..f8817f9 100644
+index e234523..42c16cc 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -526,11 +526,11 @@ function git_clone {
@@ -60,7 +60,7 @@ index bace9e0..f8817f9 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
-@@ -1742,7 +1744,7 @@ function run_phase {
+@@ -1766,7 +1768,7 @@ function run_phase {
              # white listed elements in tree. We want these to move out
              # over time as well, but they are in tree, so we need to
              # manage that.
@@ -70,10 +70,10 @@ index bace9e0..f8817f9 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index 8c6fa01..6d284c9 100644
+index 6afed0e..1ad7e19 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -592,9 +592,7 @@ function configure_tempest {
+@@ -591,9 +591,7 @@ function configure_tempest {
          tox -revenv-tempest --notest
      fi
  
@@ -85,7 +85,7 @@ index 8c6fa01..6d284c9 100644
      # Auth:
      iniset $TEMPEST_CONFIG auth tempest_roles "member"
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 7482239..2605e67 100755
+index 1fa053f..2605e67 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -238,33 +238,8 @@ function fixup_suse {
@@ -109,7 +109,7 @@ index 7482239..2605e67 100755
 -# looking for the mirror config script before doing this, and just
 -# skip it if so.
 -
--# [1] https://git.openstack.org/cgit/openstack/diskimage-builder/tree/ \
+-# [1] https://opendev.org/openstack/diskimage-builder/src/branch/master/ \
 -#        diskimage_builder/elements/pip-and-virtualenv/ \
 -#            install.d/pip-and-virtualenv-source-install/04-install-pip
 -# [2] https://bugzilla.redhat.com/show_bug.cgi?id=1477823
