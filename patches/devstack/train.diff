@@ -1,0 +1,125 @@
+diff --git a/files/debs/dstat b/files/debs/dstat
+index 0d9da44..2b643b8 100644
+--- a/files/debs/dstat
++++ b/files/debs/dstat
+@@ -1,2 +1 @@
+ dstat
+-python-psutil
+diff --git a/functions-common b/functions-common
+index a13d611..8755bca 100644
+--- a/functions-common
++++ b/functions-common
+@@ -526,11 +526,11 @@ function git_clone {
+     local git_ref=$3
+     local orig_dir
+     orig_dir=$(pwd)
+-    local git_clone_flags=""
++    local git_clone_flags="--branch $git_ref"
+ 
+     RECLONE=$(trueorfalse False RECLONE)
+-    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
+-        git_clone_flags="$git_clone_flags --depth $GIT_DEPTH"
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
+     fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
+@@ -538,6 +538,7 @@ function git_clone {
+         # print out the results so we know what change was used in the logs
+         cd $git_dest
+         git show --oneline | head -1
++        $CIDIR/scripts/patch.sh
+         cd $orig_dir
+         return
+     fi
+@@ -562,8 +563,7 @@ function git_clone {
+                 echo "the project to the \$PROJECTS variable in the job definition."
+                 die $LINENO "Cloning not allowed in this configuration"
+             fi
+-            # '--branch' can also take tags
+-            git_timed clone $git_clone_flags $git_remote $git_dest --branch $git_ref
++            git_timed clone $git_clone_flags -- $git_remote $git_dest
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $git_dest
+@@ -592,6 +592,7 @@ function git_clone {
+     # print out the results so we know what change was used in the logs
+     cd $git_dest
+     git show --oneline | head -1
++    $CIDIR/scripts/patch.sh
+     cd $orig_dir
+ }
+ 
+@@ -1080,7 +1081,8 @@ function apt_get_update {
+     time_start "apt-get-update"
+ 
+     local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
+-    local update_cmd="$sudo $proxies apt-get update"
++    local options="-o Acquire::http::Pipeline-Depth=0 -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true"
++    local update_cmd="$sudo $proxies apt-get update $options"
+     if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
+         die $LINENO "Failed to update apt repos, we're dead now"
+     fi
+@@ -1766,7 +1768,7 @@ function run_phase {
+             # white listed elements in tree. We want these to move out
+             # over time as well, but they are in tree, so we need to
+             # manage that.
+-            local exceptions="80-tempest.sh"
++            local exceptions="80-tempest.sh 99-ci.sh"
+             local extra
+             extra=$(basename $extra_plugin_file_name)
+             if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index ab39eba..f072503 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -606,9 +606,7 @@ function configure_tempest {
+         tox -revenv-tempest --notest
+     fi
+ 
+-    # The requirements might be on a different branch, while tempest needs master requirements.
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
+-    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
++    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
+ 
+     # Auth:
+     iniset $TEMPEST_CONFIG auth tempest_roles "member"
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index d298937..466b628 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -259,33 +259,8 @@ function fixup_suse {
+     sudo rm -rf /usr/lib/python3.6/site-packages/six-*.egg-info
+ }
+ 
+-# The version of pip(1.5.4) supported by python-virtualenv(1.11.4) has
+-# connection issues under proxy so re-install the latest version using
+-# pip. To avoid having pip's virtualenv overwritten by the distro's
+-# package (e.g. due to installing a distro package with a dependency
+-# on python-virtualenv), first install the distro python-virtualenv
+-# to satisfy any dependencies then use pip to overwrite it.
+-
+-# ... but, for infra builds, the pip-and-virtualenv [1] element has
+-# already done this to ensure the latest pip, virtualenv and
+-# setuptools on the base image for all platforms.  It has also added
+-# the packages to the yum/dnf ignore list to prevent them being
+-# overwritten with old versions.  F26 and dnf 2.0 has changed
+-# behaviour that means re-installing python-virtualenv fails [2].
+-# Thus we do a quick check if we're in the infra environment by
+-# looking for the mirror config script before doing this, and just
+-# skip it if so.
+-
+-# [1] https://opendev.org/openstack/diskimage-builder/src/branch/master/ \
+-#        diskimage_builder/elements/pip-and-virtualenv/ \
+-#            install.d/pip-and-virtualenv-source-install/04-install-pip
+-# [2] https://bugzilla.redhat.com/show_bug.cgi?id=1477823
+-
+ function fixup_virtualenv {
+-    if [[ ! -f /etc/ci/mirror_info.sh ]]; then
+-        install_package python-virtualenv
+-        pip_install -U --force-reinstall virtualenv
+-    fi
++    pip_install -U virtualenv
+ }
+ 
+ function fixup_all {

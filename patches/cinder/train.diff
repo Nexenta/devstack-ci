@@ -1,0 +1,79 @@
+diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
+index e5f0508..1c8005b 100644
+--- a/cinder/api/openstack/wsgi.py
++++ b/cinder/api/openstack/wsgi.py
+@@ -24,6 +24,7 @@ except ImportError:
+ import functools
+ import inspect
+ import math
++import sys
+ import time
+ 
+ from oslo_log import log as logging
+@@ -47,6 +48,9 @@ from cinder.i18n import _
+ from cinder import utils
+ from cinder.wsgi import common as wsgi
+ 
++if sys.version_info[0] == 2:
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
+ 
+ LOG = logging.getLogger(__name__)
+ 
+diff --git a/cinder/api/v3/volumes.py b/cinder/api/v3/volumes.py
+index e951817..e93ae82 100644
+--- a/cinder/api/v3/volumes.py
++++ b/cinder/api/v3/volumes.py
+@@ -194,12 +194,6 @@ class VolumeController(volumes_v2.VolumeController):
+                     "the latest one of volume %(v_id)s.")
+             raise exc.HTTPBadRequest(explanation=msg % {'s_id': snapshot_id,
+                                                         'v_id': volume.id})
+-        if volume.size != l_snap.volume_size:
+-            msg = _("Can't revert volume %(v_id)s to its latest snapshot "
+-                    "%(s_id)s. The volume size must be equal to the snapshot "
+-                    "size.")
+-            raise exc.HTTPBadRequest(explanation=msg % {'s_id': snapshot_id,
+-                                                        'v_id': volume.id})
+         try:
+             msg = 'Reverting volume %(v_id)s to snapshot %(s_id)s.'
+             LOG.info(msg, {'v_id': volume.id,
+diff --git a/tox.ini b/tox.ini
+index e6c40e9..f7d3fe6 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -14,7 +14,7 @@ setenv = VIRTUAL_ENV={envdir}
+ usedevelop = True
+ install_command = pip install {opts} {packages}
+ 
+-deps = -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/train}
++deps =  -c{toxinidir}/../requirements/upper-constraints.txt
+         -r{toxinidir}/test-requirements.txt
+         -r{toxinidir}/requirements.txt
+ 
+@@ -73,7 +73,7 @@ setenv =
+   OS_TEST_PATH = ./cinder/tests/compliance
+ 
+ [testenv:pep8]
+-basepython = python3
++basepython = python2
+ commands =
+   flake8 {posargs} .
+   doc8
+@@ -121,7 +121,7 @@ basepython = python3
+ commands = oslopolicy-sample-generator --config-file=tools/config/cinder-policy-generator.conf
+ 
+ [testenv:genopts]
+-basepython = python3
++basepython = python2
+ sitepackages = False
+ envdir = {toxworkdir}/pep8
+ commands = python tools/config/generate_cinder_opts.py
+@@ -133,7 +133,7 @@ commands = {posargs}
+ [testenv:docs]
+ basepython = python3
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/train}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+   rm -fr doc/source/contributor/api/
