@@ -47,7 +47,7 @@ CINDER_IMG_CACHE_ENABLED="False"
 CINDER_COORDINATION_URL="file://\$state_path"
 LOG_COLOR="False"
 SYSLOG="False"
-{% if (config.ci.branch == 'pike' and config.devstack.startup == 'systemd') or config.ci.branch in ['queens', 'rocky', 'stein', 'master'] %}
+{% if (config.ci.branch == 'pike' and config.devstack.startup == 'systemd') or config.ci.branch in ['queens', 'rocky', 'stein', 'train', 'master'] %}
 USE_SCREEN="False"
 USE_SYSTEMD="True"
 USE_JOURNAL="True"
@@ -56,10 +56,10 @@ USE_SCREEN="True"
 USE_SYSTEMD="False"
 USE_JOURNAL="False"
 {% endif %}
-{% if config.ci.branch in ['queens', 'rocky', 'stein', 'master'] %}
+{% if config.ci.branch in ['queens', 'rocky', 'stein', 'train', 'master'] %}
 ENABLE_VOLUME_MULTIATTACH="True"
 {% endif %}
-{% if 'ns5' in config.ci.backend and config.ci.branch in ['mitaka', 'newton', 'ocata', 'pike', 'queens', 'rocky', 'stein', 'master'] %}
+{% if 'ns5' in config.ci.backend and config.ci.branch in ['mitaka', 'newton', 'ocata', 'pike', 'queens', 'rocky', 'stein', 'train', 'master'] %}
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
@@ -127,7 +127,7 @@ SHARE_DRIVER="{{ parameter.value }}"
 {% endfor %}
 {% endfor %}
 {% else %}
-{% if config.ci.branch in ['queens', 'rocky', 'stein', 'master'] %}
+{% if config.ci.branch in ['queens', 'rocky', 'stein', 'train', 'master'] %}
 enable_plugin cinder-tempest-plugin $GIT_BASE/openstack/cinder-tempest-plugin $CINDER_TEMPEST_PLUGIN_BRANCH
 {% endif %}
 CINDER_VOLUME_CLEAR="none"
@@ -157,7 +157,7 @@ driver_ssl_cert_verify = False
 {% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
 backup_file_size = "134217728"
 backup_sha_block_size_bytes = "32768"
-{% if config.ci.branch in ['stein', 'master'] %}
+{% if config.ci.branch in ['stein', 'train', 'master'] %}
 backup_driver = "cinder.backup.drivers.nfs.NFSBackupDriver"
 {% else %}
 backup_driver = "cinder.backup.drivers.nfs"

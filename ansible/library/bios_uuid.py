@@ -20,6 +20,7 @@ openstack_branches = {
     'queens':           0xa9,
     'rocky':            0xb0,
     'stein':            0xb1,
+    'train':            0xb2
 }
 
 docker_branches = {

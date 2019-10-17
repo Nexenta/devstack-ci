@@ -4,13 +4,12 @@ backend:
   - ns5_nfs
   - ns4_iscsi
   - ns5_iscsi
-  - ned_nbd
-  - ned_iscsi
   - ns4_manila
   - ns5_manila
 
 branch:
   - master
+  - train
   - stein
   - rocky
   - queens
@@ -24,34 +23,24 @@ branch:
   - icehouse
 
 exclude:
-  - branch: master
-    backend: ned_nbd
-  - branch: icehouse
-    backend: ned_nbd
   - branch: icehouse
     backend: ns4_manila
   - branch: icehouse
     backend: ns5_manila
-  - branch: juno
-    backend: ned_nbd
   - branch: juno
     backend: ns4_manila
   - branch: juno
     backend: ns5_manila
   - branch: kilo
-    backend: ned_nbd
+    backend: ns4_manila
   - branch: kilo
     backend: ns5_manila
   - branch: liberty
-    backend: ned_nbd
+    backend: ns4_manila
+  - branch: liberty
+    backend: ns5_manila
   - branch: mitaka
-    backend: ned_nbd
-  - branch: newton
-    backend: ned_nbd
-  - branch: ocata
-    backend: ned_nbd
-  - branch: pike
-    backend: ned_nbd
-  - branch: queens
-    backend: ned_nbd
+    backend: ns4_manila
+  - branch: mitaka
+    backend: ns5_manila
 ...
