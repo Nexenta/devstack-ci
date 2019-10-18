@@ -82,11 +82,8 @@ ns4_manila)
 esac
 
 case "$_branch" in
-master|stein|rocky)
+master|stein|train|rocky)
 	_versions=(py27 py36 py37)
-	;;
-stein|rocky)
-	_versions=(py27 py36)
 	;;
 queens|pike|ocata|newton)
 	_versions=(py27)
