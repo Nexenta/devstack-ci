@@ -7,8 +7,8 @@ index e5f0508..9b22608 100644
  from cinder.wsgi import common as wsgi
  
 +if six.PY2:
-+    import sys
 +    from imp import reload
++    import sys
 +    reload(sys)
 +    sys.setdefaultencoding('utf-8')
  
