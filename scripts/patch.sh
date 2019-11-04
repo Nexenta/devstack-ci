@@ -37,7 +37,11 @@ for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-
 	if [[ -f "$_file" ]]; then
 		sed -i '/^tempest/d' $_file
 		if [[ "$_project" != 'cinder' && "$_project" != 'manila' ]]; then
-			sed -i -e '/^flake8/d' -e '/^hacking/d' $_file
+			sed -i \
+				-e '/^bandit/d' \
+				-e '/^flake8/d' \
+				-e '/^hacking/d' \
+			$_file
 		fi
 	fi
 done
