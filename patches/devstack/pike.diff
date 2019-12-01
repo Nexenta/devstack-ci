@@ -1,3 +1,10 @@
+diff --git a/files/debs/dstat b/files/debs/dstat
+index 0d9da44..2b643b8 100644
+--- a/files/debs/dstat
++++ b/files/debs/dstat
+@@ -1,2 +1 @@
+ dstat
+-python-psutil
 diff --git a/functions-common b/functions-common
 index 660df79..e02baa3 100644
 --- a/functions-common
@@ -77,3 +84,21 @@ index d27ebca..b57de55 100644
  
      # Auth:
      iniset $TEMPEST_CONFIG auth tempest_roles "Member"
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index 55cd725..274530a 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -195,12 +195,4 @@ if is_fedora; then
+     fi
+ fi
+ 
+-# The version of pip(1.5.4) supported by python-virtualenv(1.11.4) has
+-# connection issues under proxy so re-install the latest version using
+-# pip. To avoid having pip's virtualenv overwritten by the distro's
+-# package (e.g. due to installing a distro package with a dependency
+-# on python-virtualenv), first install the distro python-virtualenv
+-# to satisfy any dependencies then use pip to overwrite it.
+-
+-install_package python-virtualenv
+-pip_install -U --force-reinstall virtualenv
++pip_install -U virtualenv
