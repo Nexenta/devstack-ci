@@ -1,12 +1,13 @@
 diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index eeb9df1..96cda05 100644
+index eeb9df1..5d1fc39 100644
 --- a/cinder/api/openstack/wsgi.py
 +++ b/cinder/api/openstack/wsgi.py
-@@ -41,6 +41,10 @@ from cinder import policy
+@@ -41,6 +41,11 @@ from cinder import policy
  from cinder import utils
  from cinder.wsgi import common as wsgi
  
-+if not six.PY3:
++if six.PY2:
++    from imp import reload
 +    import sys
 +    reload(sys)
 +    sys.setdefaultencoding('utf-8')
@@ -47,14 +48,15 @@ index c524e9a..b7bcc54 100644
  
      @classmethod
 diff --git a/cinder/volume/manager.py b/cinder/volume/manager.py
-index a6d40d6..7415af4 100644
+index a6d40d6..e73512f 100644
 --- a/cinder/volume/manager.py
 +++ b/cinder/volume/manager.py
-@@ -84,6 +84,11 @@ from cinder.volume import rpcapi as volume_rpcapi
+@@ -84,6 +84,12 @@ from cinder.volume import rpcapi as volume_rpcapi
  from cinder.volume import utils as vol_utils
  from cinder.volume import volume_types
  
-+if not six.PY3:
++if six.PY2:
++    from imp import reload
 +    import sys
 +    reload(sys)
 +    sys.setdefaultencoding('utf-8')
@@ -106,22 +108,20 @@ index 8f25d59..764a865 100644
  reno!=2.3.1,>=1.8.0 # Apache-2.0
  doc8 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index bf4c656..ac435ed 100644
+index bf4c656..a6b9a98 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -10,10 +10,11 @@ setenv = VIRTUAL_ENV={envdir}
+@@ -10,8 +10,9 @@ setenv = VIRTUAL_ENV={envdir}
           PYTHONHASHSEED=0
           PYTHONWARNINGS=default::DeprecationWarning
  usedevelop = True
 -install_command = pip install -c{env:UPPER_CONSTRAINTS_FILE:https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt?h=stable/pike} {opts} {packages}
 +install_command = pip install -c{toxinidir}/../requirements/upper-constraints.txt {opts} {packages}
  deps =
++    -c{toxinidir}/../requirements/upper-constraints.txt
      -r{toxinidir}/test-requirements.txt
      -r{toxinidir}/requirements.txt
-+    -c{toxinidir}/../requirements/upper-constraints.txt
  
- # By default ostestr will set concurrency
- # to ncpu, to specify something else use
 @@ -21,7 +22,7 @@ deps =
  # call ie: 'tox -epy27 -- --concurrency=4'
  commands =
