@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index 7d7b7f5b..f97078e0 100644
+index 7d7b7f5..f97078e 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -498,11 +498,11 @@ function git_clone {
@@ -62,3 +62,33 @@ index 7d7b7f5b..f97078e0 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index e1a5630..a77c481 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -440,6 +440,7 @@ function configure_tempest {
+     if [[ "$CINDER_ENABLED_BACKENDS" == *"lvm"* ]]; then
+         TEMPEST_VOLUME_MANAGE_SNAPSHOT=${TEMPEST_VOLUME_MANAGE_SNAPSHOT:-True}
+     fi
++    iniset $TEMPEST_CONFIG volume-feature-enabled manage_volume $(trueorfalse False TEMPEST_VOLUME_MANAGE_VOLUME)
+     iniset $TEMPEST_CONFIG volume-feature-enabled manage_snapshot $(trueorfalse False TEMPEST_VOLUME_MANAGE_SNAPSHOT)
+     # TODO(ynesenenko): Remove the volume_services flag when Liberty and Kilo will correct work with host info.
+     iniset $TEMPEST_CONFIG volume-feature-enabled volume_services True
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index 6f680b8..17c0d17 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -188,12 +188,4 @@ if is_fedora; then
+     fi
+ fi
+ 
+-# The version of pip(1.5.4) supported by python-virtualenv(1.11.4) has
+-# connection issues under proxy so re-install the latest version using
+-# pip. To avoid having pip's virtualenv overwritten by the distro's
+-# package (e.g. due to installing a distro package with a dependency
+-# on python-virtualenv), first install the distro python-virtualenv
+-# to satisfy any dependencies then use pip to overwrite it.
+-
+-install_package python-virtualenv
+-pip_install -U --force-reinstall virtualenv
++pip_install -U virtualenv
