@@ -1,3 +1,19 @@
+diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
+index 8a19d18..9bf57c5 100644
+--- a/cinder/api/openstack/wsgi.py
++++ b/cinder/api/openstack/wsgi.py
+@@ -37,6 +37,11 @@ from cinder import policy
+ from cinder import utils
+ from cinder.wsgi import common as wsgi
+ 
++if six.PY2:
++    from imp import reload
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
+ 
+ LOG = logging.getLogger(__name__)
+ 
 diff --git a/cinder/hacking/checks.py b/cinder/hacking/checks.py
 index 176d4e2..8e37b3c 100644
 --- a/cinder/hacking/checks.py
@@ -32,6 +48,23 @@ index b89d34c..b38f6b8 100644
                    'name': 'fakeimage123456',
                    'created_at': timestamp,
                    'updated_at': timestamp,
+diff --git a/cinder/volume/manager.py b/cinder/volume/manager.py
+index 490b406..2c5893d 100644
+--- a/cinder/volume/manager.py
++++ b/cinder/volume/manager.py
+@@ -80,6 +80,12 @@ from cinder.volume import rpcapi as volume_rpcapi
+ from cinder.volume import utils as vol_utils
+ from cinder.volume import volume_types
+ 
++if six.PY2:
++    from imp import reload
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
++
+ LOG = logging.getLogger(__name__)
+ 
+ QUOTAS = quota.QUOTAS
 diff --git a/tox.ini b/tox.ini
 index 563e0cf..e18fbd1 100644
 --- a/tox.ini
