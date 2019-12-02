@@ -1,3 +1,19 @@
+diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
+index 0e6d04b..e33de65 100644
+--- a/cinder/api/openstack/wsgi.py
++++ b/cinder/api/openstack/wsgi.py
+@@ -37,6 +37,11 @@ from cinder import policy
+ from cinder import utils
+ from cinder.wsgi import common as wsgi
+ 
++if six.PY2:
++    from imp import reload
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
+ 
+ LOG = logging.getLogger(__name__)
+ 
 diff --git a/cinder/hacking/checks.py b/cinder/hacking/checks.py
 index 804b54c..d830b27 100644
 --- a/cinder/hacking/checks.py
@@ -122,6 +138,23 @@ index f721726..7026858 100644
                    'name': 'fakeimage123456',
                    'created_at': timestamp,
                    'updated_at': timestamp,
+diff --git a/cinder/volume/manager.py b/cinder/volume/manager.py
+index 9870017..04fb0c2 100644
+--- a/cinder/volume/manager.py
++++ b/cinder/volume/manager.py
+@@ -85,6 +85,12 @@ from cinder.volume import rpcapi as volume_rpcapi
+ from cinder.volume import utils as vol_utils
+ from cinder.volume import volume_types
+ 
++if six.PY2:
++    from imp import reload
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
++
+ LOG = logging.getLogger(__name__)
+ 
+ QUOTAS = quota.QUOTAS
 diff --git a/etc/cinder/policy.json b/etc/cinder/policy.json
 index 6a65122..3b32cb3 100644
 --- a/etc/cinder/policy.json
@@ -165,7 +198,7 @@ index 45b50a6..61dafbb 100644
  bandit>=1.1.0 # Apache-2.0
  reno>=1.8.0 # Apache-2.0
 diff --git a/tox.ini b/tox.ini
-index 3657f88..eedc88c 100644
+index 61cda1a..8a5a18e 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -10,9 +10,10 @@ setenv = VIRTUAL_ENV={envdir}
@@ -203,4 +236,4 @@ index 3657f88..eedc88c 100644
 +       -c{toxinidir}/../requirements/upper-constraints.txt
  commands = bandit -r cinder -n5 -x tests -ll
  
- [flake8]
+ [testenv:bindep]
