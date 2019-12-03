@@ -35,7 +35,7 @@ fi
 
 for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-constraints.txt; do
 	if [[ -f "$_file" ]]; then
-		sed -i '/^tempest/d' $_file
+		sed -i '/^tempest[^-]/d' $_file
 		if [[ "$_project" != 'cinder' && "$_project" != 'manila' ]]; then
 			sed -i \
 				-e '/^bandit/d' \
