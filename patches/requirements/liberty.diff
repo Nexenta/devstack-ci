@@ -12,7 +12,7 @@ index 73ccc84..f13e198 100644
  anyjson===0.3.3
  appdirs===1.4.0
  argcomplete===1.0.0
-+argparse===1.4.0
++argparse===1.2.1
  astroid===1.3.8
  autobahn===0.11.0
  automaton===1.0.0
