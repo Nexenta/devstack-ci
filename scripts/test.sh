@@ -95,7 +95,10 @@ esac
 
 
 if [[ -n "$_unit" ]]; then
-	tox -e cover -- $_unit || true
+	if (( ${#_versions[@]} > 0 )); then
+		tox -e cover -- $_unit || true
+	fi
+
 	for _index in "${!_versions[@]}"; do
 		_version=${_versions[$_index]}
 		tox -e $_version -- $_unit || true
