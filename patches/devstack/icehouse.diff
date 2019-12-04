@@ -444,7 +444,7 @@ index 1ce4f56..5969f9f 100644
      iniset $TEMPEST_CONFIG compute flavor_ref $flavor_ref
      iniset $TEMPEST_CONFIG compute flavor_ref_alt $flavor_ref_alt
      iniset $TEMPEST_CONFIG compute ssh_connect_method $ssh_connect_method
-+    iniset $TEMPEST_CONFIG compute run_ssh "False"
++    iniset $TEMPEST_CONFIG compute run_ssh "True"
  
      # Compute Features
      iniset $TEMPEST_CONFIG compute-feature-enabled resize True
