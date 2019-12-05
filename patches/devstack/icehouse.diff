@@ -39,10 +39,10 @@ index e80f447..3e2029e 100644
  python-pastedeploy
  python-xattr
 diff --git a/files/apts/horizon b/files/apts/horizon
-index eb6651d..102ec27 100644
+index eb6651d..2284eab 100644
 --- a/files/apts/horizon
 +++ b/files/apts/horizon
-@@ -1,18 +1,12 @@
+@@ -1,18 +1,10 @@
  apache2  # NOPRIME
  libapache2-mod-wsgi  # NOPRIME
  python-beautifulsoup
@@ -54,11 +54,11 @@ index eb6651d..102ec27 100644
  python-xattr
 -python-sqlalchemy
 -python-webob
- python-kombu
+-python-kombu
 -python-eventlet
  python-sphinx
  python-mox
- python-kombu
+-python-kombu
  python-coverage
 -python-cherrypy3 # why?
 diff --git a/files/apts/keystone b/files/apts/keystone
@@ -94,10 +94,10 @@ index c8722b9..e69de29 100644
 @@ -1 +0,0 @@
 -python-numpy
 diff --git a/files/apts/neutron b/files/apts/neutron
-index 648716a..daf482a 100644
+index 648716a..76546d5 100644
 --- a/files/apts/neutron
 +++ b/files/apts/neutron
-@@ -4,16 +4,10 @@ iputils-ping
+@@ -4,16 +4,9 @@ iputils-ping
  iputils-arping
  mysql-server #NOPRIME
  sudo
@@ -108,14 +108,14 @@ index 648716a..daf482a 100644
 -python-suds
  python-pastedeploy
 -python-greenlet
- python-kombu
+-python-kombu
 -python-eventlet
 -python-sqlalchemy
  python-mysqldb
  python-pyudev
  python-qpid # dist:precise
 diff --git a/files/apts/nova b/files/apts/nova
-index 1048ef1..52a1982 100644
+index 1048ef1..9189506 100644
 --- a/files/apts/nova
 +++ b/files/apts/nova
 @@ -7,7 +7,6 @@ iputils-arping
@@ -126,7 +126,7 @@ index 1048ef1..52a1982 100644
  gawk
  iptables
  ebtables
-@@ -26,20 +25,12 @@ qpidd # dist:precise NOPRIME
+@@ -26,21 +25,12 @@ qpidd # dist:precise NOPRIME
  socat # used by ajaxterm
  python-mox
  python-paste
@@ -144,9 +144,10 @@ index 1048ef1..52a1982 100644
  python-lockfile
  python-m2crypto
 -python-boto
- python-kombu
+-python-kombu
  python-feedparser
  python-iso8601
+ python-qpid # dist:precise
 diff --git a/files/apts/ryu b/files/apts/ryu
 index 9b85080..db9f745 100644
 --- a/files/apts/ryu
@@ -430,7 +431,7 @@ index cdf76c4..cd439e7 100644
  function install_infra {
      # bring down global requirements
 diff --git a/lib/tempest b/lib/tempest
-index 1ce4f56..5969f9f 100644
+index 1ce4f56..5c091c3 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -293,11 +293,14 @@ function configure_tempest {
