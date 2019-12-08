@@ -75,7 +75,7 @@ function ci_extra {
 		source $TOP_DIR/userrc_early
 
 		for key_type in rsa dsa ecdsa ed25519; do
-			key_file="$HOME/.ssh/id_${key_type}.key"
+			key_file="$HOME/.ssh/id_${key_type}"
 
 			if [[ ! -r "$key_file" ]]; then
 				ssh-keygen -N '' -t $key_type -f $key_file
