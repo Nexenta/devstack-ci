@@ -5,6 +5,10 @@ function ci_install {
 	local cinder_unit_tests_path='cinder/tests/unit/volume/drivers/nexenta'
 	local manila_drivers_path='manila/share/drivers/nexenta'
 
+	if [[ "$NEXENTA_CI_TYPE" == "external" ]]; then
+		return
+	fi
+
 	if is_service_enabled cinder; then
 		git_clone $NEXENTA_CINDER_REPO $NEXENTA_CINDER_DIR $NEXENTA_BRANCH
 

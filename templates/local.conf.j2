@@ -65,6 +65,7 @@ TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
 
+NEXENTA_CI_TYPE="{{ config.ci.type }}"
 NEXENTA_CINDER_REPO="{{ config.nexenta.cinder.repository }}"
 NEXENTA_CINDER_DIR="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
 

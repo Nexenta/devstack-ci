@@ -21,6 +21,10 @@ _git[diff]='diff --patch-with-stat'
 
 source $_source/env.sh
 
+if [[ "$_project" != "devstak" && "$_type" == "external" ]]; then
+	exit
+fi
+
 if [[ ! -d $_base/$_logs ]]; then
 	mkdir -p $_base/$_logs
 fi
