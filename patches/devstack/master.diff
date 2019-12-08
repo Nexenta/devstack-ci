@@ -6,7 +6,7 @@ index 0d9da44..2b643b8 100644
  dstat
 -python-psutil
 diff --git a/functions-common b/functions-common
-index e234523..42c16cc 100644
+index a13d611..8755bca 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -526,11 +526,11 @@ function git_clone {
@@ -70,26 +70,43 @@ index e234523..42c16cc 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index 6afed0e..1ad7e19 100644
+index ea5033a..9cbfc7e 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -591,9 +591,7 @@ function configure_tempest {
+@@ -606,12 +606,7 @@ function configure_tempest {
          tox -revenv-tempest --notest
      fi
  
 -    # The requirements might be on a different branch, while tempest needs master requirements.
--    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
--    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
+-    local tmp_u_c_m
+-    tmp_u_c_m=$(mktemp -t tempest_u_c_m.XXXXXXXXXX)
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > $tmp_u_c_m
+-    tox -evenv-tempest -- pip install -c $tmp_u_c_m -r requirements.txt
+-    rm -f $tmp_u_c_m
 +    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
  
      # Auth:
      iniset $TEMPEST_CONFIG auth tempest_roles "member"
+@@ -699,12 +694,7 @@ function install_tempest {
+ function install_tempest_plugins {
+     pushd $TEMPEST_DIR
+     if [[ $TEMPEST_PLUGINS != 0 ]] ; then
+-        # The requirements might be on a different branch, while tempest & tempest plugins needs master requirements.
+-        local tmp_u_c_m
+-        tmp_u_c_m=$(mktemp -t tempest_u_c_m.XXXXXXXXXX)
+-        (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > $tmp_u_c_m
+-        tox -evenv-tempest -- pip install -c $tmp_u_c_m $TEMPEST_PLUGINS
+-        rm -f $tmp_u_c_m
++        tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt $TEMPEST_PLUGINS
+         echo "Checking installed Tempest plugins:"
+         tox -evenv-tempest -- tempest list-plugins
+     fi
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 1fa053f..2605e67 100755
+index eb8a76f..cb1adc6 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -238,33 +238,8 @@ function fixup_suse {
-     sudo rm -rf /usr/lib/python3.6/site-packages/ply-*.egg-info
+@@ -228,33 +228,8 @@ function fixup_suse {
+     sudo rm -rf /usr/lib/python3.6/site-packages/six-*.egg-info
  }
  
 -# The version of pip(1.5.4) supported by python-virtualenv(1.11.4) has
