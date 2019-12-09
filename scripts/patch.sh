@@ -21,7 +21,7 @@ _git[diff]='diff --patch-with-stat'
 
 source $_source/env.sh
 
-if [[ "$_project" != "devstak" && "$_type" == "external" ]]; then
+if [[ "$_project" != "devstack" && "$_type" == "external" ]]; then
 	exit
 fi
 
