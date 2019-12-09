@@ -30,7 +30,7 @@ fi
 
 if grep -q 'Traceback' $_base/$_logs/openstack.log; then
 	echo 'Error: openstack command failed:'
-	grep 'Traceback' $_base/$_logs/openstack.log
+	cat $_base/$_logs/openstack.log
 	exit 1
 fi
 
