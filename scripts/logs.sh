@@ -23,7 +23,7 @@ fi
 
 if systemctl --version && journalctl --version; then
 	for _unit in $(systemctl --no-legend --no-pager list-unit-files devstack@* | awk '{print $1}'); do
-		_log="{{ config.ci.base }}/{{ config.ci.logs }}/$_unit.log"
+		_log="$_base/$_logs/$_unit.log"
 		journalctl --all --merge --unit=$_unit >$_log
 	done
 fi
