@@ -167,3 +167,9 @@ backup_driver = "cinder.backup.drivers.nfs"
 backup_share = "{{ config.backup.host }}:{{ config.backup.share }}/{{ config.ci.backend }}"
 backup_mount_options = "{{ config.backup.options }}"
 {% endif %}
+
+{% if config.ci.type == 'external' %}
+[[post-config|$NOVA_CPU_CONF]]
+[libvirt]
+nfs_mount_options = vers=3,minorversion=0,nolock
+{% endif %}
