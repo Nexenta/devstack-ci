@@ -21,10 +21,6 @@ _git[diff]='diff --patch-with-stat'
 
 source $_source/env.sh
 
-#if [[ "$_project" != "devstack" && "$_type" == "external" ]]; then
-#	exit
-#fi
-
 if [[ ! -d $_base/$_logs ]]; then
 	mkdir -p $_base/$_logs
 fi
@@ -54,6 +50,8 @@ if [[ -d $_base/$_ci/files/$_project ]]; then
 	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
 
-for item in "${!_git[@]}"; do
-	git ${_git[$item]} | tee -a $_base/$_logs/git.$item.$_project.log
-done
+if [[ "$_type" == "internal" ]]; then
+	for item in "${!_git[@]}"; do
+		git ${_git[$item]} | tee -a $_base/$_logs/git.$item.$_project.log
+	done
+fi
