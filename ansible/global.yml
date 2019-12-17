@@ -3,7 +3,7 @@
   - branch
   - backend
   - config
-- shell: /bin/sh
+- shell: /bin/bash
 - hasync: |
     limit=128
     while ls /opt/HAC/RSF-1/event-queue/*; do
