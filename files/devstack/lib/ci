@@ -174,7 +174,7 @@ function ci_test_config {
 			iniset $TEMPEST_CONFIG share run_mount_snapshot_tests False
 			iniset $TEMPEST_CONFIG share run_quota_tests True
 			iniset $TEMPEST_CONFIG share run_extend_tests True
-			iniset $TEMPEST_CONFIG share run_revert_to_snapshot_tests True
+			iniset $TEMPEST_CONFIG share run_revert_to_snapshot_tests False
 			iniset $TEMPEST_CONFIG share run_share_group_tests True
 			iniset $TEMPEST_CONFIG share run_snapshot_tests True
 			iniset $TEMPEST_CONFIG share run_consistency_group_tests False
