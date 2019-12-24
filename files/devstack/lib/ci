@@ -191,6 +191,9 @@ function ci_test_config {
 			stein)
 				iniset $TEMPEST_CONFIG share max_api_microversion 2.49
 				;;
+			master)
+				iniset $TEMPEST_CONFIG share max_api_microversion 2.50
+				;;
 			*)
 				;;
 			esac
