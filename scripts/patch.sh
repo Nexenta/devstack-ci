@@ -32,7 +32,11 @@ fi
 git reset --hard
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
-	patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
+	if patch --dry-run -t -p1 < $_base/$_ci/patches/$_project/$_branch.diff; then
+		patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
+	elif [[ "$_type" == "internal" ]]; then
+		exit 1
+	fi
 fi
 
 for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-constraints.txt; do
