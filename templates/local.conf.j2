@@ -13,7 +13,7 @@ enable_service tempest
 enable_service c-bak
 {% endif %}
 
-{% if config.ci.branch in ['master'] %}
+{% if config.ci.branch in ['xmaster'] %}
 enable_service key
 enable_plugin barbican https://opendev.org/openstack/barbican
 {% endif %}
