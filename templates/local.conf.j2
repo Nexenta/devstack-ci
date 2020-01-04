@@ -18,7 +18,6 @@ enable_service key
 enable_plugin barbican https://opendev.org/openstack/barbican
 {% endif %}
 
-LIBVIRT_TYPE="qemu"
 GIT_BASE="https://opendev.org"
 FORCE="yes"
 DATABASE_USER="root"
@@ -37,6 +36,7 @@ VIRT_DRIVER="libvirt"
 GIT_DEPTH="1"
 ROOTSLEEP="0"
 API_WORKERS="2"
+BUILD_TIMEOUT="300"
 SERVICE_TIMEOUT="600"
 IP_VERSION="4"
 CIRROS_VERSION="0.3.6"
