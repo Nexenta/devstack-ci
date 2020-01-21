@@ -1,3 +1,10 @@
+diff --git a/files/debs/dstat b/files/debs/dstat
+index 0d9da44..2b643b8 100644
+--- a/files/debs/dstat
++++ b/files/debs/dstat
+@@ -1,2 +1 @@
+ dstat
+-python-psutil
 diff --git a/functions-common b/functions-common
 index a13d611..dd78f10 100644
 --- a/functions-common
