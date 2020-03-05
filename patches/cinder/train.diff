@@ -32,7 +32,7 @@ index e951817..e93ae82 100644
              msg = 'Reverting volume %(v_id)s to snapshot %(s_id)s.'
              LOG.info(msg, {'v_id': volume.id,
 diff --git a/tox.ini b/tox.ini
-index e6c40e9..4930299 100644
+index 33c40d1..ddd2cc9 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -14,7 +14,7 @@ setenv = VIRTUAL_ENV={envdir}
@@ -50,6 +50,6 @@ index e6c40e9..4930299 100644
  deps =
 -  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/train}
 +  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
  commands =
-   rm -fr doc/source/contributor/api/
