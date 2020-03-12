@@ -46,6 +46,7 @@ function ci_install {
 }
 
 function ci_extra {
+	local python=${PYTHON:-python}
 	local etc_apache lib_apache
 	local lso_apache lso_python
 	local pkg_python mod_python
@@ -64,10 +65,10 @@ function ci_extra {
 		install_package apache2-dev
 		lib_apache=$(apxs -q exp_libexecdir)
 		lso_apache=$(ldd $lib_apache/mod_wsgi.so | awk '/libpython/{print $1}')
-		lso_python=$($PYTHON $CIDIR/scripts/get_python_soname.py)
+		lso_python=$($python $CIDIR/scripts/get_python_soname.py)
 		if [[ "$lso_apache" != "$lso_python" ]]; then
-			sudo $PYTHON -m pip install mod_wsgi
-			pkg_python=$($PYTHON $CIDIR/scripts/get_python_packages.py)
+			sudo $python -m pip install mod_wsgi
+			pkg_python=$($python $CIDIR/scripts/get_python_packages.py)
 			mod_python=$(find $pkg_python -type f -name 'mod_wsgi*.so')
 			etc_apache=$(apxs -q exp_sysconfdir)
 			sudo tee $etc_apache/mods-available/wsgi.load <<-EOF
