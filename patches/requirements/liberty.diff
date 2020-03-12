@@ -1,8 +1,8 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 73ccc84..f13e198 100644
+index 73ccc84..9af4dfc 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -54,12 +54,12 @@ XStatic-roboto-fontface===0.4.3.2
+@@ -54,18 +54,17 @@ XStatic-roboto-fontface===0.4.3.2
  XStatic-smart-table===1.4.5.3
  XStatic-term.js===0.0.4.2
  XenAPI===1.2
@@ -16,7 +16,13 @@ index 73ccc84..f13e198 100644
  astroid===1.3.8
  autobahn===0.11.0
  automaton===1.0.0
-@@ -82,7 +82,7 @@ cliff===1.15.0
+ backports-abc===0.4
+ backports.ssl-match-hostname===3.4.0.2;python_version=='2.7'
+-bandit===0.16.2
+ bashate===0.3.2
+ beautifulsoup4===4.4.1
+ blockdiag===1.5.3
+@@ -82,7 +81,7 @@ cliff===1.15.0
  cliff-tablib===1.1
  cmd2===0.6.8
  colorama===0.3.5
@@ -25,7 +31,7 @@ index 73ccc84..f13e198 100644
  coverage===4.0.3
  croniter===0.3.10
  cryptography===1.1.2
-@@ -160,6 +160,7 @@ logutils===0.3.3
+@@ -160,6 +159,7 @@ logutils===0.3.3
  lxml===3.5.0
  mock===1.3.0
  monotonic===0.4
@@ -33,7 +39,7 @@ index 73ccc84..f13e198 100644
  mox===0.5.3
  mox3===0.12.0
  msgpack-python===0.4.6
-@@ -200,7 +201,7 @@ oslo.reports===1.1.0
+@@ -200,7 +200,7 @@ oslo.reports===1.1.0
  oslo.rootwrap===3.1.0
  oslo.serialization===1.10.0
  oslo.service===0.9.1
@@ -42,7 +48,7 @@ index 73ccc84..f13e198 100644
  oslo.versionedobjects===1.1.0
  oslo.vmware===2.1.0
  oslosphinx===4.1.0
-@@ -319,14 +320,15 @@ thrift===0.9.3;python_version=='2.7'
+@@ -319,14 +319,15 @@ thrift===0.9.3;python_version=='2.7'
  tooz===1.28.0
  tornado===4.3
  tosca-parser===0.3.0
@@ -60,3 +66,9 @@ index 73ccc84..f13e198 100644
  waitress===0.8.10
  warlock===1.2.0
  webcolors===1.5
+@@ -339,4 +340,5 @@ xattr===0.7.8
+ xvfbwrapper===0.2.6
+ yaql===1.0.2
+ zake===0.2.2
++zipp===2.2.1
+ zope.interface===4.1.3
