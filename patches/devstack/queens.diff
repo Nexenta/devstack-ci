@@ -69,26 +69,11 @@ index df295a3..5693134 100644
              local extra
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
-diff --git a/lib/tempest b/lib/tempest
-index 0bac72e..616c617 100644
---- a/lib/tempest
-+++ b/lib/tempest
-@@ -559,9 +559,7 @@ function configure_tempest {
-         tox -revenv-tempest --notest
-     fi
- 
--    # The requirements might be on a different branch, while tempest needs master requirements.
--    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > u-c-m.txt
--    tox -evenv-tempest -- pip install -c u-c-m.txt -r requirements.txt
-+    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
- 
-     # Auth:
-     iniset $TEMPEST_CONFIG auth tempest_roles "Member"
 diff --git a/stackrc b/stackrc
-index ff85146..6f3b196 100644
+index 9d7ff35..31f3fe6 100644
 --- a/stackrc
 +++ b/stackrc
-@@ -625,20 +625,7 @@ VIRT_DRIVER=${VIRT_DRIVER:-$DEFAULT_VIRT_DRIVER}
+@@ -627,20 +627,7 @@ VIRT_DRIVER=${VIRT_DRIVER:-$DEFAULT_VIRT_DRIVER}
  case "$VIRT_DRIVER" in
      ironic|libvirt)
          LIBVIRT_TYPE=${LIBVIRT_TYPE:-kvm}
@@ -111,10 +96,10 @@ index ff85146..6f3b196 100644
      lxd)
          LXD_GROUP=${LXD_GROUP:-"lxd"}
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 90b2c8b..e958c5d 100755
+index eeed14a..e958c5d 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -210,33 +210,8 @@ function fixup_fedora {
+@@ -210,37 +210,8 @@ function fixup_fedora {
      fi
  }
  
@@ -140,10 +125,14 @@ index 90b2c8b..e958c5d 100755
 -#            install.d/pip-and-virtualenv-source-install/04-install-pip
 -# [2] https://bugzilla.redhat.com/show_bug.cgi?id=1477823
 -
+-# TODO(jh): virtualenv 20.0.1 is breaking things in a yet unknown way.
+-# Install previous virtualenv over what infra preinstalls as a hotfix.
  function fixup_virtualenv {
 -    if [[ ! -f /etc/ci/mirror_info.sh ]]; then
 -        install_package python-virtualenv
--        pip_install -U --force-reinstall virtualenv
+-        pip_install -U --force-reinstall 'virtualenv<20'
+-    else
+-        pip_install -U --force-reinstall 'virtualenv<20'
 -    fi
 +    pip_install -U virtualenv
  }
