@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+unset PS1 PS2 PS3 PS4
+
 set -o nounset
 set -o xtrace
 set -o errexit

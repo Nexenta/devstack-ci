@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-unset PS4
+unset PS1 PS2 PS3 PS4
 
 set -o nounset
 set -o xtrace
@@ -59,14 +59,5 @@ fi
 if [[ "$_type" == "internal" ]]; then
 	for item in "${!_git[@]}"; do
 		git ${_git[$item]} | tee -a $_base/$_logs/git.$item.$_project.log
-	done
-fi
-
-# Temporary workaround
-if [[ "$_branch" == "master" ]]; then
-	for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-constraints.txt; do
-		if [[ -f "$_file" ]]; then
-			sed -i 's|^setuptools.*|setuptools==45.0.0|' $_file
-		fi
 	done
 fi
