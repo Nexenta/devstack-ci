@@ -1,11 +1,11 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 8a672fd..4ee2c7b 100644
+index 34e8380..745dcf5 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
 @@ -366,7 +366,6 @@ numpy===1.14.5
  msgpack===0.5.6
  Sphinx===1.7.6
- oslo.config===6.4.1
+ oslo.config===6.4.2
 -tempest===19.0.0
  django-floppyforms===1.7.0
  openstackdocstheme===1.22.0
