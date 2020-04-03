@@ -1,0 +1,14 @@
+diff --git a/server b/server
+index 8bdb512..b296b92 100755
+--- a/server
++++ b/server
+@@ -17,6 +17,9 @@
+ #	mntpoint	path to mount on locally
+ #	server_name	server to mount from
+ #
++FullPath=`readlink -f $0`
++WorkDir=`dirname $FullPath`
++cd $WorkDir
+ Program=`basename $0`
+ 
+ InitFile="./tests.init"
