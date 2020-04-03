@@ -13,12 +13,10 @@ typeset _project=$(basename $_pwd)
 typeset _script=$(readlink -f $0)
 typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
-typeset _host=$1
-typeset _share=$2
 typeset _mnt='/mnt'
 typeset -i _rc=0
 typeset -i _vers
-typeset _name
+typeset _host _share _name
 
 source $_source/env.sh
 
@@ -36,6 +34,9 @@ if (( $# < 2 )); then
 	echo "Usage: $_script nfs_host nfs_share"
 	exit 1
 fi
+
+_host=$1
+_share=$2
 
 figlet 'Connectathon'
 
