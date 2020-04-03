@@ -15,9 +15,10 @@ typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
 typeset _host=$1
 typeset _share=$2
+typeset _mnt='/mnt'
 typeset -i _rc=0
 typeset -i _vers
-typeset _mnt
+typeset _name
 
 source $_source/env.sh
 
@@ -36,11 +37,22 @@ if (( $# < 2 )); then
 	exit 1
 fi
 
+figlet 'Connectathon'
+
 for _vers in 3 4; do
-	figlet "$_ident NFSv$_vers"
-	_mnt="/$_ident/$_vers"
-	sudo mkdir -p $_mnt
+	_name="NFSv$_vers"
+	figlet "$_name"
 	if ! sudo cthon/server -a -t -o vers=$_vers -N $_retries -m $_mnt -p $_share $_host; then
+		(( _rc++ ))
+	fi
+done
+
+figlet 'NFStest'
+
+for _vers in 3 4; do
+	_name="NFSv$_vers"
+	figlet "$_name"
+	if nfstest_posix --server=$_host --export=$_share --mtpoint=$_mnt --nfsversion=$_vers; then
 		(( _rc++ ))
 	fi
 done
