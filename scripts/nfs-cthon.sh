@@ -34,7 +34,7 @@ fi
 
 for _vers in 3 4; do
 	figlet "$_ident NFSv$_vers"
-	_mnt="$_ident/$_vers"
+	_mnt="/$_ident/$_vers"
 	sudo mkdir -p $_mnt
 	if ! sudo ./server -a -t -o vers=$_vers -N $_retries -m $_mnt -p $_share $_host; then
 		(( _rc++ ))
