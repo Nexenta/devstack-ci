@@ -18,6 +18,10 @@ typeset -a _versions
 
 source $_source/env.sh
 
+if [[ ! -d $_base/$_logs ]]; then
+	mkdir -p $_base/$_logs
+fi
+
 if [[ -t 1 ]]; then
 	exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
 else
