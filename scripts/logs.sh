@@ -22,7 +22,7 @@ else
 fi
 
 if systemctl --version && journalctl --version; then
-	for _unit in $(systemctl --no-legend --no-pager list-unit-files | awk '{print $1}'); do
+	for _unit in $(systemctl --no-legend --no-pager list-unit-files devstack@* | awk '{print $1}'); do
 		_log="$_base/$_logs/$_unit.log"
 		journalctl --all --merge --unit=$_unit >$_log
 	done
