@@ -32,8 +32,8 @@ fi
 git reset --hard
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
-	if patch --dry-run --batch --strip=1 < $_base/$_ci/patches/$_project/$_branch.diff; then
-		patch -p1 < $_base/$_ci/patches/$_project/$_branch.diff
+	if patch --dry-run --batch --forward --strip=1 --input=$_base/$_ci/patches/$_project/$_branch.diff; then
+		patch --batch --forward --strip=1 --input=$_base/$_ci/patches/$_project/$_branch.diff
 	elif [[ "$_type" == "internal" ]]; then
 		exit 1
 	fi
