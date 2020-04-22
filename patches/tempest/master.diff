@@ -11,14 +11,14 @@ index 18e0b9bff..c60b0da69 100644
                                         self.dst_vol_type['name'])
  
 diff --git a/tox.ini b/tox.ini
-index e861c8482..fe851c845 100644
+index e324c917c..fe851c845 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -11,7 +11,7 @@ setenv =
      VIRTUAL_ENV={envdir}
      OS_TEST_PATH=./tempest/test_discover
  deps =
--    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
 +    -c{toxinidir}/../requirements/upper-constraints.txt
      -r{toxinidir}/requirements.txt
  
@@ -31,7 +31,7 @@ index e861c8482..fe851c845 100644
 +install_command = pip install {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
  whitelist_externals = *
  deps =
--    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
 +    -c{toxinidir}/../requirements/upper-constraints.txt
      -r{toxinidir}/requirements.txt
      -r{toxinidir}/test-requirements.txt
@@ -63,7 +63,7 @@ index e861c8482..fe851c845 100644
  
  [testenv:venv]
  deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
 +  -c{toxinidir}/../requirements/upper-constraints.txt
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
@@ -72,7 +72,7 @@ index e861c8482..fe851c845 100644
  
  [testenv:docs]
  deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
 +  -c{toxinidir}/../requirements/upper-constraints.txt
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
@@ -89,7 +89,7 @@ index e861c8482..fe851c845 100644
  
  [testenv:releasenotes]
  deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
 +  -c{toxinidir}/../requirements/upper-constraints.txt
    -r{toxinidir}/requirements.txt
    -r{toxinidir}/doc/requirements.txt
