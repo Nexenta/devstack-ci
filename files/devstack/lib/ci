@@ -140,6 +140,7 @@ function ci_test_config {
 		fi
 
 		if is_service_enabled cinder; then
+			iniset $TEMPEST_CONFIG volume build_interval 5
 			case "$CI_BRANCH" in
 			ocata|pike)
 				iniset $TEMPEST_CONFIG volume catalog_type volumev3
