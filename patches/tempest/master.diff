@@ -1,5 +1,25 @@
+diff --git a/tempest/api/compute/servers/test_server_rescue.py b/tempest/api/compute/servers/test_server_rescue.py
+index 3fa859e..cccd549 100644
+--- a/tempest/api/compute/servers/test_server_rescue.py
++++ b/tempest/api/compute/servers/test_server_rescue.py
+@@ -149,6 +149,15 @@ class BaseServerStableDeviceRescueTest(base.BaseV2ComputeTest):
+         self.servers_client.unrescue_server(server_id)
+         waiters.wait_for_server_status(
+             self.servers_client, server_id, 'ACTIVE')
++        server_info = self.servers_client.show_server(server_id)['server']
++        created_volumes = server_info['os-extended-volumes:volumes_attached']
++        for created_volume in created_volumes:
++            if created_volume.get('delete_on_termination') is False:
++                self.addCleanup(self.volumes_client.delete_volume,
++                                created_volume['id'], cascade=True)
++        self.addCleanup(waiters.wait_for_server_termination,
++                        self.servers_client, server_id)
++        self.addCleanup(self.servers_client.delete_server, server_id)
+ 
+ 
+ class ServerStableDeviceRescueTest(BaseServerStableDeviceRescueTest):
 diff --git a/tox.ini b/tox.ini
-index e324c917c..fe851c845 100644
+index e861c84..fe851c8 100644
 --- a/tox.ini
 +++ b/tox.ini
 @@ -11,7 +11,7 @@ setenv =
