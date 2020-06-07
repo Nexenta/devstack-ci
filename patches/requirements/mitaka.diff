@@ -1,8 +1,16 @@
 diff --git a/upper-constraints.txt b/upper-constraints.txt
-index 0cdcd13..6b1e369 100644
+index 0cdcd13..3961627 100644
 --- a/upper-constraints.txt
 +++ b/upper-constraints.txt
-@@ -331,6 +331,7 @@ selenium===2.52.0
+@@ -312,6 +312,7 @@ pyzmq===15.2.0
+ qpid-python===0.32;python_version=='2.7'
+ rcssmin===1.0.6
+ redis===2.10.5
++reno===1.9.0
+ repoze.lru===0.6
+ repoze.who===2.2
+ requests===2.9.1
+@@ -331,6 +332,7 @@ selenium===2.52.0
  semantic-version===2.5.0
  seqdiag===0.9.5
  service-identity===16.0.0
