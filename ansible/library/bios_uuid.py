@@ -21,6 +21,7 @@ openstack_branches = {
     'rocky':            0xb0,
     'stein':            0xb1,
     'train':            0xb2
+    'ussury':           0xb3
 }
 
 docker_branches = {
@@ -71,6 +72,7 @@ openstack_osversions = {
     'ubuntu14':         0x14,
     'ubuntu16':         0x16,
     'ubuntu18':         0x18,
+    'ubuntu20':         0x20,
     'nexentastor50':    0x50,
     'nexentastor51':    0x51,
     'nexentastor52':    0x52,
