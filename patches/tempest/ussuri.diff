@@ -1,0 +1,112 @@
+diff --git a/tempest/api/compute/servers/test_server_rescue.py b/tempest/api/compute/servers/test_server_rescue.py
+index 2c1ad80..d3cc3a7 100644
+--- a/tempest/api/compute/servers/test_server_rescue.py
++++ b/tempest/api/compute/servers/test_server_rescue.py
+@@ -142,6 +142,15 @@ class ServerStableDeviceRescueTest(base.BaseV2ComputeTest):
+         self.servers_client.unrescue_server(server_id)
+         waiters.wait_for_server_status(
+             self.servers_client, server_id, 'ACTIVE')
++        server_info = self.servers_client.show_server(server_id)['server']
++        created_volumes = server_info['os-extended-volumes:volumes_attached']
++        for created_volume in created_volumes:
++            if created_volume.get('delete_on_termination') is False:
++                self.addCleanup(self.volumes_client.delete_volume,
++                                created_volume['id'], cascade=True)
++        self.addCleanup(waiters.wait_for_server_termination,
++                        self.servers_client, server_id)
++        self.addCleanup(self.servers_client.delete_server, server_id)
+ 
+     @decorators.idempotent_id('947004c3-e8ef-47d9-9f00-97b74f9eaf96')
+     def test_stable_device_rescue_cdrom_ide(self):
+diff --git a/tox.ini b/tox.ini
+index e324c91..fe851c8 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -11,7 +11,7 @@ setenv =
+     VIRTUAL_ENV={envdir}
+     OS_TEST_PATH=./tempest/test_discover
+ deps =
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
++    -c{toxinidir}/../requirements/upper-constraints.txt
+     -r{toxinidir}/requirements.txt
+ 
+ [testenv]
+@@ -25,16 +25,33 @@ setenv =
+     PYTHONWARNINGS=default::DeprecationWarning,ignore::DeprecationWarning:distutils,ignore::DeprecationWarning:site
+ passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST GABBI_TEMPEST_PATH
+ usedevelop = True
+-install_command = pip install {opts} {packages}
++install_command = pip install {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
+ whitelist_externals = *
+ deps =
+-    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
++    -c{toxinidir}/../requirements/upper-constraints.txt
+     -r{toxinidir}/requirements.txt
+     -r{toxinidir}/test-requirements.txt
+ commands =
+     find . -type f -name "*.pyc" -delete
+     stestr --test-path ./tempest/tests run {posargs}
+ 
++[testenv:ci]
++setenv = {[tempestenv]setenv}
++deps = {[tempestenv]deps}
++ignore_errors = True
++sitepackages = True
++recreate = True
++envdir = .tox/ci
++commands =
++    bash -cexu 'sudo chown -R $(id -un):$(id -gn) {toxinidir}'
++    find {toxinidir} -type f -name '*.pyc' -delete
++    bash -cexu 'find {toxinidir}/.. -mindepth 1 -maxdepth 1 -type d -name *-tempest-plugin | xargs -L1 -rt pip install'
++    ostestr --no-slowest --serial --concurrency 0 --regex '{posargs}'
++    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
++    bash -cexu 'stestr last --subunit >report.sub'
++    bash -cexu 'cat report.sub | subunit-trace >report.txt'
++    subunit2html report.sub report.html
++
+ [testenv:genconfig]
+ commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
+ 
+@@ -263,7 +280,7 @@ commands =
+ 
+ [testenv:venv]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands = {posargs}
+@@ -278,7 +295,7 @@ commands = {posargs}
+ 
+ [testenv:docs]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+@@ -296,6 +313,7 @@ commands =
+ 
+ [testenv:pep8]
+ deps =
++    -c{toxinidir}/../requirements/upper-constraints.txt
+     -r{toxinidir}/test-requirements.txt
+     autopep8
+ commands =
+@@ -348,7 +366,7 @@ paths =
+ 
+ [testenv:releasenotes]
+ deps =
+-  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/ussuri}
++  -c{toxinidir}/../requirements/upper-constraints.txt
+   -r{toxinidir}/requirements.txt
+   -r{toxinidir}/doc/requirements.txt
+ commands =
+@@ -376,6 +394,7 @@ commands = bash -c "find {toxinidir}/tools    \
+ # This also means that pip-check-reqs must be installed separately, outside
+ # of the requirements.txt files
+ deps = pip_check_reqs
++       -c{toxinidir}/../requirements/upper-constraints.txt
+        -r{toxinidir}/requirements.txt
+ commands=
+     pip-extra-reqs -d --ignore-file=tempest/tests/* tempest

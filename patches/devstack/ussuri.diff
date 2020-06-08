@@ -1,0 +1,90 @@
+diff --git a/functions-common b/functions-common
+index 6be07b4..464a9b4 100644
+--- a/functions-common
++++ b/functions-common
+@@ -536,6 +536,7 @@ function git_clone {
+         # print out the results so we know what change was used in the logs
+         cd $git_dest
+         git show --oneline | head -1
++        $CIDIR/scripts/patch.sh
+         cd $orig_dir
+         return
+     fi
+@@ -590,6 +591,7 @@ function git_clone {
+     # print out the results so we know what change was used in the logs
+     cd $git_dest
+     git show --oneline | head -1
++    $CIDIR/scripts/patch.sh
+     cd $orig_dir
+ }
+ 
+@@ -1078,7 +1080,8 @@ function apt_get_update {
+     time_start "apt-get-update"
+ 
+     local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
+-    local update_cmd="$sudo $proxies apt-get update"
++    local options="-o Acquire::http::Pipeline-Depth=0 -o Acquire::http::No-Cache=true -o Acquire::BrokenProxy=true"
++    local update_cmd="$sudo $proxies apt-get update $options"
+     if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
+         die $LINENO "Failed to update apt repos, we're dead now"
+     fi
+@@ -1764,7 +1767,7 @@ function run_phase {
+             # white listed elements in tree. We want these to move out
+             # over time as well, but they are in tree, so we need to
+             # manage that.
+-            local exceptions="80-tempest.sh"
++            local exceptions="80-tempest.sh 99-ci.sh"
+             local extra
+             extra=$(basename $extra_plugin_file_name)
+             if [[ ! ( $exceptions =~ "$extra" ) ]]; then
+diff --git a/lib/tempest b/lib/tempest
+index 69831a5..bd489c1 100644
+--- a/lib/tempest
++++ b/lib/tempest
+@@ -616,12 +616,7 @@ function configure_tempest {
+         tox -revenv-tempest --notest
+     fi
+ 
+-    # The requirements might be on a different branch, while tempest needs master requirements.
+-    local tmp_u_c_m
+-    tmp_u_c_m=$(mktemp -t tempest_u_c_m.XXXXXXXXXX)
+-    (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > $tmp_u_c_m
+-    tox -evenv-tempest -- pip install -c $tmp_u_c_m -r requirements.txt
+-    rm -f $tmp_u_c_m
++    tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt -r requirements.txt
+ 
+     # Auth:
+     iniset $TEMPEST_CONFIG auth tempest_roles "member"
+@@ -744,12 +739,7 @@ function install_tempest {
+ function install_tempest_plugins {
+     pushd $TEMPEST_DIR
+     if [[ $TEMPEST_PLUGINS != 0 ]] ; then
+-        # The requirements might be on a different branch, while tempest & tempest plugins needs master requirements.
+-        local tmp_u_c_m
+-        tmp_u_c_m=$(mktemp -t tempest_u_c_m.XXXXXXXXXX)
+-        (cd $REQUIREMENTS_DIR && git show origin/master:upper-constraints.txt) > $tmp_u_c_m
+-        tox -evenv-tempest -- pip install -c $tmp_u_c_m $TEMPEST_PLUGINS
+-        rm -f $tmp_u_c_m
++        tox -evenv-tempest -- pip install -c $REQUIREMENTS_DIR/upper-constraints.txt $TEMPEST_PLUGINS
+         echo "Checking installed Tempest plugins:"
+         tox -evenv-tempest -- tempest list-plugins
+     fi
+diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
+index e140929..e481949 100755
+--- a/tools/fixup_stuff.sh
++++ b/tools/fixup_stuff.sh
+@@ -207,9 +207,14 @@ function fixup_suse {
+     sudo zypper up -y p11-kit ca-certificates-mozilla
+ }
+ 
++function fixup_virtualenv {
++    pip_install -U virtualenv
++}
++
+ function fixup_all {
+     fixup_keystone
+     fixup_ubuntu
+     fixup_fedora
+     fixup_suse
++    fixup_virtualenv
+ }
