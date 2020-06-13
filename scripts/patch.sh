@@ -13,8 +13,8 @@ typeset _project=$(basename $_pwd)
 typeset _script=$(readlink -f $0)
 typeset _ident=$(basename -s .sh $_script)
 typeset _source=$(dirname $_script)
-
 typeset -A _git
+
 _git[branch]='branch --verbose'
 _git[status]='status --short --branch'
 _git[diff]='diff --patch-with-stat'
