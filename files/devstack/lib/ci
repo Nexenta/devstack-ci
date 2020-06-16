@@ -5,6 +5,10 @@ function ci_install {
 	local cinder_unit_tests_path='cinder/tests/unit/volume/drivers/nexenta'
 	local manila_drivers_path='manila/share/drivers/nexenta'
 
+	if [[ "$WSGI_MODE" == "uwsgi" ]]; then
+		pip_install uwsgi
+	fi
+
 	if [[ "$NEXENTA_CI_TYPE" == "external" ]]; then
 		return
 	fi
@@ -46,10 +50,6 @@ function ci_install {
 }
 
 function ci_extra {
-	local python=${PYTHON:-python}
-	local etc_apache lib_apache
-	local lso_apache lso_python
-	local pkg_python mod_python
 	local key_type key_file
 	local tnt pid gid
 
@@ -61,22 +61,6 @@ function ci_extra {
 		;;
 	esac
 
-	if is_service_enabled horizon; then
-		install_package apache2-dev
-		lib_apache=$(apxs -q exp_libexecdir)
-		lso_apache=$(ldd $lib_apache/mod_wsgi.so | awk '/libpython/{print $1}')
-		lso_python=$($python $CIDIR/scripts/get_python_soname.py)
-		if [[ "$lso_apache" != "$lso_python" ]]; then
-			sudo $python -m pip install mod_wsgi
-			pkg_python=$($python $CIDIR/scripts/get_python_packages.py)
-			mod_python=$(find $pkg_python -type f -name 'mod_wsgi*.so')
-			etc_apache=$(apxs -q exp_sysconfdir)
-			sudo tee $etc_apache/mods-available/wsgi.load <<-EOF
-			LoadModule wsgi_module $mod_python
-			EOF
-			sudo systemctl restart apache2
-		fi
-	fi
 
 	if is_service_enabled nova; then
 		case "$VIRT_DRIVER" in
