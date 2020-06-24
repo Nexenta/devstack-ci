@@ -66,6 +66,13 @@ TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
 
+{% if config.ci.type == 'internal' and config.ci.branch in ['master'] %}
+enable_service s-proxy s-object s-container s-account
+SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5c2000f5
+SWIFT_REPLICAS=1
+SWIFT_DATA_DIR=$DEST/data/swift
+{% endif %}
+
 NEXENTA_CI_TYPE="{{ config.ci.type }}"
 NEXENTA_CINDER_REPO="{{ config.nexenta.cinder.repository }}"
 NEXENTA_CINDER_DIR="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
