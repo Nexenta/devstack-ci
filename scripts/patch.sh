@@ -29,6 +29,8 @@ if [[ "$_type" == "internal" ]]; then
 	exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
 fi
 
+echo "Patch $_branch branch of $_project project"
+
 git reset --hard
 
 if [[ -f $_base/$_ci/patches/$_project/$_branch.diff ]]; then
