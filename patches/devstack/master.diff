@@ -1,8 +1,8 @@
 diff --git a/functions-common b/functions-common
-index 6be07b4..464a9b4 100644
+index 6595c3d..4a6d1db 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -536,6 +536,7 @@ function git_clone {
+@@ -538,6 +538,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
          git show --oneline | head -1
@@ -10,7 +10,7 @@ index 6be07b4..464a9b4 100644
          cd $orig_dir
          return
      fi
-@@ -590,6 +591,7 @@ function git_clone {
+@@ -592,6 +593,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -18,7 +18,7 @@ index 6be07b4..464a9b4 100644
      cd $orig_dir
  }
  
-@@ -1078,7 +1080,8 @@ function apt_get_update {
+@@ -1080,7 +1082,8 @@ function apt_get_update {
      time_start "apt-get-update"
  
      local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
@@ -28,7 +28,7 @@ index 6be07b4..464a9b4 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
-@@ -1764,7 +1767,7 @@ function run_phase {
+@@ -1733,7 +1736,7 @@ function run_phase {
              # white listed elements in tree. We want these to move out
              # over time as well, but they are in tree, so we need to
              # manage that.
@@ -38,10 +38,10 @@ index 6be07b4..464a9b4 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index 525abcb..ee959fc 100644
+index 05fcb1f..bdd16b4 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -610,12 +610,7 @@ function configure_tempest {
+@@ -616,12 +616,7 @@ function configure_tempest {
          tox -revenv-tempest --notest
      fi
  
@@ -55,7 +55,7 @@ index 525abcb..ee959fc 100644
  
      # Auth:
      iniset $TEMPEST_CONFIG auth tempest_roles "member"
-@@ -708,12 +703,7 @@ function install_tempest {
+@@ -714,12 +709,7 @@ function install_tempest {
  function install_tempest_plugins {
      pushd $TEMPEST_DIR
      if [[ $TEMPEST_PLUGINS != 0 ]] ; then
@@ -70,10 +70,10 @@ index 525abcb..ee959fc 100644
          tox -evenv-tempest -- tempest list-plugins
      fi
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index e140929..e481949 100755
+index 2ac8a47..6ac9e41 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -207,9 +207,14 @@ function fixup_suse {
+@@ -174,8 +174,13 @@ function fixup_suse {
      sudo zypper up -y p11-kit ca-certificates-mozilla
  }
  
@@ -82,7 +82,6 @@ index e140929..e481949 100755
 +}
 +
  function fixup_all {
-     fixup_keystone
      fixup_ubuntu
      fixup_fedora
      fixup_suse
