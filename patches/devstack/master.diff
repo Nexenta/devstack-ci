@@ -1,5 +1,5 @@
 diff --git a/functions-common b/functions-common
-index 6595c3d..4a6d1db 100644
+index 6595c3de..4a6d1dbd 100644
 --- a/functions-common
 +++ b/functions-common
 @@ -538,6 +538,7 @@ function git_clone {
@@ -38,10 +38,10 @@ index 6595c3d..4a6d1db 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index 05fcb1f..bdd16b4 100644
+index 0d6bdc9d..6d20d965 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -616,12 +616,7 @@ function configure_tempest {
+@@ -615,12 +615,7 @@ function configure_tempest {
          tox -revenv-tempest --notest
      fi
  
@@ -55,7 +55,7 @@ index 05fcb1f..bdd16b4 100644
  
      # Auth:
      iniset $TEMPEST_CONFIG auth tempest_roles "member"
-@@ -714,12 +709,7 @@ function install_tempest {
+@@ -713,12 +708,7 @@ function install_tempest {
  function install_tempest_plugins {
      pushd $TEMPEST_DIR
      if [[ $TEMPEST_PLUGINS != 0 ]] ; then
@@ -70,10 +70,10 @@ index 05fcb1f..bdd16b4 100644
          tox -evenv-tempest -- tempest list-plugins
      fi
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 2ac8a47..6ac9e41 100755
+index e1409291..3db694b1 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -174,8 +174,13 @@ function fixup_suse {
+@@ -207,7 +207,12 @@ function fixup_suse {
      sudo zypper up -y p11-kit ca-certificates-mozilla
  }
  
@@ -82,8 +82,7 @@ index 2ac8a47..6ac9e41 100755
 +}
 +
  function fixup_all {
++    fixup_virtualenv
+     fixup_keystone
      fixup_ubuntu
      fixup_fedora
-     fixup_suse
-+    fixup_virtualenv
- }
