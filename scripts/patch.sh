@@ -58,7 +58,7 @@ if [[ -d $_base/$_ci/files/$_project ]]; then
 	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
 
-if [[ "$_type" != "internal" ]]; then
+if [[ "$_type" == "internal" ]]; then
 	for item in "${!_git[@]}"; do
 		git ${_git[$item]} | tee -a $_base/$_logs/git.$item.$_project.log
 	done
