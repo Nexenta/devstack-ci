@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# Configure the NexentaStor5 iSCSI backend
+# Configure the EXAScaler Lustre backend
 #
 
 _XTRACE_CI=$(set +o | grep xtrace)
 set +o xtrace
 
-function configure_cinder_backend_ns5_iscsi {
+function configure_cinder_backend_exa_lustre {
 	local backend="$1"
 	local prefix="CINDER_OPTGROUP_${backend}_"
 	local item
@@ -20,7 +20,7 @@ function configure_cinder_backend_ns5_iscsi {
 	done
 }
 
-function cleanup_cinder_backend_ns5_iscsi {
+function cleanup_cinder_backend_exa_lustre {
 	ci_clean
 }
 

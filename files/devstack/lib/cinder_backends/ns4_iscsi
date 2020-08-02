@@ -3,12 +3,12 @@
 # Configure the NexentaStor4 iSCSI backend
 #
 
-NEXENTA_XTRACE=$(set +o | grep xtrace)
+_XTRACE_CI=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ns4_iscsi {
 	local backend="$1"
-	local prefix="NEXENTA_OPTGROUP_${backend}_"
+	local prefix="CINDER_OPTGROUP_${backend}_"
 	local item
 
 	for item in $(set | grep "^$prefix"); do
@@ -24,4 +24,4 @@ function cleanup_cinder_backend_ns4_iscsi {
 	ci_clean
 }
 
-$NEXENTA_XTRACE
+$_XTRACE_CI

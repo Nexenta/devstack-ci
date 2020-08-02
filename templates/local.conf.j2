@@ -65,6 +65,9 @@ ENABLE_VOLUME_MULTIATTACH="True"
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
+{% if config.ci.backend == 'exa_lustre' and config.ci.branch in ['master'] %}
+TEMPEST_VOLUME_MANAGE_VOLUME="True"
+{% endif %}
 
 {% if config.ci.type == 'internal' and config.ci.branch in ['master'] %}
 enable_service s-proxy s-object s-container s-account
@@ -151,7 +154,7 @@ TEMPEST_EXTEND_ATTACHED_VOLUME="True"
 {% endif %}
 {% for instance in config.backend.instances %}
 {% set instance_name = config.ci.backend ~ loop.index %}
-{% set prefix = 'NEXENTA_OPTGROUP_' ~ instance_name %}
+{% set prefix = 'CINDER_OPTGROUP_' ~ instance_name %}
 
 {{ prefix }}_volume_backend_name="{{ instance_name }}"
 {% for parameter in instance %}

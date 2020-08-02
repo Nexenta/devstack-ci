@@ -3,12 +3,12 @@
 # Configure the NexentaStor5 NFS backend
 #
 
-NEXENTA_XTRACE=$(set +o | grep xtrace)
+_XTRACE_CI=$(set +o | grep xtrace)
 set +o xtrace
 
 function configure_cinder_backend_ns5_nfs {
 	local backend="$1"
-	local prefix="NEXENTA_OPTGROUP_${backend}_"
+	local prefix="CINDER_OPTGROUP_${backend}_"
 	local options=''
 	local item
 
@@ -37,4 +37,4 @@ function cleanup_cinder_backend_ns5_nfs {
 	ci_clean
 }
 
-$NEXENTA_XTRACE
+$_XTRACE_CI
