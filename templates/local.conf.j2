@@ -163,6 +163,16 @@ TEMPEST_EXTEND_ATTACHED_VOLUME="True"
 {% endfor %}
 {% endif %}
 
+{% if config.ci.backend == 'exascaler' %}
+LIBS_FROM_GIT="os-brick"
+OS_BRICK_BRANCH="ES-6"
+OS_BRICK_REPO="https://github.com/deiter/os-brick.git"
+NOVA_BRANCH="ES-6"
+NOVA_REPO="https://github.com/deiter/nova.git"
+CINDER_BRANCH="ES-6"
+CINDER_REPO="https://github.com/deiter/cinder.git"
+{% endif %}
+
 [[post-config|$CINDER_CONF]]
 
 [DEFAULT]
