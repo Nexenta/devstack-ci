@@ -54,7 +54,7 @@ case "$_backend" in
 ns4_manila|ns5_manila)
 	cd $_base/manila
 	;;
-ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs|ned_iscsi)
+ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs|ned_iscsi|exascaler)
 	cd $_base/cinder
 	;;
 *)
@@ -82,6 +82,9 @@ ns5_manila)
 ns4_manila)
 	_unit='nexenta.ns4'
 	;;
+exascaler)
+    _unit='lustre'
+    ;;
 *)
 	_unit=''
 	;;
