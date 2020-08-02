@@ -70,6 +70,8 @@ function ci_extra {
 					sudo tee -a $QEMU_CONF
 				if [[ -n "$LIBVIRT_DAEMON" ]]; then
 					restart_service $LIBVIRT_DAEMON
+				else
+					restart_service libvirtd
 				fi
 			fi
 			;;
