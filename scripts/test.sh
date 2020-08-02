@@ -22,6 +22,8 @@ if [[ ! -d $_base/$_logs ]]; then
 	mkdir -p $_base/$_logs
 fi
 
+sudo dmesg -n 1
+
 if [[ -t 1 ]]; then
 	exec > >(tee -a $_base/$_logs/$_ident.log) 2>&1
 else
