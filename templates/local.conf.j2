@@ -73,10 +73,10 @@ SWIFT_REPLICAS=1
 SWIFT_DATA_DIR=$DEST/data/swift
 {% endif %}
 
-NEXENTA_CI_TYPE="{{ config.ci.type }}"
 NEXENTA_CINDER_REPO="{{ config.nexenta.cinder.repository }}"
 NEXENTA_CINDER_DIR="{{ config.ci.base }}/{{ config.nexenta.cinder.destination }}"
 
+CI_TYPE="{{ config.ci.type }}"
 CI_BACKEND="{{ config.ci.backend }}"
 CI_BRANCH="{{ config.ci.branch }}"
 {% for item in config.matrix.python %}

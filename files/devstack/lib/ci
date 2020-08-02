@@ -9,7 +9,7 @@ function ci_install {
 		pip_install uwsgi
 	fi
 
-	if [[ "$NEXENTA_CI_TYPE" == "external" ]]; then
+	if [[ "$CI_TYPE" == "external" ]]; then
 		return
 	fi
 
