@@ -65,7 +65,7 @@ ENABLE_VOLUME_MULTIATTACH="True"
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
-{% if config.ci.backend == 'exascaler' and config.ci.branch in ['master'] %}
+{% if config.ci.backend == 'exascaler' and config.ci.branch in ['xmaster'] %}
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 {% endif %}
 
