@@ -65,7 +65,7 @@ ENABLE_VOLUME_MULTIATTACH="True"
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 TEMPEST_VOLUME_MANAGE_SNAPSHOT="True"
 {% endif %}
-{% if config.ci.backend == 'exa_lustre' and config.ci.branch in ['master'] %}
+{% if config.ci.backend == 'exascaler' and config.ci.branch in ['master'] %}
 TEMPEST_VOLUME_MANAGE_VOLUME="True"
 {% endif %}
 
@@ -170,6 +170,10 @@ driver_ssl_cert_verify = False
 {% if config.ci.branch != 'juno' and config.ci.branch != 'icehouse' %}
 backup_file_size = "134217728"
 backup_sha_block_size_bytes = "32768"
+{% if config.ci.backend == 'exascaler' %}
+backup_driver = "cinder.backup.drivers.lustre.LustreBackupDriver"
+lustre_backup_share = "{{ config.backup.host }}:{{ config.backup.share }}"
+{% else %}
 {% if config.ci.branch in ['stein', 'train', 'ussuri', 'master'] %}
 backup_driver = "cinder.backup.drivers.nfs.NFSBackupDriver"
 {% else %}
@@ -177,6 +181,7 @@ backup_driver = "cinder.backup.drivers.nfs"
 {% endif %}
 backup_share = "{{ config.backup.host }}:{{ config.backup.share }}/{{ config.ci.backend }}"
 backup_mount_options = "{{ config.backup.options }}"
+{% endif %}
 {% endif %}
 
 {% if config.ci.type == 'external' %}

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# Configure the EXAScaler Lustre backend
+# Configure the EXAScaler backend
 #
 
 _XTRACE_CI=$(set +o | grep xtrace)
 set +o xtrace
 
-function configure_cinder_backend_exa_lustre {
+function configure_cinder_backend_exascaler {
 	local backend="$1"
 	local prefix="CINDER_OPTGROUP_${backend}_"
 	local item
@@ -20,7 +20,7 @@ function configure_cinder_backend_exa_lustre {
 	done
 }
 
-function cleanup_cinder_backend_exa_lustre {
+function cleanup_cinder_backend_exascaler {
 	ci_clean
 }
 
