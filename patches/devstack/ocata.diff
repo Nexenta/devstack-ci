@@ -1,13 +1,9 @@
 diff --git a/functions-common b/functions-common
-index 7d7b7f5b..fbc4730b 100644
+index 7d7b7f5b..2e877898 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -498,18 +498,16 @@ function git_clone {
-     local git_ref=$3
-     local orig_dir
-     orig_dir=$(pwd)
--    local git_clone_flags=""
-+    local git_clone_flags="--branch $git_ref"
+@@ -501,15 +501,13 @@ function git_clone {
+     local git_clone_flags=""
  
      RECLONE=$(trueorfalse False RECLONE)
 -    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
@@ -30,9 +26,9 @@ index 7d7b7f5b..fbc4730b 100644
 -            # '--branch' can also take tags
 -            git_timed clone $git_clone_flags $git_remote $git_dest --branch $git_ref
 +            if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
-+                git_clone_flags+=" --depth $GIT_DEPTH"
++                git_clone_flags="--branch $git_ref --depth $GIT_DEPTH"
 +            fi
-+            git_timed clone $git_clone_flags -- $git_remote $git_dest
++            git_timed clone $git_clone_flags $git_remote $git_dest
          elif [[ "$RECLONE" = "True" ]]; then
              # if it does exist then simulate what clone does if asked to RECLONE
              cd $git_dest
