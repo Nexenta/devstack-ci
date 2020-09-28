@@ -1,8 +1,8 @@
 diff --git a/functions-common b/functions-common
-index 7d7b7f5..f97078e 100644
+index 7d7b7f5b..fbc4730b 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -498,11 +498,11 @@ function git_clone {
+@@ -498,18 +498,16 @@ function git_clone {
      local git_ref=$3
      local orig_dir
      orig_dir=$(pwd)
@@ -12,12 +12,10 @@ index 7d7b7f5..f97078e 100644
      RECLONE=$(trueorfalse False RECLONE)
 -    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
 -        git_clone_flags="$git_clone_flags --depth $GIT_DEPTH"
-+    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
-+        git_clone_flags+=" --depth $GIT_DEPTH"
-     fi
+-    fi
  
      if [[ "$OFFLINE" = "True" ]]; then
-@@ -510,6 +510,7 @@ function git_clone {
+         echo "Running in offline mode, clones already exist"
          # print out the results so we know what change was used in the logs
          cd $git_dest
          git show --oneline | head -1
@@ -25,12 +23,15 @@ index 7d7b7f5..f97078e 100644
          cd $orig_dir
          return
      fi
-@@ -534,8 +535,7 @@ function git_clone {
+@@ -534,8 +532,10 @@ function git_clone {
                  echo "the project to the \$PROJECTS variable in the job definition."
                  die $LINENO "Cloning not allowed in this configuration"
              fi
 -            # '--branch' can also take tags
 -            git_timed clone $git_clone_flags $git_remote $git_dest --branch $git_ref
++            if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++                git_clone_flags+=" --depth $GIT_DEPTH"
++            fi
 +            git_timed clone $git_clone_flags -- $git_remote $git_dest
          elif [[ "$RECLONE" = "True" ]]; then
              # if it does exist then simulate what clone does if asked to RECLONE
@@ -63,7 +64,7 @@ index 7d7b7f5..f97078e 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index e1a5630..a77c481 100644
+index c2ba6b17..9089e6e7 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -440,6 +440,7 @@ function configure_tempest {
@@ -75,7 +76,7 @@ index e1a5630..a77c481 100644
      # TODO(ynesenenko): Remove the volume_services flag when Liberty and Kilo will correct work with host info.
      iniset $TEMPEST_CONFIG volume-feature-enabled volume_services True
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 6f680b8..17c0d17 100755
+index 6f680b86..17c0d175 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -188,12 +188,4 @@ if is_fedora; then
