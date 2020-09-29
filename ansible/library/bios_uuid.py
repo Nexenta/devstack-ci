@@ -3,8 +3,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 projects = {
     'openstack':        0xec,
-    'docker':           0xde,
-    'kubernetes':       0xb8
+    'nfs':              0xed,
+    'iscsi':            0xee
 }
 
 openstack_branches = {
@@ -24,13 +24,12 @@ openstack_branches = {
     'ussuri':           0xb3
 }
 
-docker_branches = {
-    'latest':           0xb1,
-    'available':        0xb2
+nfs_branches = {
+    'master':           0xa0
 }
 
-kubernetes_branches = {
-    'latest':           0xb1
+iscsi_branches = {
+    'master':           0xa0
 }
 
 openstack_backends = {
@@ -41,53 +40,79 @@ openstack_backends = {
     'ned_nbd':          0x94,
     'ned_iscsi':        0x95,
     'ns4_manila':       0x96,
-    'ns5_manila':       0x97
+    'ns5_manila':       0x97,
+    'lustre':           0x98
 }
 
-docker_backends = {
-    'node1':            0xd1,
-    'node2':            0xd2
+nfs_backends = {
+    'nfs':              0x88
 }
 
-kubernetes_backends = {
-    'node1':            0xd1,
-    'node2':            0xd2,
-    'node3':            0xd3
+iscsi_backends = {
+    'iscsi':            0x89
 }
 
 openstack_ostypes = {
-    'nexentastor':      0xa1,
-    'linux':            0xa2
+    'nexentastor4':     0xa1,
+    'nexentastor5':     0xa2,
+    'firecrest':        0xa3,
+    'exascaler':        0xa4,
+    'ubuntu':           0xa5,
+    'centos':           0xa6
 }
 
-docker_ostypes = {
-    'linux':            0xa2
+nfs_ostypes = {
+    'nexentastor5':     0xa2,
+    'firecrest':        0xa3,
+    'ubuntu':           0xa5,
+    'centos':           0xa6
 }
 
-kubernetes_ostypes = {
-    'linux':            0xa2
+iscsi_ostypes = {
+    'nexentastor5':     0xa2,
+    'firecrest':        0xa3,
+    'ubuntu':           0xa5,
+    'centos':           0xa6
 }
 
-openstack_osversions = {
-    'ubuntu14':         0x14,
-    'ubuntu16':         0x16,
-    'ubuntu18':         0x18,
-    'ubuntu20':         0x20,
-    'nexentastor50':    0x50,
-    'nexentastor51':    0x51,
-    'nexentastor52':    0x52,
-    'nexentastor53':    0x53
+nexentastor4_versions = {
+    '4.0.5':            0x40
 }
 
-docker_osversions = {
-    'ubuntu14':         0x14,
-    'ubuntu16':         0x16,
-    'ubuntu18':         0x18
+nexentastor5_versions = {
+    '5.0':              0x50,
+    '5.1':              0x51,
+    '5.2':              0x52,
+    '5.3':              0x53
 }
 
-kubernetes_osversions = {
-    'ubuntu16':         0x16,
-    'ubuntu18':         0x18
+firecrest_versions = {
+    '1.0':              0x30
+}
+
+exascaler_versions = {
+    '5.1.1':            0xa0
+}
+
+ubuntu_versions = {
+    '14.04':            0x14,
+    '16.04':            0x16,
+    '18.04':            0x18,
+    '20.04':            0x20
+}
+
+centos_versions = {
+    '7.7':              0x77,
+    '7.8':              0x78
+}
+
+common_osversions = {
+    'nexentastor4':     nexentastor4_versions,
+    'nexentastor5':     nexentastor5_versions,
+    'firecrest':        firecrest_versions,
+    'exascaler':        exascaler_versions,
+    'ubuntu':           ubuntu_versions,
+    'centos':           centos_versions
 }
 
 config = {
@@ -95,19 +120,19 @@ config = {
         'branches':     openstack_branches,
         'backends':     openstack_backends,
         'ostypes':      openstack_ostypes,
-        'osversions':   openstack_osversions
+        'osversions':   common_osversions
     },
-    'docker': {
-        'branches':     docker_branches,
-        'backends':     docker_backends,
-        'ostypes':      docker_ostypes,
-        'osversions':   docker_osversions
+    'nfs': {
+        'branches':     nfs_branches,
+        'backends':     nfs_backends,
+        'ostypes':      nfs_ostypes,
+        'osversions':   common_osversions
     },
-    'kubernetes': {
-        'branches':     kubernetes_branches,
-        'backends':     kubernetes_backends,
-        'ostypes':      kubernetes_ostypes,
-        'osversions':   kubernetes_osversions
+    'iscsi': {
+        'branches':     iscsi_branches,
+        'backends':     iscsi_backends,
+        'ostypes':      iscsi_ostypes,
+        'osversions':   common_osversions
     }
 }
 
@@ -118,8 +143,8 @@ def get_uuid(project, branch, backend, ostype, osversion):
     b[1] = config[project]['branches'][branch]
     b[2] = config[project]['backends'][backend]
     b[3] = config[project]['ostypes'][ostype]
-    b[4] = config[project]['osversions'][osversion]
-    return str(uuid.UUID(''.join(map(lambda x: "%02x" % x, b))))
+    b[4] = config[project]['osversions'][ostype][osversion]
+    return str(uuid.UUID(''.join(map(lambda x: '%02x' % x, b))))
 
 def main():
     spec = {
@@ -148,6 +173,7 @@ def main():
 
     module = AnsibleModule(argument_spec=spec)
     project = module.params.get('project')
+    ostype = module.params.get('ostype')
 
     spec = {
         'project': {
@@ -172,7 +198,7 @@ def main():
         },
         'osversion': {
             'required': True,
-            'choices':  config[project]['osversions'].keys(),
+            'choices':  config[project]['osversions'][ostype].keys(),
             'type':     'str'
         }
     }
@@ -184,7 +210,7 @@ def main():
     ostype = module.params.get('ostype')
     osversion = module.params.get('osversion')
     result = get_uuid(project, branch, backend, ostype, osversion)
-    module.exit_json(msg="New uuid has been successfully created", changed=True, uuid=result)
+    module.exit_json(msg='New uuid has been successfully created', changed=True, uuid=result)
  
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
