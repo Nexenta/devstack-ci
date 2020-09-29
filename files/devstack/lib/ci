@@ -82,8 +82,8 @@ function ci_extra {
 			etc_apache=$(apxs -q exp_sysconfdir)
 
 			if [[ -e "$etc_apache/mods-available/wsgi.load" ]]; then
-				mv -v "$etc_apache/mods-available/wsgi.load" \
-				      "$etc_apache/mods-available/wsgi.orig"
+				sudo mv -v "$etc_apache/mods-available/wsgi.load" \
+				           "$etc_apache/mods-available/wsgi.orig"
 			fi
 
 			sudo tee $etc_apache/mods-available/wsgi.load <<-EOF
@@ -255,8 +255,8 @@ function ci_clean {
 	etc_apache=$(apxs -q exp_sysconfdir)
 
 	if [[ -e "$etc_apache/mods-available/wsgi.orig" ]]; then
-		mv -v "$etc_apache/mods-available/wsgi.orig" \
-		      "$etc_apache/mods-available/wsgi.load"
+		sudo mv -v "$etc_apache/mods-available/wsgi.orig" \
+		           "$etc_apache/mods-available/wsgi.load"
 	fi
 
 	sudo systemctl restart apache2
