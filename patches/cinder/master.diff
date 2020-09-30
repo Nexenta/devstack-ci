@@ -1,5 +1,5 @@
 diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
-index 447d9f1..4661bb8 100644
+index 447d9f1e1..4661bb83d 100644
 --- a/cinder/api/openstack/wsgi.py
 +++ b/cinder/api/openstack/wsgi.py
 @@ -51,6 +51,11 @@ _MEDIA_TYPE_MAP = {
@@ -14,42 +14,3 @@ index 447d9f1..4661bb8 100644
  
  # name of attribute to keep version method information
  VER_METHOD_ATTR = 'versioned_methods'
-diff --git a/cinder/api/v3/volumes.py b/cinder/api/v3/volumes.py
-index d611be1..b849f5d 100644
---- a/cinder/api/v3/volumes.py
-+++ b/cinder/api/v3/volumes.py
-@@ -194,12 +194,6 @@ class VolumeController(volumes_v2.VolumeController):
-                     "the latest one of volume %(v_id)s.")
-             raise exc.HTTPBadRequest(explanation=msg % {'s_id': snapshot_id,
-                                                         'v_id': volume.id})
--        if volume.size != l_snap.volume_size:
--            msg = _("Can't revert volume %(v_id)s to its latest snapshot "
--                    "%(s_id)s. The volume size must be equal to the snapshot "
--                    "size.")
--            raise exc.HTTPBadRequest(explanation=msg % {'s_id': snapshot_id,
--                                                        'v_id': volume.id})
-         try:
-             msg = 'Reverting volume %(v_id)s to snapshot %(s_id)s.'
-             LOG.info(msg, {'v_id': volume.id,
-diff --git a/tox.ini b/tox.ini
-index c2eb0cb..aa2bcc5 100644
---- a/tox.ini
-+++ b/tox.ini
-@@ -19,7 +19,7 @@ setenv = VIRTUAL_ENV={envdir}
- usedevelop = True
- install_command = pip install {opts} {packages}
- 
--deps = -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+deps = -c{toxinidir}/../requirements/upper-constraints.txt
-         -r{toxinidir}/test-requirements.txt
-         -r{toxinidir}/requirements.txt
- 
-@@ -126,7 +126,7 @@ commands = {posargs}
- 
- [testenv:docs]
- deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+  -c{toxinidir}/../requirements/upper-constraints.txt
-   -r{toxinidir}/requirements.txt
-   -r{toxinidir}/doc/requirements.txt
- commands =
