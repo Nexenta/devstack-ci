@@ -335,7 +335,7 @@
           delegate_to: "{{ config.vm.name }}"
 
         - name: Install DevStack Environment
-          shell: "{{ config.ci.base }}/{{ config.devstack.destination }}/stack.sh"
+          shell: "{{ config.ci.base }}/{{ config.ci.destination }}/scripts/stack.sh"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Acquire Backend Lock
