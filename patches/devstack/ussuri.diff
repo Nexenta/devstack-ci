@@ -1,7 +1,18 @@
 diff --git a/functions-common b/functions-common
-index 6be07b4..464a9b4 100644
+index 6be07b42..6eea7c7c 100644
 --- a/functions-common
 +++ b/functions-common
+@@ -527,8 +527,8 @@ function git_clone {
+     local git_clone_flags=""
+ 
+     RECLONE=$(trueorfalse False RECLONE)
+-    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
+-        git_clone_flags="$git_clone_flags --depth $GIT_DEPTH"
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
+     fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
 @@ -536,6 +536,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
@@ -10,6 +21,17 @@ index 6be07b4..464a9b4 100644
          cd $orig_dir
          return
      fi
+@@ -560,8 +561,8 @@ function git_clone {
+                 echo "the project to the \$PROJECTS variable in the job definition."
+                 die $LINENO "Cloning not allowed in this configuration"
+             fi
+-            # '--branch' can also take tags
+-            git_timed clone $git_clone_flags $git_remote $git_dest --branch $git_ref
++            git_clone_flags+=" --branch $git_ref"
++            git_timed clone $git_clone_flags $git_remote $git_dest
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $git_dest
 @@ -590,6 +591,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
@@ -38,7 +60,7 @@ index 6be07b4..464a9b4 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index 69831a5..bd489c1 100644
+index 69831a54..bd489c1f 100644
 --- a/lib/tempest
 +++ b/lib/tempest
 @@ -616,12 +616,7 @@ function configure_tempest {
@@ -70,10 +92,10 @@ index 69831a5..bd489c1 100644
          tox -evenv-tempest -- tempest list-plugins
      fi
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index e140929..e481949 100755
+index 550239a2..08e76372 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -207,9 +207,14 @@ function fixup_suse {
+@@ -216,7 +216,12 @@ function fixup_suse {
      sudo zypper up -y p11-kit ca-certificates-mozilla
  }
  
@@ -82,9 +104,7 @@ index e140929..e481949 100755
 +}
 +
  function fixup_all {
++    fixup_virtualenv
      fixup_keystone
      fixup_ubuntu
      fixup_fedora
-     fixup_suse
-+    fixup_virtualenv
- }
