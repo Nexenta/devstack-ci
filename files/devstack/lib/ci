@@ -5,9 +5,9 @@ function ci_install {
 	local cinder_unit_tests_path='cinder/tests/unit/volume/drivers/nexenta'
 	local manila_drivers_path='manila/share/drivers/nexenta'
 
-	#if [[ "$WSGI_MODE" == "uwsgi" ]]; then
-	#	pip_install uwsgi
-	#fi
+	if [[ "$WSGI_MODE" == "uwsgi" ]]; then
+		pip_install uwsgi
+	fi
 
 	if [[ "$CI_TYPE" == "external" ]]; then
 		return
