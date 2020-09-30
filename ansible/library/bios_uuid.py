@@ -21,7 +21,8 @@ openstack_branches = {
     'rocky':            0xb0,
     'stein':            0xb1,
     'train':            0xb2,
-    'ussuri':           0xb3
+    'ussuri':           0xb3,
+    'victoria':         0xb4
 }
 
 nfs_branches = {

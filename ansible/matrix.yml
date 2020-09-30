@@ -9,6 +9,7 @@ backend:
 
 branch:
   - master
+  - victoria
   - ussuri
   - train
   - stein

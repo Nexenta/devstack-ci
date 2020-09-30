@@ -1,0 +1,16 @@
+diff --git a/cinder/api/openstack/wsgi.py b/cinder/api/openstack/wsgi.py
+index 447d9f1..4661bb8 100644
+--- a/cinder/api/openstack/wsgi.py
++++ b/cinder/api/openstack/wsgi.py
+@@ -51,6 +51,11 @@ _MEDIA_TYPE_MAP = {
+     'application/json': 'json',
+ }
+ 
++if six.PY2:
++    from imp import reload
++    import sys
++    reload(sys)
++    sys.setdefaultencoding('utf-8')
+ 
+ # name of attribute to keep version method information
+ VER_METHOD_ATTR = 'versioned_methods'

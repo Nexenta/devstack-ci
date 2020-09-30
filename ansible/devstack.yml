@@ -336,6 +336,8 @@
 
         - name: Install DevStack Environment
           shell: "{{ config.ci.base }}/{{ config.devstack.destination }}/stack.sh"
+          environment:
+            UPPER_CONSTRAINTS_FILE: "{{ config.ci.base }}/requirements/upper-constraints.txt"
           delegate_to: "{{ config.vm.name }}"
 
         - name: Acquire Backend Lock
