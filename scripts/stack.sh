@@ -15,8 +15,6 @@ typeset _unit _log
 
 source $_source/env.sh
 
-export UPPER_CONSTRAINTS_FILE="$_base/requirements/upper-constraints.txt"
-
 cd $_base/devstack
 
 exec $_base/devstack/stack.sh
