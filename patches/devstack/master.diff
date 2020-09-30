@@ -1,8 +1,19 @@
 diff --git a/functions-common b/functions-common
-index 6595c3de..4a6d1dbd 100644
+index 547f6df0..ac0d70db 100644
 --- a/functions-common
 +++ b/functions-common
-@@ -538,6 +538,7 @@ function git_clone {
+@@ -530,8 +530,8 @@ function git_clone {
+     local git_clone_flags=""
+ 
+     RECLONE=$(trueorfalse False RECLONE)
+-    if [[ "${GIT_DEPTH}" -gt 0 ]]; then
+-        git_clone_flags="$git_clone_flags --depth $GIT_DEPTH"
++    if [[ "$GIT_DEPTH" =~ ^[0-9]+$ ]] && (( GIT_DEPTH > 0 )); then
++        git_clone_flags+=" --depth $GIT_DEPTH"
+     fi
+ 
+     if [[ "$OFFLINE" = "True" ]]; then
+@@ -539,6 +539,7 @@ function git_clone {
          # print out the results so we know what change was used in the logs
          cd $git_dest
          git show --oneline | head -1
@@ -10,7 +21,18 @@ index 6595c3de..4a6d1dbd 100644
          cd $orig_dir
          return
      fi
-@@ -592,6 +593,7 @@ function git_clone {
+@@ -563,8 +564,8 @@ function git_clone {
+                 echo "the project to the \$PROJECTS variable in the job definition."
+                 die $LINENO "Cloning not allowed in this configuration"
+             fi
+-            # '--branch' can also take tags
+-            git_timed clone $git_clone_flags $git_remote $git_dest --branch $git_ref
++            git_clone_flags+=" --branch $git_ref"
++            git_timed clone $git_clone_flags $git_remote $git_dest
+         elif [[ "$RECLONE" = "True" ]]; then
+             # if it does exist then simulate what clone does if asked to RECLONE
+             cd $git_dest
+@@ -593,6 +594,7 @@ function git_clone {
      # print out the results so we know what change was used in the logs
      cd $git_dest
      git show --oneline | head -1
@@ -18,7 +40,7 @@ index 6595c3de..4a6d1dbd 100644
      cd $orig_dir
  }
  
-@@ -1080,7 +1082,8 @@ function apt_get_update {
+@@ -1081,7 +1083,8 @@ function apt_get_update {
      time_start "apt-get-update"
  
      local proxies="http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} no_proxy=${no_proxy:-} "
@@ -28,7 +50,7 @@ index 6595c3de..4a6d1dbd 100644
      if ! timeout 300 sh -c "while ! $update_cmd; do sleep 30; done"; then
          die $LINENO "Failed to update apt repos, we're dead now"
      fi
-@@ -1733,7 +1736,7 @@ function run_phase {
+@@ -1744,7 +1747,7 @@ function run_phase {
              # white listed elements in tree. We want these to move out
              # over time as well, but they are in tree, so we need to
              # manage that.
@@ -38,10 +60,10 @@ index 6595c3de..4a6d1dbd 100644
              extra=$(basename $extra_plugin_file_name)
              if [[ ! ( $exceptions =~ "$extra" ) ]]; then
 diff --git a/lib/tempest b/lib/tempest
-index 0d6bdc9d..6d20d965 100644
+index 9f2ec30c..64bca064 100644
 --- a/lib/tempest
 +++ b/lib/tempest
-@@ -615,12 +615,7 @@ function configure_tempest {
+@@ -614,12 +614,7 @@ function configure_tempest {
          tox -revenv-tempest --notest
      fi
  
@@ -55,7 +77,7 @@ index 0d6bdc9d..6d20d965 100644
  
      # Auth:
      iniset $TEMPEST_CONFIG auth tempest_roles "member"
-@@ -713,12 +708,7 @@ function install_tempest {
+@@ -712,12 +707,7 @@ function install_tempest {
  function install_tempest_plugins {
      pushd $TEMPEST_DIR
      if [[ $TEMPEST_PLUGINS != 0 ]] ; then
@@ -70,10 +92,10 @@ index 0d6bdc9d..6d20d965 100644
          tox -evenv-tempest -- tempest list-plugins
      fi
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index e1409291..3db694b1 100755
+index a3bda2b7..926d70e6 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
-@@ -207,7 +207,12 @@ function fixup_suse {
+@@ -191,7 +191,12 @@ function fixup_suse {
      sudo zypper up -y p11-kit ca-certificates-mozilla
  }
  
