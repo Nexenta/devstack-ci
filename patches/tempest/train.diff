@@ -1,29 +1,17 @@
 diff --git a/tox.ini b/tox.ini
-index effd400..8beab2f 100644
+index effd400..98ed9cc 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -9,7 +9,7 @@ setenv =
-     VIRTUAL_ENV={envdir}
-     OS_TEST_PATH=./tempest/test_discover
- deps =
--    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+    -c{toxinidir}/../requirements/upper-constraints.txt
-     -r{toxinidir}/requirements.txt
- 
- [testenv]
-@@ -22,16 +22,33 @@ setenv =
+@@ -22,7 +22,7 @@ setenv =
      PYTHONWARNINGS=default::DeprecationWarning,ignore::DeprecationWarning:distutils,ignore::DeprecationWarning:site
  passenv = OS_STDOUT_CAPTURE OS_STDERR_CAPTURE OS_TEST_TIMEOUT OS_TEST_LOCK_PATH TEMPEST_CONFIG TEMPEST_CONFIG_DIR http_proxy HTTP_PROXY https_proxy HTTPS_PROXY no_proxy NO_PROXY ZUUL_CACHE_DIR REQUIREMENTS_PIP_LOCATION GENERATE_TEMPEST_PLUGIN_LIST GABBI_TEMPEST_PATH
  usedevelop = True
 -install_command = pip install {opts} {packages}
-+install_command = pip install {opts} -c{toxinidir}/../requirements/upper-constraints.txt {packages}
++install_command = pip install {opts} -c{env:UPPER_CONSTRAINTS_FILE} {packages}
  whitelist_externals = *
  deps =
--    -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+    -c{toxinidir}/../requirements/upper-constraints.txt
-     -r{toxinidir}/requirements.txt
-     -r{toxinidir}/test-requirements.txt
- commands =
+     -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
+@@ -32,6 +32,23 @@ commands =
      find . -type f -name "*.pyc" -delete
      stestr --test-path ./tempest/tests run {posargs}
  
@@ -47,46 +35,3 @@ index effd400..8beab2f 100644
  [testenv:genconfig]
  commands = oslo-config-generator --config-file tempest/cmd/config-generator.tempest.conf
  
-@@ -245,7 +262,7 @@ commands =
- 
- [testenv:venv]
- deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+  -c{toxinidir}/../requirements/upper-constraints.txt
-   -r{toxinidir}/requirements.txt
-   -r{toxinidir}/doc/requirements.txt
- commands = {posargs}
-@@ -260,7 +277,7 @@ commands = {posargs}
- [testenv:docs]
- basepython = python3
- deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+  -c{toxinidir}/../requirements/upper-constraints.txt
-   -r{toxinidir}/requirements.txt
-   -r{toxinidir}/doc/requirements.txt
- commands =
-@@ -279,6 +296,7 @@ commands =
- 
- [testenv:pep8]
- deps =
-+    -c{toxinidir}/../requirements/upper-constraints.txt
-     -r{toxinidir}/test-requirements.txt
-     autopep8
- basepython = python3
-@@ -315,7 +333,7 @@ import-order-style = pep8
- [testenv:releasenotes]
- basepython = python3
- deps =
--  -c{env:UPPER_CONSTRAINTS_FILE:https://releases.openstack.org/constraints/upper/master}
-+  -c{toxinidir}/../requirements/upper-constraints.txt
-   -r{toxinidir}/requirements.txt
-   -r{toxinidir}/doc/requirements.txt
- commands =
-@@ -344,6 +362,7 @@ commands = bash -c "find {toxinidir}/tools    \
- # This also means that pip-check-reqs must be installed separately, outside
- # of the requirements.txt files
- deps = pip_check_reqs
-+       -c{toxinidir}/../requirements/upper-constraints.txt
-        -r{toxinidir}/requirements.txt
- commands=
-     pip-extra-reqs -d --ignore-file=tempest/tests/* tempest
