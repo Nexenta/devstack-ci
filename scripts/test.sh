@@ -65,8 +65,10 @@ ns4_iscsi|ns4_nfs|ns5_iscsi|ns5_nfs|ned_iscsi|exascaler)
 	;;
 esac
 
-if grep -q genopts tox.ini; then
-	tox -e genopts
+if [[ "$_type" == "internal" ]]; then
+	if grep -q genopts tox.ini; then
+		tox -e genopts
+	fi
 fi
 
 tox -e pep8 || true
@@ -93,7 +95,10 @@ exascaler)
 esac
 
 case "$_branch" in
-master|ussuri|train|stein|rocky)
+master)
+	_versions=(py36 py37)
+	;;
+ussuri|train|stein|rocky)
 	_versions=(py27 py36 py37)
 	;;
 queens|pike|ocata|newton)
