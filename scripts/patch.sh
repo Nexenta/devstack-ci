@@ -54,6 +54,12 @@ for _file in requirements.txt test-requirements.txt lower-constraints.txt upper-
 	fi
 done
 
+if [[ "$_project" == "requirements" ]]; then
+	cat >>upper-constraints.txt <<-EOF
+	pip==20.2.2
+	EOF
+fi
+
 if [[ -d $_base/$_ci/files/$_project ]]; then
 	tar -cf - -C $_base/$_ci/files/$_project . | tar -xpvf -
 fi
