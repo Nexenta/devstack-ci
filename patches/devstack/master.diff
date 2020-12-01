@@ -108,16 +108,3 @@ index cd7ee59..f72724b 100755
      fixup_keystone
      fixup_ubuntu
      fixup_fedora
-diff --git a/tools/install_pip.sh b/tools/install_pip.sh
-index f3fd1e2..3b59d2e 100755
---- a/tools/install_pip.sh
-+++ b/tools/install_pip.sh
-@@ -91,7 +91,7 @@ function install_get_pip {
-             die $LINENO "Download of get-pip.py failed"
-         touch $LOCAL_PIP.downloaded
-     fi
--    sudo -H -E python${PYTHON3_VERSION} $LOCAL_PIP
-+    sudo -H -E python${PYTHON3_VERSION} $LOCAL_PIP -c $REQUIREMENTS_DIR/upper-constraints.txt
- }
- 
- 
