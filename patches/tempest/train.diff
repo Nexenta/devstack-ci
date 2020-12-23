@@ -28,7 +28,7 @@ index effd400..98ed9cc 100644
 +    bash -cexu 'find {toxinidir}/.. -mindepth 1 -maxdepth 1 -type d -name *-tempest-plugin | xargs -L1 -rt pip install'
 +    ostestr --no-slowest --serial --concurrency 0 --regex '{posargs}'
 +    bash -cexu 'if [[ ! -e .testrepository && -d .stestr ]]; then ln -s .stestr .testrepository; fi'
-+    bash -cexu 'testr last --subunit >report.sub'
++    bash -cexu 'stestr last --subunit >report.sub'
 +    bash -cexu 'cat report.sub | subunit-trace >report.txt'
 +    subunit2html report.sub report.html
 +
