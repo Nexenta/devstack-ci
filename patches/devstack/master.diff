@@ -1,3 +1,15 @@
+diff --git a/files/debs/general b/files/debs/general
+index d64417f..4bf1ff4 100644
+--- a/files/debs/general
++++ b/files/debs/general
+@@ -28,7 +28,6 @@ pkg-config
+ psmisc
+ python3-dev
+ python3-pip
+-python3-systemd
+ python3-venv
+ tar
+ tcpdump
 diff --git a/functions-common b/functions-common
 index 87d8c64..94f5149 100644
 --- a/functions-common
@@ -92,7 +104,7 @@ index 552e1c2..752b6fb 100644
          tox -evenv-tempest -- tempest list-plugins
      fi
 diff --git a/tools/fixup_stuff.sh b/tools/fixup_stuff.sh
-index 25f7268..f39d734 100755
+index 25f7268..5fe7c13 100755
 --- a/tools/fixup_stuff.sh
 +++ b/tools/fixup_stuff.sh
 @@ -192,7 +192,17 @@ function fixup_ovn_centos {
@@ -104,7 +116,7 @@ index 25f7268..f39d734 100755
 +}
 +
 +function fixup_systemd {
-+    pip_install -U systemd
++    pip_install -U systemd-python
 +}
 +
  function fixup_all {
